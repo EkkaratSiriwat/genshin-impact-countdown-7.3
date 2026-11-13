@@ -714,6 +714,47 @@
   .region-reveal[data-region="nod-krai"] .region-heading h2 { margin-inline-start: 0; }
   .region-info .region-heading { flex-wrap: wrap; row-gap: .25rem; }
 }
+
+.timeline-rail { display: contents; }
+.timeline-arrow { display: none; }
+.region-reveal[data-region="nod-krai"] .timeline-rail {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  flex: 1 0 100%;
+  min-width: 0;
+  gap: .25rem;
+}
+.region-reveal[data-region="nod-krai"] .story-timeline:not([hidden]) {
+  display: flex;
+  max-width: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.region-reveal[data-region="nod-krai"] .story-timeline::before,
+.region-reveal[data-region="nod-krai"] .story-timeline::after { content: none; }
+.region-reveal[data-region="nod-krai"] .story-point {
+  flex: 0 0 44px;
+  scroll-snap-align: start;
+  background: linear-gradient(#e4dafa9e, #e4dafa9e) center / 100% 1px no-repeat;
+}
+.region-reveal[data-region="nod-krai"] .story-point:first-child { background-position: right center; background-size: 50% 1px; }
+.region-reveal[data-region="nod-krai"] .story-point:last-child { background-position: left center; background-size: 50% 1px; }
+.region-reveal[data-region="nod-krai"] .timeline-arrow {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #eee4ff;
+  font: 1.65rem/1 system-ui;
+  text-shadow: 0 0 9px #c6b1ff;
+  cursor: pointer;
+}
+.timeline-arrow:disabled { opacity: .3; cursor: default; }
+.timeline-arrow:focus-visible { outline: 1px solid #e3d8f8; }
 </style>
 </head>
 <body>
@@ -732,7 +773,11 @@
       <div class="region-info">
         <div class="region-heading">
           <h2 id="region-title" lang="en"></h2>
-          <div class="story-timeline" role="group" aria-label="ไทม์ไลน์เรื่องราว" hidden></div>
+          <div class="timeline-rail">
+            <button class="timeline-arrow" type="button" aria-label="เลื่อนไทม์ไลน์ไปทางซ้าย" aria-controls="story-timeline">‹</button>
+            <div class="story-timeline" id="story-timeline" role="group" aria-label="ไทม์ไลน์เรื่องราว" hidden></div>
+            <button class="timeline-arrow" type="button" aria-label="เลื่อนไทม์ไลน์ไปทางขวา" aria-controls="story-timeline">›</button>
+          </div>
         </div>
         <div aria-live="polite">
           <div class="region-story-heading">
@@ -1750,6 +1795,19 @@
     const regionInfo = document.querySelector(".region-info");
     const regionTitle = document.querySelector("#region-title");
     const storyTimeline = document.querySelector(".story-timeline");
+    const timelineArrows = [...document.querySelectorAll(".timeline-arrow")];
+    function updateTimelineArrows() {
+      timelineArrows[0].disabled = storyTimeline.scrollLeft <= 1;
+      timelineArrows[1].disabled = storyTimeline.scrollLeft + storyTimeline.clientWidth >= storyTimeline.scrollWidth - 1;
+    }
+    timelineArrows.forEach((arrow, i) => arrow.addEventListener("click", () => {
+      const distance = Math.max(44, Math.floor(storyTimeline.clientWidth / 44) * 44);
+      storyTimeline.scrollBy({left: i === 0 ? -distance : distance,
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"});
+    }));
+    storyTimeline.addEventListener("scroll", updateTimelineArrows, {passive: true});
+    new ResizeObserver(updateTimelineArrows).observe(storyTimeline);
+
     const storyTitle = document.querySelector("#region-story-title");
     const regionEpithet = document.querySelector("#region-epithet");
     const regionDescription = document.querySelector("#region-description");
@@ -2165,6 +2223,7 @@ function hideRegion(next) {
       regionReveal.hidden = false;
       regionTitle.textContent = star.textContent.trim();
       storyTimeline.replaceChildren();
+      storyTimeline.scrollLeft = 0;
       storyTimeline.hidden = !activeRegion.stories?.length;
       storyTimeline.toggleAttribute("data-long", (activeRegion.stories?.length ?? 0) >= 8);
       if (!storyTimeline.hidden) {
@@ -2181,6 +2240,7 @@ function hideRegion(next) {
         }
       }
       showRegionChapter(0);
+      updateTimelineArrows();
       selectedStar.setAttribute("aria-expanded", "true");
     }
 
