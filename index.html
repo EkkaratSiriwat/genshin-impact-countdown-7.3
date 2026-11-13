@@ -698,6 +698,8 @@
     mask-image: radial-gradient(ellipse closest-side, #000 52%, #000b 76%, transparent 100%);
   }
   .region-vision .region-video { transform: none; }
+  /* The 720px Mondstadt opening contains 88px letterbox bars on both edges. */
+  .region-vision .region-video[src$="/mondstadt-overview.mp4"] { transform: scale(1.33); }
   .region-reveal[data-corner][data-region] .region-info {
     position: relative;
     inset: auto;
