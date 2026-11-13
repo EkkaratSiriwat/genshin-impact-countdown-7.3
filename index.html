@@ -618,6 +618,23 @@
     padding: max(4.25rem, calc(env(safe-area-inset-top) + 3.75rem)) 1rem max(1rem, env(safe-area-inset-bottom));
   }
   .scene > .plate { top: 0; }
+  .scene:has(.region-reveal[hidden]) {
+    align-content: stretch;
+    grid-template-rows: auto auto 1fr auto;
+    row-gap: .65rem;
+  }
+  .scene:has(.region-reveal[hidden]) > .clock {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+  }
+  .scene:has(.region-reveal[hidden]) > footer {
+    grid-row: 4;
+    padding-bottom: .75rem;
+  }
+  .scene:has(.region-reveal[hidden]) .region-stars {
+    width: min(100%, 14rem);
+  }
   .scene:has(.region-reveal:not([hidden])) { align-content: start; }
   .scene > h1, .scene > .clock, .scene > footer {
     position: relative;
