@@ -606,51 +606,36 @@
 @keyframes city-moonlight { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 
 
-/* Stack the city media and story around the countdown on narrow screens. */
+/* Keep the mobile controls in place while revealing city content. */
 @media (max-width: 680px) {
   .scene {
+    --mobile-top: max(4.25rem, calc(env(safe-area-inset-top) + 3.75rem));
+    --mobile-bottom: max(1rem, env(safe-area-inset-bottom));
+    --mobile-gap: .65rem;
+    --half-digits: calc(var(--timer-width) * .08875);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto auto auto auto auto;
-    align-content: space-between;
+    grid-template-rows: auto auto 1fr auto;
     justify-items: center;
-    row-gap: clamp(.75rem, 2svh, 1.25rem);
-    padding: max(4.25rem, calc(env(safe-area-inset-top) + 3.75rem)) 1rem max(1rem, env(safe-area-inset-bottom));
+    row-gap: var(--mobile-gap);
+    min-height: max(100svh, 560px);
+    padding: var(--mobile-top) 1rem var(--mobile-bottom);
   }
   .scene > .plate { top: 0; }
-  .scene:has(.region-reveal[hidden]) {
-    align-content: stretch;
-    grid-template-rows: auto auto 1fr auto;
-    row-gap: .65rem;
-  }
-  .scene:has(.region-reveal[hidden]) > .clock {
-    grid-area: auto;
-    position: absolute;
-    inset: 50% auto auto 50%;
-    transform: translate(-50%, -50%);
-  }
-  .scene:has(.region-reveal[hidden]) > footer {
-    grid-row: 4;
-    padding-bottom: .75rem;
-  }
-  .scene:has(.region-reveal:not([hidden])) { align-content: start; }
-  .scene > h1, .scene > .clock, .scene > footer {
+  .scene > h1, .scene > footer {
     position: relative;
     inset: auto;
-    transform: none;
     grid-column: 1;
   }
-  .scene > h1 { grid-row: 1; }
-  .scene > .clock { grid-row: 4; z-index: 1; }
-  .scene:has(.region-reveal:not([hidden])) .units {
-    position: static;
-    margin-top: .6rem;
+  .scene > h1 { grid-row: 1; line-height: 1.5rem; }
+  .scene > .clock {
+    position: absolute;
+    grid-area: auto;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
   }
-  .scene:has(.region-reveal:not([hidden])) .digit-trails {
-    bottom: auto;
-    height: auto;
-  }
-  .scene > footer { grid-row: 6; }
+  .scene > footer { grid-row: 4; padding-bottom: .75rem; }
   .region-stars:not([hidden]) {
     grid-area: 2 / 1;
     display: grid;
@@ -675,22 +660,13 @@
     box-shadow: inset 0 0 0 1px #ddd1fa88;
   }
   .region-stars .star-name { display: none; }
-  .region-reveal:not([hidden]) {
-    position: relative;
-    inset: auto;
-    grid-area: 3 / 1 / 6 / 2;
-    display: grid;
-    grid-template-rows: subgrid;
-    width: min(100%, 34rem);
-  }
+  .region-reveal:not([hidden]) { grid-area: auto; }
   .region-reveal[data-corner] .region-vision {
-    position: relative;
-    inset: auto;
-    grid-row: 1;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    transform: none;
+    position: absolute;
+    inset: auto auto calc(50% + var(--half-digits) + .85rem) 50%;
+    width: min(calc(100% - 2rem), 34rem);
+    height: min(calc(50% - var(--half-digits) - var(--mobile-top) - 92px - 1.5rem - 3 * var(--mobile-gap) - .85rem), calc((100vw - 2rem) * .5625));
+    transform: translateX(-50%);
     -webkit-mask-image: radial-gradient(ellipse closest-side, #000 52%, #000b 76%, transparent 100%);
     mask-image: radial-gradient(ellipse closest-side, #000 52%, #000b 76%, transparent 100%);
   }
@@ -698,13 +674,12 @@
   /* The 720px Mondstadt opening contains 88px letterbox bars on both edges. */
   .region-vision .region-video[src$="/mondstadt-overview.mp4"] { transform: scale(1.33); }
   .region-reveal[data-corner][data-region] .region-info {
-    position: relative;
-    inset: auto;
-    grid-row: 3;
-    width: 100%;
-    max-height: none;
-    overflow: visible;
-    transform: none;
+    position: absolute;
+    inset: calc(50% + var(--half-digits) + 2.25rem) auto auto 50%;
+    width: min(calc(100% - 2rem), 34rem);
+    max-height: calc(50% - var(--half-digits) - 2.25rem - var(--mobile-bottom) - 4.75rem);
+    overflow: auto;
+    transform: translateX(-50%);
     padding: .75rem .85rem;
     border-radius: .6rem;
     background: #171422e6;
