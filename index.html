@@ -587,8 +587,8 @@
   position: absolute;
   left: var(--lightning-x);
   top: var(--lightning-y);
-  width: clamp(38px, 8vw, 108px);
-  height: clamp(80px, 19vh, 240px);
+  width: clamp(65px, 16vh, 190px);
+  height: clamp(130px, 32vh, 380px);
   transform: translate(-50%, -100%);
   fill: none;
   stroke: #eee8ff;
@@ -1941,8 +1941,6 @@ function startInazumaLightning(layer) {
   bolt.setAttribute("class", "lightning-bolt");
   bolt.setAttribute("viewBox", "0 0 60 120");
   bolt.setAttribute("preserveAspectRatio", "xMidYMax meet");
-  const line = document.createElementNS(ns, "polyline");
-  bolt.append(line);
   layer.append(flash, bolt);
 
   const active = () => layer.isConnected && !layer.classList.contains("is-leaving");
@@ -1956,14 +1954,24 @@ function startInazumaLightning(layer) {
       setTimeout(() => {
         if (!active()) return;
         const x = Math.random() * 100;
-        const y = hasBolt ? 23 + Math.random() * 74 : Math.random() * 100;
+        const y = hasBolt ? 38 + Math.random() * 59 : Math.random() * 100;
         const brightness = .14 + Math.random() * .27;
         layer.style.setProperty("--lightning-x", x + "%");
         layer.style.setProperty("--lightning-y", y + "%");
         flash.animate([{opacity: 0}, {opacity: brightness, offset: .18}, {opacity: 0}], 160);
         if (hasBolt) {
-          const points = Array.from({length: 7}, (_, j) => `${12 + Math.random() * 36},${j * 17}`);
-          line.setAttribute("points", [...points, "30,120"].join(" "));
+          const count = 2 + Math.floor(Math.random() * 3);
+          const lines = Array.from({length: count}, (_, index) => {
+            const line = document.createElementNS(ns, "polyline");
+            const center = 9 + index * 42 / (count - 1);
+            const points = Array.from({length: 8}, (_, step) => {
+              const x = Math.max(1, Math.min(59, center + (Math.random() - .5) * 14));
+              return x + "," + step * 17;
+            });
+            line.setAttribute("points", [...points, "30,120"].join(" "));
+            return line;
+          });
+          bolt.replaceChildren(...lines);
           bolt.animate([{opacity: 0}, {opacity: brightness * 1.8, offset: .18}, {opacity: 0}], 150);
         }
       }, delay);
