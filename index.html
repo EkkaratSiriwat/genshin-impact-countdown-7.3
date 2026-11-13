@@ -645,6 +645,14 @@
   }
   .scene > h1 { grid-row: 1; }
   .scene > .clock { grid-row: 4; z-index: 1; }
+  .scene:has(.region-reveal:not([hidden])) .units {
+    position: static;
+    margin-top: .6rem;
+  }
+  .scene:has(.region-reveal:not([hidden])) .digit-trails {
+    bottom: auto;
+    height: auto;
+  }
   .scene > footer { grid-row: 6; }
   .region-stars:not([hidden]) {
     grid-area: 2 / 1;
