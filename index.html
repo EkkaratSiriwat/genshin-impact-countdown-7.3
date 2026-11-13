@@ -1228,7 +1228,7 @@
     });
 
     const dayTest = document.querySelector(".day-test");
-    dayTest.hidden = false;
+    dayTest.hidden = true;
     dayTest.addEventListener("click", () => {
       if (clockEntrance || dayTransition) return;
       const currentDay = previousDisplay.split(":")[0];
