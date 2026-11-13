@@ -1748,6 +1748,8 @@
     let selectedStar;
     let activeRegion;
     let obscuredStars = [];
+    const mobileStarGrid = matchMedia("(max-width: 680px)");
+    mobileStarGrid.addEventListener("change", () => setObscuredStar(selectedStar?.dataset.hideStar));
     let nextRegion;
     let imageRevealVersion = 0;
     let regionArtworkCrop;
@@ -1767,7 +1769,7 @@
 
     function setObscuredStar(regionsToHide = "") {
       for (const star of obscuredStars) star.hidden = false;
-      const ids = regionsToHide.split(" ");
+      const ids = mobileStarGrid.matches ? [] : regionsToHide.split(" ");
       obscuredStars = starButtons.filter(star => ids.includes(star.dataset.region));
       for (const star of obscuredStars) star.hidden = true;
     }
@@ -2189,7 +2191,7 @@ function hideRegion(next) {
     const starEntranceStep = 100;
 
     function animateStarEntrance(star, viewportSize, delay) {
-      const origin = matchMedia("(max-width: 680px)").matches ? "" : "translate(-50%, -50%) ";
+      const origin = mobileStarGrid.matches ? "" : "translate(-50%, -50%) ";
       const order = starEntranceOrder.indexOf(star.textContent.trim());
       const stagger = order * starEntranceStep;
       const angle = Math.random() * Math.PI * 2;
