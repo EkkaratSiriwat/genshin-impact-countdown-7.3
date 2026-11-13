@@ -577,19 +577,25 @@
   100% { transform: translate3d(var(--particle-drift), -105vh, 0) rotate(var(--particle-turn)); opacity: 0; }
 }
 .city-atmosphere[data-effect="inazuma"] { z-index: -1; }
-.city-atmosphere[data-effect="inazuma"]::before {
-  content: "";
+.lightning-flash {
   position: absolute;
   inset: 0;
   opacity: 0;
-  background: radial-gradient(ellipse at var(--lightning-x, 75%) var(--lightning-y, 12%), #cbd4ff55, #9682e722 40%, transparent 75%);
-  animation: city-lightning 3.5s linear infinite;
+  background: radial-gradient(ellipse at var(--lightning-x) var(--lightning-y), #cbd4ff55, #9682e722 40%, transparent 75%);
 }
-@keyframes city-lightning {
-  0%, 39%, 46%, 100% { opacity: 0; }
-  40% { opacity: .252; }
-  41.5% { opacity: .06; }
-  43% { opacity: .408; }
+.lightning-bolt {
+  position: absolute;
+  left: var(--lightning-x);
+  top: var(--lightning-y);
+  width: clamp(38px, 8vw, 108px);
+  height: clamp(80px, 19vh, 240px);
+  transform: translate(-50%, -100%);
+  fill: none;
+  stroke: #eee8ff;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px #a58aff);
+  opacity: 0;
 }
 .city-atmosphere[data-effect="nod-krai"]:not(.is-leaving) {
   transition: opacity 1.5s ease-in-out;
@@ -1927,6 +1933,47 @@ function addWindParticles(layer) {
   }
   requestAnimationFrame(draw);
 }
+function startInazumaLightning(layer) {
+  const flash = document.createElement("div");
+  flash.className = "lightning-flash";
+  const ns = "http://www.w3.org/2000/svg";
+  const bolt = document.createElementNS(ns, "svg");
+  bolt.setAttribute("class", "lightning-bolt");
+  bolt.setAttribute("viewBox", "0 0 60 120");
+  bolt.setAttribute("preserveAspectRatio", "xMidYMax meet");
+  const line = document.createElementNS(ns, "polyline");
+  bolt.append(line);
+  layer.append(flash, bolt);
+
+  const active = () => layer.isConnected && !layer.classList.contains("is-leaving");
+  function runCycle() {
+    if (!active()) return;
+    const count = 2 + Math.floor(Math.random() * 4);
+    const strike = Math.floor(Math.random() * count);
+    let delay = 450 + Math.random() * 350;
+    for (let i = 0; i < count; i++) {
+      const hasBolt = i === strike;
+      setTimeout(() => {
+        if (!active()) return;
+        const x = Math.random() * 100;
+        const y = hasBolt ? 23 + Math.random() * 74 : Math.random() * 100;
+        const brightness = .14 + Math.random() * .27;
+        layer.style.setProperty("--lightning-x", x + "%");
+        layer.style.setProperty("--lightning-y", y + "%");
+        flash.animate([{opacity: 0}, {opacity: brightness, offset: .18}, {opacity: 0}], 160);
+        if (hasBolt) {
+          const points = Array.from({length: 7}, (_, j) => `${12 + Math.random() * 36},${j * 17}`);
+          line.setAttribute("points", [...points, "30,120"].join(" "));
+          bolt.animate([{opacity: 0}, {opacity: brightness * 1.8, offset: .18}, {opacity: 0}], 150);
+        }
+      }, delay);
+      delay += 210 + Math.random() * 320;
+    }
+    setTimeout(runCycle, 3500);
+  }
+  runCycle();
+}
+
 function startCityAtmosphere(index) {
   stopCityAtmosphere();
   const id = cityEffectIds[index];
@@ -1975,17 +2022,8 @@ function startCityAtmosphere(index) {
     }
   }
   if (id === "nod-krai") layer.style.opacity = "0";
-  if (id === "inazuma") {
-    const moveLightning = () => {
-      layer.style.setProperty("--lightning-x", `${Math.random() * 100}%`);
-      layer.style.setProperty("--lightning-y", `${Math.random() * 100}%`);
-    };
-    moveLightning();
-    layer.addEventListener("animationiteration", event => {
-      if (event.animationName === "city-lightning") moveLightning();
-    });
-  }
   regionReveal.before(layer);
+  if (id === "inazuma") startInazumaLightning(layer);
   if (id === "mondstadt") addWindParticles(layer);
   if (id === "nod-krai") {
     // Commit the transparent state before starting the entrance transition.
