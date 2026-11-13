@@ -745,83 +745,198 @@
       overflow: hidden;
       pointer-events: none;
       isolation: isolate;
-      background: radial-gradient(ellipse at center, #292944, #10101d 72%);
+      background: radial-gradient(ellipse at center, #323854 0%, #1b2038 52%, #10101d 100%);
       animation: opening-reveal 4s linear both;
     }
-    .opening-halo, .opening-burst, .opening-scan, .opening-star {
+    .opening-optics, .opening-satellites, .opening-rays,
+    .opening-streaks, .opening-star, .opening-flare, .opening-scan {
       position: absolute;
     }
-    .opening-halo {
-      width: min(68vmin, 26rem);
+    .opening-optics {
+      width: 76vmin;
       aspect-ratio: 1;
       border-radius: 50%;
-      border: 1px solid #c3b5ff75;
-      box-shadow: 0 0 1.5rem #7e8dff66, inset 0 0 2rem #b39bff55;
-      background: conic-gradient(from 25deg, #89acff25, transparent, #dc8dff44, transparent, #91cbff44, transparent, #89acff25);
-      animation: opening-halo 4s ease-out both;
+      background:
+        conic-gradient(from 55deg, #9b65fd, #79e4ff, #83eea0, #ffb16f, #dd6988, #9b65fd);
+      mask-image: radial-gradient(transparent 49%, #0003 55%, #000 58%, #0002 62%, #000 65%, transparent 71%);
+      animation: opening-optics 4s ease-out both;
+    }
+    .opening-satellites {
+      width: 84vmin;
+      height: 94vmin;
+      animation: opening-satellites 4s ease-out both;
+    }
+    .opening-satellites > i {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 2.6vmin;
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      background: #f5faff;
+      clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%);
+    }
+    .opening-rays, .opening-streaks, .opening-scan, .opening-flare { inset: 0; }
+    .opening-rays > i {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--length);
+      height: var(--weight);
+      transform-origin: left center;
+      background: linear-gradient(90deg, transparent, var(--tint) 48%, #f9f7ff 82%, transparent);
+      clip-path: polygon(0 49%, 100% 0, 100% 100%);
+      animation: opening-ray 4s linear both;
+    }
+    .opening-streaks > i {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      height: var(--length);
+      width: var(--weight);
+      background: linear-gradient(transparent, var(--tint) 38%, #f2edff 80%, transparent);
+      box-shadow: 0 0 8px var(--tint);
+      animation: opening-streak 4s linear both;
     }
     .opening-star {
-      width: min(27vmin, 10rem);
-      fill: #f8f5ff;
-      filter: drop-shadow(0 0 12px #bdb8ff);
-      animation: opening-star 4s cubic-bezier(.25,.55,.4,1) both;
+      width: 62vmin;
+      height: 83vmin;
+      overflow: visible;
+      filter: drop-shadow(0 0 1.3vmin #c0d6ff);
+      animation: opening-star 4s linear both;
     }
-    .opening-burst {
-      inset: 0;
-      background: radial-gradient(ellipse at center, #fff1cf9c, #e3c8ff32 32%, transparent 67%);
-      animation: opening-burst 4s ease-in-out both;
+    .opening-flare {
+      background: radial-gradient(ellipse at center, #fff9df, #ffdca880 17%, #e5b0ff3b 40%, transparent 72%);
+      animation: opening-flare 4s linear both;
     }
     .opening-scan {
-      inset: 0;
-      background: repeating-linear-gradient(90deg, transparent 0 7px, #ded5ff65 8px 9px, transparent 11px 23px);
+      background:
+        repeating-linear-gradient(90deg, transparent 0 2.1vw, #e5d9ffb5 2.2vw 2.35vw, transparent 2.55vw 4.1vw),
+        repeating-linear-gradient(90deg, #191b30 0 1.1vw, #8790ab 1.3vw 1.45vw, #24263a 1.6vw 2.9vw, #c9cde2 3vw 3.2vw);
       animation: opening-scan 4s linear both;
     }
-    @media (prefers-reduced-motion: reduce) {
-      .opening-sequence { animation-timing-function: ease-out; }
-      .opening-halo, .opening-star { animation: opening-still 4s linear both; }
-      .opening-burst, .opening-scan { display: none; }
-    }
-    @keyframes opening-still {
-      0% { opacity: 0; }
-      25%, 85% { opacity: .85; }
-      100% { opacity: 0; }
-    }
     @keyframes opening-reveal {
-      0%, 87% { opacity: 1; }
+      0%, 90% { opacity: 1; }
       100% { opacity: 0; }
     }
-    @keyframes opening-halo {
-      0% { opacity: 0; transform: scale(.45) rotate(-40deg); }
-      30% { opacity: .8; }
-      78% { opacity: .7; }
-      100% { opacity: 0; transform: scale(2.3) rotate(45deg); }
+    @keyframes opening-optics {
+      0% { opacity: 0; transform: scale(.4) rotate(-40deg); }
+      25% { opacity: .58; transform: scale(1) rotate(5deg); }
+      66% { opacity: .32; transform: scale(.85) rotate(45deg); }
+      81% { opacity: .75; transform: scale(1.5) rotate(62deg); }
+      92%, 100% { opacity: 0; transform: scale(2.6) rotate(70deg); }
+    }
+    @keyframes opening-satellites {
+      0% { opacity: 0; transform: scale(1.1); filter: drop-shadow(0 0 14px #d1e6ff); }
+      15%, 32% { opacity: .95; }
+      55%, 100% { opacity: 0; transform: scale(.66); }
+    }
+    @keyframes opening-ray {
+      0%, 9% { opacity: 0; transform: rotate(var(--angle)) scaleX(.22); }
+      27% { opacity: var(--strength); transform: rotate(var(--angle)) scaleX(1); }
+      53% { opacity: .06; transform: rotate(calc(var(--angle) + 10deg)) scaleX(.55); }
+      76% { opacity: var(--strength); transform: rotate(calc(var(--angle) + 16deg)) scaleX(1.24); }
+      88%, 100% { opacity: 0; transform: rotate(calc(var(--angle) + 20deg)) scaleX(1.65); }
+    }
+    @keyframes opening-streak {
+      0%, 17% { opacity: 0; transform: translateY(var(--from)); }
+      40%, 69% { opacity: var(--strength); }
+      84%, 100% { opacity: 0; transform: translateY(var(--to)); }
     }
     @keyframes opening-star {
-      0% { opacity: 0; transform: scale(.18); }
-      28% { opacity: 1; transform: scale(.85); }
-      67% { opacity: 1; transform: scale(1.12); }
-      82% { opacity: 1; transform: scale(2.6); }
-      94%, 100% { opacity: 0; transform: scale(5); }
+      0% { opacity: 0; transform: scale(.23); }
+      19% { opacity: 1; transform: scale(.43); }
+      42% { opacity: 1; transform: scale(.76); }
+      58% { transform: scale(.77) rotate(-5deg); }
+      72% { transform: scale(.96) rotate(3deg); }
+      83% { opacity: 1; transform: scale(1.7); }
+      91%, 100% { opacity: 0; transform: scale(4); }
     }
-    @keyframes opening-burst {
-      0%, 61% { opacity: 0; transform: scale(.4); }
-      81% { opacity: .74; transform: scale(1.35); }
-      100% { opacity: 0; transform: scale(2.3); }
+    @keyframes opening-flare {
+      0%, 61% { opacity: 0; transform: scale(.45); }
+      76% { opacity: .46; }
+      83% { opacity: .79; transform: scale(1.55); }
+      91%, 100% { opacity: 0; transform: scale(2); }
     }
     @keyframes opening-scan {
-      0%, 80% { opacity: 0; transform: scaleY(.3); }
-      90% { opacity: .5; }
-      100% { opacity: 0; transform: scaleY(1.2); }
+      0%, 83% { opacity: 0; transform: scaleX(.9); }
+      89%, 91% { opacity: .85; transform: scaleX(1.05); }
+      100% { opacity: 0; transform: scaleX(1.18); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .opening-optics, .opening-rays, .opening-streaks,
+      .opening-flare, .opening-scan, .opening-satellites { display: none; }
+      .opening-star { animation: opening-still 4s linear both; }
+    }
+    @keyframes opening-still {
+      0%, 100% { opacity: 0; }
+      25%, 85% { opacity: .85; }
     }
 </style>
 </head>
 <body>
   <div class="opening-sequence" aria-hidden="true" hidden>
-    <div class="opening-halo"></div>
-    <svg class="opening-star" viewBox="0 0 100 100">
-      <path d="M50 0C54 37 60 44 100 50C60 56 54 63 50 100C46 63 40 56 0 50C40 44 46 37 50 0Z"/>
+    <div class="opening-optics"></div>
+    <div class="opening-satellites">
+      <i style="--x:21%;--y:26%"></i><i style="--x:48%;--y:6%"></i>
+      <i style="--x:79%;--y:28%"></i><i style="--x:23%;--y:76%"></i>
+      <i style="--x:63%;--y:90%"></i>
+    </div>
+    <div class="opening-streaks">
+      <i style="--x:2%;--y:0%;--length:6vh;--weight:2px;--tint:#aabaff;--strength:0.26;--from:-25vh;--to:18vh"></i>
+      <i style="--x:39%;--y:23%;--length:17vh;--weight:1px;--tint:#cba6ff;--strength:0.57;--from:24vh;--to:-19vh"></i>
+      <i style="--x:76%;--y:46%;--length:28vh;--weight:1px;--tint:#fddbad;--strength:0.40;--from:-25vh;--to:18vh"></i>
+      <i style="--x:16%;--y:69%;--length:7vh;--weight:2px;--tint:#9fddff;--strength:0.71;--from:24vh;--to:-19vh"></i>
+      <i style="--x:53%;--y:92%;--length:18vh;--weight:1px;--tint:#aabaff;--strength:0.53;--from:-25vh;--to:18vh"></i>
+      <i style="--x:90%;--y:21%;--length:29vh;--weight:1px;--tint:#cba6ff;--strength:0.35;--from:24vh;--to:-19vh"></i>
+      <i style="--x:30%;--y:44%;--length:8vh;--weight:2px;--tint:#fddbad;--strength:0.67;--from:-25vh;--to:18vh"></i>
+      <i style="--x:67%;--y:67%;--length:19vh;--weight:1px;--tint:#9fddff;--strength:0.48;--from:24vh;--to:-19vh"></i>
+      <i style="--x:7%;--y:90%;--length:30vh;--weight:1px;--tint:#aabaff;--strength:0.30;--from:-25vh;--to:18vh"></i>
+      <i style="--x:44%;--y:19%;--length:9vh;--weight:2px;--tint:#cba6ff;--strength:0.62;--from:24vh;--to:-19vh"></i>
+      <i style="--x:81%;--y:42%;--length:20vh;--weight:1px;--tint:#fddbad;--strength:0.44;--from:-25vh;--to:18vh"></i>
+      <i style="--x:21%;--y:65%;--length:31vh;--weight:1px;--tint:#9fddff;--strength:0.26;--from:24vh;--to:-19vh"></i>
+      <i style="--x:58%;--y:88%;--length:10vh;--weight:2px;--tint:#aabaff;--strength:0.57;--from:-25vh;--to:18vh"></i>
+      <i style="--x:95%;--y:17%;--length:21vh;--weight:1px;--tint:#cba6ff;--strength:0.40;--from:24vh;--to:-19vh"></i>
+      <i style="--x:35%;--y:40%;--length:32vh;--weight:1px;--tint:#fddbad;--strength:0.71;--from:-25vh;--to:18vh"></i>
+      <i style="--x:72%;--y:63%;--length:11vh;--weight:2px;--tint:#9fddff;--strength:0.53;--from:24vh;--to:-19vh"></i>
+      <i style="--x:12%;--y:86%;--length:22vh;--weight:1px;--tint:#aabaff;--strength:0.35;--from:-25vh;--to:18vh"></i>
+      <i style="--x:49%;--y:15%;--length:33vh;--weight:1px;--tint:#cba6ff;--strength:0.67;--from:24vh;--to:-19vh"></i>
+      <i style="--x:86%;--y:38%;--length:12vh;--weight:2px;--tint:#fddbad;--strength:0.48;--from:-25vh;--to:18vh"></i>
+      <i style="--x:26%;--y:61%;--length:23vh;--weight:1px;--tint:#9fddff;--strength:0.30;--from:24vh;--to:-19vh"></i>
+      <i style="--x:63%;--y:84%;--length:34vh;--weight:1px;--tint:#aabaff;--strength:0.62;--from:-25vh;--to:18vh"></i>
+      <i style="--x:3%;--y:13%;--length:13vh;--weight:2px;--tint:#cba6ff;--strength:0.44;--from:24vh;--to:-19vh"></i>
+      <i style="--x:40%;--y:36%;--length:24vh;--weight:1px;--tint:#fddbad;--strength:0.26;--from:-25vh;--to:18vh"></i>
+      <i style="--x:77%;--y:59%;--length:35vh;--weight:1px;--tint:#9fddff;--strength:0.57;--from:24vh;--to:-19vh"></i>
+      <i style="--x:17%;--y:82%;--length:14vh;--weight:2px;--tint:#aabaff;--strength:0.40;--from:-25vh;--to:18vh"></i>
+    </div>
+    <div class="opening-rays">
+      <i style="--angle:0deg;--length:46vmax;--weight:2px;--tint:#aabaff;--strength:0.17"></i>
+      <i style="--angle:32deg;--length:63vmax;--weight:9px;--tint:#cba6ff;--strength:0.56"></i>
+      <i style="--angle:49deg;--length:80vmax;--weight:2px;--tint:#fddbad;--strength:0.34"></i>
+      <i style="--angle:66deg;--length:97vmax;--weight:9px;--tint:#9fddff;--strength:0.72"></i>
+      <i style="--angle:83deg;--length:48vmax;--weight:2px;--tint:#aabaff;--strength:0.50"></i>
+      <i style="--angle:100deg;--length:65vmax;--weight:9px;--tint:#cba6ff;--strength:0.28"></i>
+      <i style="--angle:117deg;--length:82vmax;--weight:2px;--tint:#fddbad;--strength:0.67"></i>
+      <i style="--angle:134deg;--length:99vmax;--weight:9px;--tint:#9fddff;--strength:0.45"></i>
+      <i style="--angle:166deg;--length:50vmax;--weight:2px;--tint:#aabaff;--strength:0.23"></i>
+      <i style="--angle:183deg;--length:67vmax;--weight:9px;--tint:#cba6ff;--strength:0.61"></i>
+      <i style="--angle:200deg;--length:84vmax;--weight:2px;--tint:#fddbad;--strength:0.39"></i>
+      <i style="--angle:217deg;--length:101vmax;--weight:9px;--tint:#9fddff;--strength:0.17"></i>
+      <i style="--angle:234deg;--length:52vmax;--weight:2px;--tint:#aabaff;--strength:0.56"></i>
+      <i style="--angle:251deg;--length:69vmax;--weight:9px;--tint:#cba6ff;--strength:0.34"></i>
+      <i style="--angle:268deg;--length:86vmax;--weight:2px;--tint:#fddbad;--strength:0.72"></i>
+      <i style="--angle:285deg;--length:103vmax;--weight:9px;--tint:#9fddff;--strength:0.50"></i>
+      <i style="--angle:317deg;--length:54vmax;--weight:2px;--tint:#aabaff;--strength:0.28"></i>
+      <i style="--angle:334deg;--length:71vmax;--weight:9px;--tint:#cba6ff;--strength:0.67"></i>
+      <i style="--angle:351deg;--length:88vmax;--weight:2px;--tint:#fddbad;--strength:0.45"></i>
+    </div>
+    <div class="opening-flare"></div>
+    <svg class="opening-star" viewBox="0 0 180 240">
+      <path fill="#111528" d="M90 0C96 101 103 111 180 120C103 129 96 139 90 240C84 139 77 129 0 120C77 111 84 101 90 0Z"/>
+      <path fill="#fff9ff" d="M90 20C93 104 99 116 171 120C99 124 93 136 90 220C87 136 81 124 9 120C81 116 87 104 90 20Z"/>
+      <path fill="#4e587a" d="M90 79C92 109 99 116 121 120C99 124 92 131 90 161C88 131 81 124 59 120C81 116 88 109 90 79Z"/>
+      <path fill="#fff" d="M90 99Q92 118 109 120Q92 122 90 141Q88 122 71 120Q88 118 90 99Z"/>
     </svg>
-    <div class="opening-burst"></div>
     <div class="opening-scan"></div>
   </div>
   <main class="scene">
