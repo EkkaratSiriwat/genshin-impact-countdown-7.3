@@ -1955,7 +1955,7 @@ function startInazumaLightning(layer) {
         if (!active()) return;
         const x = Math.random() * 100;
         const y = hasBolt ? 38 + Math.random() * 59 : Math.random() * 100;
-        const brightness = .14 + Math.random() * .27;
+        const brightness = (.14 + Math.random() * .27) * .6;
         layer.style.setProperty("--lightning-x", x + "%");
         layer.style.setProperty("--lightning-y", y + "%");
         flash.animate([{opacity: 0}, {opacity: brightness, offset: .18}, {opacity: 0}], 160);
