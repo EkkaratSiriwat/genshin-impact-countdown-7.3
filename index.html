@@ -1449,7 +1449,19 @@
     music.addEventListener("playing", syncMusic);
     music.addEventListener("pause", syncMusic);
     music.addEventListener("error", syncMusic);
+    const musicGesture = new AbortController();
+    const startMusicOnGesture = event => {
+      if (!event.isTrusted || musicToggle.contains(event.target)) return;
+      if (music.paused) playMusic();
+    };
+    const gestureOptions = {capture: true, signal: musicGesture.signal};
+    document.addEventListener("click", startMusicOnGesture, gestureOptions);
+    document.addEventListener("keydown", startMusicOnGesture, gestureOptions);
+    music.addEventListener("playing", () => musicGesture.abort(), {once: true});
+    music.addEventListener("error", () => musicGesture.abort(), {once: true});
+
     musicToggle.addEventListener("click", () => {
+      musicGesture.abort();
       if (music.paused) playMusic();
       else music.pause();
     });
