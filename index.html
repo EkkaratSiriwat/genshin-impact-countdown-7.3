@@ -440,7 +440,11 @@
       letter-spacing: .07em;
     }
     @media (width > 680px) {
-      .units { font-size: clamp(.5625rem, max(.53vw, .94vh), .75rem); }
+      .units {
+        top: calc(100% + .6rem - 2px);
+        font-size: clamp(.5625rem, max(.53vw, .94vh), .75rem);
+      }
+      .units > :last-child { translate: 1px 0; }
     }
     footer {
       position: absolute;
