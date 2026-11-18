@@ -439,6 +439,9 @@
       font-size: clamp(.7rem, .9vw, .85rem);
       letter-spacing: .07em;
     }
+    @media (width > 680px) {
+      .units { font-size: clamp(.5625rem, max(.53vw, .94vh), .75rem); }
+    }
     footer {
       position: absolute;
       bottom: max(5svh, env(safe-area-inset-bottom));
