@@ -8,6 +8,8 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22a%22%20x2%3D%220%22%20y2%3D%221%22%20gradientUnits%3D%22objectBoundingBox%22%3E%3Cstop%20stop-color%3D%22%23fff%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b9a7e5%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20fill%3D%22url(%23a)%22%20stroke%3D%22%23817497%22%20stroke-width%3D%22.55%22%20stroke-linejoin%3D%22round%22%20d%3D%22M16%207c1.2%205%202.2%206%206.3%207.2-4.1%201.2-5.1%202.3-6.3%207.1-1.2-4.8-2.2-5.9-6.3-7.1C13.8%2013%2014.8%2012%2016%207ZM2%2021c2.4-2.5%207.1-4.2%209.6-4.6.4%201.2%201%202%201.8%202.7-4.9.5-8.1%201.4-9.7%202.5.4.6%201%201%201.6%201.3C3.5%2022.7%202.4%2022%202%2021Zm28%200c-2.4-2.5-7.1-4.2-9.6-4.6-.4%201.2-1%202-1.8%202.7%204.9.5%208.1%201.4%209.7%202.5-.4.6-1%201-1.6%201.3%201.8-.2%202.9-.9%203.3-1.9Z%22%2F%3E%3C%2Fsvg%3E">
   <style>
     :root {
+      --constellation-size: clamp(86px, 9vw, 138px);
+      --constellation-scale: 1;
       color-scheme: dark;
       font-family: "Atkinson Hyperlegible Next", "Leelawadee UI", Tahoma, sans-serif;
       background: #14141b;
@@ -132,7 +134,7 @@
       --star-mask: radial-gradient(ellipse closest-side, #000 24%, #000b 56%, transparent);
       position: absolute;
       inset: 50% auto auto 50%;
-      width: clamp(86px, 9vw, 138px);
+      width: var(--constellation-size);
       aspect-ratio: 1;
       transform: translate(-50%, -50%);
       background-image: var(--star-art);
@@ -621,6 +623,7 @@
 
 /* Keep the mobile controls in place while revealing city content. */
 @media (max-width: 680px) {
+  :root { --constellation-scale: .5; }
   .scene {
     --mobile-top: max(4.25rem, calc(env(safe-area-inset-top) + 3.75rem));
     --mobile-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -666,7 +669,7 @@
     transform: none;
   }
   .region-stars .region-star .star-glyph {
-    transform: translate(-50%, -50%) scale(.5);
+    transform: translate(-50%, -50%) scale(var(--constellation-scale));
   }
   .region-stars .region-star[aria-expanded="true"] {
     border-radius: 50%;
@@ -758,6 +761,1016 @@
     @media (prefers-reduced-motion: reduce) {
       .opening-sequence { transition: none; }
     }
+
+
+    .scene .region-stars .region-star {
+      opacity: var(--star-scroll-opacity, 1);
+      --star-scroll-transform: translate(
+        calc(var(--star-scatter-distance, 0px) * var(--star-scatter-x, 0)),
+        calc(var(--star-scatter-distance, 0px) * var(--star-scatter-y, 0))
+      );
+      transform: translate(-50%, -50%) var(--star-scroll-transform);
+    }
+    @media (max-width: 680px) {
+      .scene .region-stars .region-star {
+        transform: var(--star-scroll-transform);
+      }
+    }
+    .successor-hall {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 100svh;
+      overflow: hidden;
+      isolation: isolate;
+      padding: 1.5rem;
+      background: linear-gradient(90deg, #171e2c, #11121a 24%, #11121a 76%, #171e2c);
+    }
+    .successor-hall-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+    }
+    .successor-hall-art,
+    .successor-hall-atmosphere {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 53% center;
+    }
+    .hall-tower-dusk,
+    .hall-tower-bloom {
+      position: absolute;
+      inset: 0;
+    }
+    .hall-tower-dusk {
+      background: radial-gradient(ellipse 49% 52% at 54% 15%, #101321f5 6%, #131629c4 42%, transparent 100%);
+    }
+    .hall-tower-bloom {
+      opacity: 0;
+      background: radial-gradient(ellipse 39% 46% at 54% 16%, #ffcf753b, #ec974622 47%, transparent 100%);
+    }
+    .successor-hall::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0 0 auto;
+      height: clamp(10rem, 39svh, 28rem);
+      pointer-events: none;
+      background: linear-gradient(90deg, #171e2c, #11121a 24%, #11121a 76%, #171e2c);
+      mask-image: linear-gradient(to bottom, #000 0%, #000f 7%, #000c 30%, #0005 64%, transparent);
+    }
+    .successor-hall::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: radial-gradient(ellipse at center, #10111b9c, #10111b00 58%);
+    }
+    .successor-hall h2 {
+      margin: 0;
+      position: relative;
+      isolation: isolate;
+      z-index: 1;
+      color: #fff6e6;
+      font-size: clamp(1.5rem, 3vw, 3.25rem);
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: center;
+      text-shadow: 0 2px 16px #0b0c19, 0 2px 5px #0b0c19;
+    }
+    .successor-hall h2[data-heading-reveal] {
+      opacity: 0;
+    }
+    .successor-hall h2[data-heading-reveal="visible"] {
+      opacity: 1;
+      transition: opacity .6s ease-out;
+    }
+    .successor-hall :is(h2,.celestia-reply-copy)::before,
+    .successor-hall :is(h2,.celestia-reply-copy)::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: -70% -12%;
+      pointer-events: none;
+    }
+    .successor-hall :is(h2,.celestia-reply-copy)::before {
+      inset: -80% -20%;
+      mask-image: radial-gradient(ellipse closest-side, #000 36%, #000d 57%, #0005 82%, transparent 100%);
+      background:
+        radial-gradient(ellipse 40% 43% at 36% 53%, #6676da95, transparent 100%),
+        radial-gradient(ellipse 48% 36% at 60% 64%, #7e57d174, transparent 100%),
+        radial-gradient(ellipse 34% 28% at 63% 73%, #7fc5ef68, transparent 100%),
+        radial-gradient(ellipse 22% 30% at 79% 68%, #c07fd769, transparent 100%);
+      opacity: .85;
+      translate: var(--heading-haze-x, 0%) var(--heading-haze-y, 0%);
+      transition: translate 7.5s ease-in-out;
+    }
+    .successor-hall :is(h2,.celestia-reply-copy)::after {
+      background:
+        radial-gradient(circle at 10% 49%, #ccbeff76 1px, transparent 2px),
+        radial-gradient(circle at 14% 67%, #d4c3ff9c .8px, transparent 2px),
+        radial-gradient(circle at 19% 43%, #fbf0ffbc 1.2px, transparent 2.6px),
+        radial-gradient(circle at 22% 72%, #88b9ff96 1px, transparent 2.3px),
+        radial-gradient(circle at 26% 60%, #e7dfffad .8px, transparent 2px),
+        radial-gradient(circle at 31% 69%, #c3abf7b5 1px, transparent 2.4px),
+        radial-gradient(circle at 35% 37%, #bcb0f778 1px, transparent 2px),
+        radial-gradient(circle at 40% 76%, #e5ddff9c 1px, transparent 2px),
+        radial-gradient(circle at 45% 67%, #b0b8ff98 .8px, transparent 2px),
+        radial-gradient(circle at 53% 32%, #ded4ff7a .7px, transparent 2px),
+        radial-gradient(circle at 56% 73%, #b6deffa8 1px, transparent 2px),
+        radial-gradient(circle at 62% 65%, #e2cbff8a .8px, transparent 2px),
+        radial-gradient(circle at 67% 77%, #e3d6ffbb 1px, transparent 2.6px),
+        radial-gradient(circle at 71% 44%, #c3c6ff91 .8px, transparent 2px),
+        radial-gradient(circle at 75% 66%, #f0dcffc9 1.2px, transparent 2.8px),
+        radial-gradient(circle at 80% 57%, #b997fea8 .8px, transparent 2px),
+        radial-gradient(circle at 84% 70%, #c9bcff98 1px, transparent 2.2px),
+        radial-gradient(circle at 88% 44%, #ecdfffad .8px, transparent 2px);
+      animation: heading-haze-drift 11s ease-in-out -3s infinite alternate-reverse;
+    }
+    .heading-constellations {
+      position: absolute;
+      z-index: -1;
+      left: 50%;
+      top: 50%;
+      width: min(calc(100vw - 1rem), calc(100% + 10rem));
+      height: calc(100% + 5rem);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    @keyframes heading-haze-drift {
+      from { transform: translate(-1%, 2%) scale(.98); opacity: .7; }
+      to { transform: translate(2%, -4%) scale(1.05); opacity: 1; }
+    }
+    @supports (animation-timeline: view()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .successor-hall { view-timeline-name: --successor-hall; }
+        .successor-hall-backdrop {
+          animation: successor-hall-arrive linear both;
+          animation-timeline: --successor-hall;
+          animation-range: entry;
+        }
+        @keyframes successor-hall-arrive {
+          from { transform: translateY(-4%) scale(1.09); }
+          to { transform: translateY(0) scale(1.09); }
+        }
+      }
+    }
+
+    .gnosis-display {
+      position: absolute;
+      inset: 0;
+      translate: 0 30px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      pointer-events: none;
+    }
+    .gnosis-slot {
+      position: absolute;
+      top: var(--piece-y);
+      left: var(--piece-x);
+      transform: translate(-50%, -50%);
+    }
+    .gnosis-piece {
+      display: block;
+      height: clamp(3.5rem, 13svh, 7.8rem);
+      aspect-ratio: 292 / 520;
+      background: url("assets/gnosis-sprites.png") var(--sprite-x) 51.4706% / 743.8356% 139.2308% no-repeat;
+    }
+    .gnosis-piece {
+      --float-distance: clamp(10px, 1.85svh, 18px);
+      rotate: var(--piece-tilt);
+      animation: gnosis-hover var(--float-period) ease-in-out var(--float-phase) infinite;
+    }
+    .gnosis-slot:first-child .gnosis-piece {
+      mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2231%20105%20292%20520%22%3E%3Cpath%20fill%3D%22white%22%20fill-rule%3D%22evenodd%22%20d%3D%22M%2031%20105%20H%20323%20V%20625%20H%2031%20Z%20M%20163%20202%20C%20142%20204%20126%20217%20119%20232%20C%20112%20247%20112%20262%20118%20274%20Q%20122%20264%20134%20256%20C%20130%20248%20129%20238%20135%20233%20C%20141%20227%20150%20227%20158%20231%20Q%20164%20217%20166%20203%20Z%20M%20189%20202%20C%20204%20203%20219%20209%20229%20223%20C%20239%20237%20242%20257%20237%20273%20Q%20231%20263%20222%20255%20C%20227%20244%20224%20235%20217%20231%20Q%20207%20226%20196%20232%20Q%20192%20220%20185%20203%20Z%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% no-repeat;
+    }
+    @keyframes gnosis-hover {
+      0%, 100% { translate: 0 calc(-1 * var(--float-distance)); }
+      50% { translate: 0 var(--float-distance); }
+    }
+    @media (max-width: 680px) {
+      .successor-hall h2 { align-self: start; margin-top: 29svh; }
+      .gnosis-display {
+        inset: 48% 7% 6%;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: start;
+        justify-content: center;
+        row-gap: clamp(.5rem, 2svh, 1rem);
+      }
+      .gnosis-slot {
+        position: static;
+        flex: 0 0 25%;
+        transform: none;
+      }
+      .gnosis-piece {
+        height: clamp(2.8rem, 13svh, 6rem);
+        margin-inline: auto;
+      }
+    }
+
+    .gnosis-trigger {
+      display: block;
+      padding: 0;
+      margin-inline: auto;
+      border: 0;
+      border-radius: .75rem;
+      background: none;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .gnosis-halo {
+      display: block;
+      filter: drop-shadow(0 2px 7px var(--piece-light));
+      transition: filter .22s ease-out;
+    }
+    .gnosis-trigger:hover .gnosis-halo {
+      filter: drop-shadow(0 0 14px var(--piece-light)) drop-shadow(0 0 8px var(--piece-light));
+    }
+    .gnosis-trigger:focus-visible {
+      outline: 2px solid transparent;
+      outline-offset: 5px;
+    }
+    .gnosis-trigger:focus-visible .gnosis-halo {
+      filter: drop-shadow(0 0 7px #f5deb4) drop-shadow(0 0 13px var(--piece-light));
+    }
+    @media (forced-colors: active) {
+      .gnosis-trigger:focus-visible { outline-color: Highlight; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gnosis-halo { transition: none; }
+    }
+    .character-picker {
+      --element-accent: #e2c491;
+      width: min(calc(100% - 2rem), 144svh, 92rem);
+      max-width: none;
+      max-height: calc(100svh - 1.25rem);
+      padding: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      color: #f7f1eb;
+      border: 1px solid color-mix(in srgb, var(--element-accent) 55%, #343d54);
+      border-radius: clamp(1rem, 1.8vw, 1.6rem);
+      background: #101727;
+      box-shadow: 0 20px 80px #060810c9;
+    }
+    .character-picker::backdrop { background: #070a16ac; }
+    body:has(.character-picker[open]) { overflow: hidden; }
+    .character-picker-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: clamp(.75rem, 2.3svh, 1.45rem) clamp(.8rem, 3vw, 2.25rem) 0;
+    }
+    .character-picker-header h3 {
+      display: flex;
+      align-items: center;
+      gap: .55em;
+      margin: 0;
+      font-size: clamp(1.1rem, 2.9vw, 2.15rem);
+      line-height: 1.2;
+    }
+    .character-picker-header h3 span span { color: var(--element-accent); }
+    .character-element-icon { display: block; width: 1.08em; height: 1.08em; object-fit: contain; }
+    .character-picker-header::after {
+      content: "";
+      position: absolute;
+      left: clamp(.8rem, 3vw, 2.25rem);
+      bottom: -.55rem;
+      width: min(33%, 25rem);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--element-accent) 16%, transparent);
+      opacity: .55;
+    }
+    .character-picker-control {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 2.55rem;
+      height: 2.55rem;
+      padding: 0;
+      border: 0;
+      border-radius: .4rem;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+    .character-picker-control:hover:not(:disabled) { background: #ffffff11; }
+    .character-picker-control:disabled { opacity: .28; cursor: default; }
+    .character-picker-control::before,
+    .character-profile-date dd::before,
+    .character-rating i {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      flex: 0 0 1em;
+      background: currentColor;
+      mask: var(--picker-icon) center / contain no-repeat;
+    }
+    .character-picker-close { --picker-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-x-lg%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20d%3D%22M2.146%202.854a.5.5%200%201%201%20.708-.708L8%207.293l5.146-5.147a.5.5%200%200%201%20.708.708L8.707%208l5.147%205.146a.5.5%200%200%201-.708.708L8%208.707l-5.146%205.147a.5.5%200%200%201-.708-.708L7.293%208z%22%2F%3E%0A%3C%2Fsvg%3E"); font-size: 1.25rem; }
+    .character-rail-arrow { --picker-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-chevron-right%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M4.646%201.646a.5.5%200%200%201%20.708%200l6%206a.5.5%200%200%201%200%20.708l-6%206a.5.5%200%200%201-.708-.708L10.293%208%204.646%202.354a.5.5%200%200%201%200-.708%22%2F%3E%0A%3C%2Fsvg%3E"); font-size: 1.18rem; }
+    .character-rail-arrow[data-direction="-1"]::before { rotate: 180deg; }
+    .character-picker button:focus-visible {
+      outline: 2px solid var(--element-accent);
+      outline-offset: 2px;
+    }
+    .character-profile {
+      position: relative;
+      overflow: clip;
+      background: radial-gradient(ellipse 58% 78% at 70% 50%, color-mix(in srgb, var(--element-accent) 13%, #131c32), transparent 85%);
+    }
+    .character-profile-details {
+      display: grid;
+      grid-template-columns: minmax(0, 35fr) minmax(0, 65fr);
+      align-items: center;
+      min-height: calc(min(63svh, 38rem) * .9);
+      padding: 1rem clamp(1.4rem, 5vw, 4.75rem) 1.15rem;
+      padding-inline-start: calc(clamp(1.4rem, 5vw, 4.75rem) + 3.25rem);
+    }
+    .character-elements {
+      position: absolute;
+      z-index: 2;
+      inset: 50% auto auto clamp(.75rem, 2.3vw, 2rem);
+      translate: 0 -50%;
+      display: grid;
+      gap: min(.45rem, 1svh);
+    }
+    .character-elements button {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: clamp(1.45rem, 6svh, 2.8rem);
+      aspect-ratio: 1;
+      border: 1px solid #ffffff24;
+      border-radius: 50%;
+      background: #121827;
+      color: #fff;
+      cursor: pointer;
+    }
+    .character-elements img { width: 65%; }
+    .character-elements button:is(:hover, [aria-pressed="true"]) {
+      border-color: var(--element-color);
+      background: color-mix(in srgb, var(--element-color) 24%, #121827);
+    }
+    .character-elements [data-filled="true"] {
+      border-color: var(--element-color);
+      box-shadow: 0 0 .6rem color-mix(in srgb, var(--element-color) 33%, transparent);
+    }
+    .character-elements [data-filled="true"] img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .character-profile-details[hidden], .character-profile-hint[hidden] { display: none; }
+    .character-profile-hint { min-height: 12rem; margin: 0; display: grid; place-items: center; color: #c7c2d6; }
+    .character-profile-copy { z-index: 1; min-width: 0; padding-block: .8rem; }
+    .character-profile-art {
+      display: block;
+      width: 106.2%;
+      height: calc(min(58svh, 36rem) * .9);
+      max-width: none;
+      margin-inline-start: -3.1%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .character-profile h4 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4.65vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -.025em;
+      overflow-wrap: anywhere;
+    }
+    .character-profile-title { color: var(--element-accent); margin: .4rem 0 0; font-size: clamp(1rem, 2vw, 1.55rem); }
+    .character-profile dl { display: grid; gap: .55rem; margin: 1.35rem 0 .85rem; font-size: clamp(.95rem, 1.75vw, 1.23rem); }
+    .character-profile dl div, .character-profile dd {
+      display: flex;
+      align-items: center;
+      gap: .55em;
+    }
+    .character-profile dt { color: #c2c7da; font-size: .84em; }
+    .character-profile dd { margin: 0; }
+    .character-profile-date { --picker-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-calendar4%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200a.5.5%200%200%201%20.5.5V1h8V.5a.5.5%200%200%201%201%200V1h1a2%202%200%200%201%202%202v11a2%202%200%200%201-2%202H2a2%202%200%200%201-2-2V3a2%202%200%200%201%202-2h1V.5a.5.5%200%200%201%20.5-.5M2%202a1%201%200%200%200-1%201v1h14V3a1%201%200%200%200-1-1zm13%203H1v9a1%201%200%200%200%201%201h12a1%201%200%200%200%201-1z%22%2F%3E%0A%3C%2Fsvg%3E"); }
+    .character-rating { --picker-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-star-fill%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20d%3D%22M3.612%2015.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173%206.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927%200l2.184%204.327%204.898.696c.441.062.612.636.282.95l-3.522%203.356.83%204.73c.078.443-.36.79-.746.592L8%2013.187l-4.389%202.256z%22%2F%3E%0A%3C%2Fsvg%3E"); color: #edc476; }
+    .character-rating i { width: .93em; height: .93em; flex-basis: .93em; }
+    .character-picker-confirm {
+      width: 100%;
+      margin-top: .4rem;
+      padding: .38rem .18rem;
+      border: 1px solid color-mix(in srgb, var(--element-accent) 64%, transparent);
+      border-radius: .45rem;
+      color: #f7f1eb;
+      background: color-mix(in srgb, var(--element-accent) 16%, #101727);
+      font-family: inherit;
+      font-size: clamp(.68rem, 1vw, .85rem);
+      font-weight: 600;
+      line-height: 1.25;
+      cursor: pointer;
+    }
+    .character-picker-confirm:hover {
+      background: color-mix(in srgb, var(--element-accent) 28%, #101727);
+    }
+    .celestia-reply {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+      align-items: center;
+      padding: clamp(1.25rem, 4svh, 3rem) 0 clamp(4rem, 9svh, 6rem) clamp(2rem, 7vw, 7rem);
+      color: #fff6e6;
+      font-family: Georgia, "Noto Serif Thai", serif;
+      background: linear-gradient(90deg, #141320f7 0%, #1c1828e8 31%, #17172548 70%, #1c18202b);
+      pointer-events: none;
+    }
+    .celestia-reply[hidden], .successor-hall h2[hidden] { display: none; }
+    .celestia-reply-copy {
+      position: relative;
+      isolation: isolate;
+      z-index: 1;
+      width: min(100%, 36rem);
+      text-shadow: 0 2px 12px #11101b;
+      pointer-events: auto;
+    }
+    .celestia-reply-copy::before {
+      opacity: .42;
+      animation: heading-haze-drift 7.5s ease-in-out infinite alternate;
+    }
+    .celestia-reply .heading-constellations { left: 25%; width: min(54vw, 46rem); height: 36%; }
+    .celestia-reply-element {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin: 0 0 .7rem;
+      color: #f4debb;
+      font-size: clamp(1rem, 1.7vw, 1.45rem);
+    }
+    .celestia-reply-element img {
+      width: clamp(1.8rem, 3.5vw, 3.25rem);
+      height: clamp(1.8rem, 3.5vw, 3.25rem);
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px var(--element-accent, #aee3d5));
+    }
+    .celestia-reply-element::after {
+      content: "";
+      width: 4.6rem;
+      height: 1px;
+      background: linear-gradient(90deg, #d0a96a, transparent);
+    }
+    .celestia-reply h3 {
+      margin: 0 0 clamp(.9rem, 3svh, 2rem);
+      font-size: clamp(2.45rem, 6.4vw, 6rem);
+      line-height: 1.08;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    .celestia-reply h3:focus { outline: none; }
+    .celestia-reply figure { margin: 0; }
+    .celestia-reply blockquote {
+      margin: 0;
+      color: #fff0de;
+      font-size: clamp(1rem, 1.65vw, 1.35rem);
+      line-height: 1.65;
+      text-wrap: pretty;
+      overflow-wrap: anywhere;
+    }
+    .celestia-reply figcaption { margin-top: .65rem; color: #eacfa3; }
+    .celestia-reply-art {
+      width: 116%;
+      height: min(86svh, 61rem);
+      margin-left: -10%;
+      object-fit: contain;
+      transform: scale(1.24);
+      filter: drop-shadow(0 0 2rem #a788744a);
+    }
+    .celestia-reply-back {
+      position: absolute;
+      bottom: clamp(1.05rem, 4.6svh, 3rem);
+      left: clamp(2rem, 7vw, 7rem);
+      z-index: 2;
+      padding: .5em 0;
+      border: 0;
+      border-bottom: 1px solid #b9945d;
+      background: transparent;
+      color: #f0d8ae;
+      font: inherit;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .celestia-reply-back:hover { color: #fff6e6; }
+    .celestia-reply-back:focus-visible { outline: 2px solid #f0d8ae; outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) {
+      .celestia-reply-copy::before, .celestia-reply-copy::after { animation: none; }
+    }
+    @media (max-width: 680px) {
+      .celestia-reply {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
+        align-items: end;
+        padding: .25rem 1.2rem 3.4rem;
+        background: linear-gradient(0deg, #141320fa, #1c1828f0 37%, #17172533 82%);
+      }
+      .celestia-reply-art { grid-row: 1; width: 120%; height: 100%; min-height: 0; margin: 0 -10%; transform: none; object-position: center 63%; }
+      .celestia-reply-copy { grid-row: 2; margin-inline: auto; }
+      .celestia-reply-element, .celestia-reply h3 { margin-bottom: .48rem; }
+      .celestia-reply-back { bottom: .8rem; left: 1.2rem; }
+      .celestia-reply .heading-constellations { left: 50%; top: 73%; width: 95%; }
+    }
+    @media (min-width: 681px) {
+      .celestia-reply {
+        width: min(calc(100% - 3rem), 62rem);
+        height: min(84svh, 48rem);
+        margin: auto;
+        padding: 2rem 1rem 4.5rem 2rem;
+        grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+        border-radius: 1rem;
+      }
+      .celestia-reply h3 { font-size: clamp(2.2rem, 4.2vw, 4rem); margin-bottom: 1.2rem; }
+      .celestia-reply-element { font-size: 1.1rem; }
+      .celestia-reply-element img { width: 2.3rem; height: 2.3rem; }
+      .celestia-reply blockquote { font-size: clamp(1rem, 1.2vw, 1.15rem); }
+      .celestia-reply-art { height: min(67svh, 39rem); transform: scale(1.06); }
+      .celestia-reply-back { left: 2rem; bottom: 1.5rem; }
+    }
+    .character-rail {
+      --portrait-gap: .8rem;
+      --portraits-visible: 9;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: .35rem;
+      margin: 0 clamp(.65rem, 2.35vw, 2rem);
+      padding: clamp(.65rem, 2.5svh, 1.3rem) 0 clamp(1.05rem, 3.4svh, 2rem);
+      border-top: 1px solid color-mix(in srgb, var(--element-accent) 32%, transparent);
+    }
+    .character-roster {
+      display: flex;
+      gap: var(--portrait-gap);
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: .2rem;
+      overscroll-behavior-inline: contain;
+      padding: .25rem .2rem;
+    }
+    .character-roster[data-wheel-scrolling] { scroll-snap-type: none; }
+    .character-slot {
+      flex: 0 0 calc((100% - (var(--portraits-visible) - 1) * var(--portrait-gap)) / var(--portraits-visible));
+      min-width: 0;
+      scroll-snap-align: start;
+    }
+    .character-option {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+      min-width: 0;
+      padding: 0 .1rem .7rem;
+      border: 0;
+      border-radius: .25rem;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: clamp(.74rem, 1.4vw, 1.02rem);
+      text-align: center;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+    }
+    .character-option img { display: block; width: 100%; max-height: 13svh; aspect-ratio: 1; object-fit: contain; }
+    .character-option:hover img { filter: brightness(1.15); }
+    .character-option[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      inset: auto 7% 0;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--element-accent);
+    }
+    @media (min-width: 681px) {
+      .character-profile-art { transform: translateY(-.7rem) scale(1.13); }
+      .character-profile-copy { translate: 0 -1.15rem; }
+    }
+    @media (max-width: 900px) { .character-rail { --portraits-visible: 6; } }
+    @media (max-width: 680px) {
+      .character-picker { width: calc(100% - 1rem); max-height: 95svh; }
+      .character-picker-header { padding: .65rem .8rem 0; }
+      .character-picker-header::after { bottom: -.35rem; }
+      .character-profile-details { grid-template-columns: 1fr; min-height: 0; padding: .55rem 1rem .85rem; }
+      .character-elements {
+        position: relative;
+        inset: auto;
+        translate: none;
+        grid-template-columns: repeat(7, auto);
+        justify-content: center;
+        gap: clamp(.15rem, 1.2vw, .45rem);
+        padding: .65rem .5rem .35rem;
+      }
+      .character-elements button { width: clamp(1.75rem, 10vw, 2.5rem); }
+      .character-profile-copy { padding: .1rem 0 0; }
+      .character-profile-art {
+        grid-row: 1;
+        width: 90%;
+        height: calc(clamp(8rem, 33svh, 18rem) * .9);
+        margin: 0 auto;
+      }
+      .character-profile dl { display: flex; flex-wrap: wrap; gap: .3rem .85rem; margin: .75rem 0 .6rem; }
+      .character-rail { --portraits-visible: 4; --portrait-gap: .5rem; gap: .12rem; }
+      .character-rail-arrow { width: 1.8rem; }
+      .character-option img { max-height: 9svh; }
+    }
+
+    .future-light {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.2s ease, background 1.2s ease;
+      background: radial-gradient(ellipse at 70% 30%, #a6e5df36, transparent 62%);
+    }
+    .successor-hall[data-future="hope"] .future-light { opacity: .8; }
+    .successor-hall[data-future="wisdom"] .future-light {
+      opacity: .85;
+      background: radial-gradient(ellipse at 50% 60%, #a391e550, transparent 65%);
+    }
+    .successor-hall[data-future="freedom"] .future-light {
+      opacity: .85;
+      background: radial-gradient(ellipse at 55% 35%, #5fb5d644, transparent 67%);
+    }
+    .successor-hall[data-future="resolve"] .future-light {
+      opacity: .85;
+      background: radial-gradient(ellipse at 65% 25%, #f6be6152, transparent 67%);
+    }
+    .council-progress {
+      position: absolute;
+      top: max(1.25rem, 4svh);
+      left: 50%;
+      translate: -50% 0;
+      z-index: 4;
+      width: min(30rem, calc(100% - 2rem));
+      text-align: center;
+      color: #f3e7cf;
+    }
+    .council-progress p { margin: 0 0 .6rem; font-size: .85rem; letter-spacing: .025em; }
+    .council-seats { display: flex; gap: .6rem; justify-content: center; }
+    .council-seat {
+      display: grid;
+      place-items: center;
+      width: clamp(2.05rem, 4.3vw, 3rem);
+      aspect-ratio: 1;
+      padding: .2rem;
+      border: 1px solid #d8c39155;
+      border-radius: 50%;
+      background: #151827b5;
+      color: #eee4d0;
+      cursor: pointer;
+    }
+    .character-profile-art, .celestia-reply-art {
+      width: 100%;
+      margin-inline: 0;
+      transform: none;
+      transition: opacity .15s ease-out;
+    }
+    .council-seat img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+    .council-seat[data-filled="true"] { border-color: #e9cf8e; box-shadow: 0 0 14px #ebc17a38; }
+    .council-seat:focus-visible, .council-summary:focus-visible { outline: 2px solid #f7e3ac; outline-offset: 4px; }
+    .council-summary, .council-finale-reset {
+      margin-top: .65rem;
+      padding: .45rem .85rem;
+      border: 1px solid #dec48c70;
+      border-radius: .4rem;
+      background: #151827ba;
+      color: #f5dfb7;
+      font: inherit;
+      font-size: .85rem;
+      cursor: pointer;
+    }
+    .council-summary[hidden] { display: none; }
+    .future-vision {
+      margin-top: .9rem;
+      padding-top: .7rem;
+      border-top: 1px solid #dac28f50;
+      color: #e0ddf0;
+      font-family: "Leelawadee UI", Tahoma, sans-serif;
+    }
+    .future-vision h4 { margin: 0 0 .3rem; color: #d6c197; font-size: .8rem; font-weight: 400; }
+    .future-vision p { margin: 0; font-size: clamp(.85rem, 1.05vw, 1rem); line-height: 1.55; }
+    .future-vision-status { display: block; margin-top: .35rem; color: #c5e2d5; font-size: .77rem; }
+    .team-relation[hidden] { display: none; }
+    .team-relation { margin-top: .7rem; }
+    .team-relation h4 { margin: 0 0 .25rem; }
+    @media (max-height: 690px) {
+      .celestia-reply-copy { max-height: 57svh; overflow-y: auto; overscroll-behavior: contain; }
+    }
+    .council-finale {
+      --glyph-size: calc(var(--constellation-size) * var(--constellation-scale));
+      --fusion-duration: 2.5s;
+      --member-transition: .7s cubic-bezier(.22, 1, .36, 1);
+      --member-enter-shift: 2rem;
+      isolation: isolate;
+      width: calc(100% - 2rem);
+      max-width: none;
+      max-height: 93svh;
+      padding: 1rem;
+      border: 0;
+      border-radius: 1.1rem;
+      background: transparent;
+      color: #fff0d5;
+      text-align: center;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+    html:has(.council-finale[open]) { overflow: hidden; }
+    .council-finale::backdrop {
+      background: radial-gradient(
+        ellipse min(27rem, 48vw) min(25rem, 48svh) at center,
+        #363047 0%, #222438 58%, #151a2bc2 78%, transparent 100%
+      );
+      backdrop-filter: blur(3px) brightness(.65);
+    }
+    .council-finale::before {
+      content: "";
+      position: fixed;
+      inset: 3svh .5rem;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 53% 46%, #302d43f5, #202337ed 59%, #131727de);
+      mask-image:
+        linear-gradient(to right, transparent, #000 12% 88%, transparent),
+        linear-gradient(to bottom, transparent, #000 12% 88%, transparent);
+      mask-composite: intersect;
+      opacity: 0;
+      transition: opacity var(--member-transition);
+    }
+    .council-finale[data-member]::before { opacity: 1; }
+    .council-result {
+      width: min(100%, 52rem);
+      margin-inline: auto;
+      transition: transform var(--member-transition), opacity var(--member-transition);
+    }
+    .council-finale[data-member] .council-result {
+      transform: translateX(-8%);
+      opacity: 0;
+    }
+    .council-member-preview {
+      position: absolute;
+      z-index: 2;
+      inset: auto .5rem .5rem;
+      padding: 1.15rem;
+      text-align: left;
+      pointer-events: none;
+      background: radial-gradient(ellipse closest-side, #343246 0%, #1c2032f5 68%, transparent 100%);
+    }
+    .council-member-preview-art {
+      display: block;
+      width: 100%;
+      height: min(22svh, 13rem);
+      object-fit: contain;
+      filter: drop-shadow(0 0 1rem color-mix(in srgb, var(--element-accent) 35%, transparent));
+    }
+    .council-member-preview h4 {
+      margin: .2rem 0 .65rem;
+      font: 500 clamp(1.65rem, 3vw, 3rem)/1.12 Georgia, "Noto Serif Thai", serif;
+      overflow-wrap: anywhere;
+    }
+    .council-member-preview blockquote { margin: 0; line-height: 1.65; }
+    .council-orbit .council-seat img { transition: scale .16s ease, filter .16s ease; }
+    .council-orbit .council-seat:is(:hover, :focus-visible) img { filter: brightness(1.2); }
+    .council-orbit .council-seat:active img { scale: .9; }
+    .council-finale .celestia-reply {
+      --detail-top-fade: clamp(1.5rem, 4svh, 2.5rem);
+      inset: 0 .25rem;
+      width: auto;
+      height: auto;
+      margin: 0;
+      padding: 1.25rem;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+      align-content: safe center;
+      overflow: auto;
+      overscroll-behavior: contain;
+      mask-image: linear-gradient(to bottom, transparent, #000 var(--detail-top-fade));
+      pointer-events: auto;
+      text-align: left;
+      background: transparent;
+      border-radius: 0;
+    }
+    .council-finale[data-member] .celestia-reply:not([hidden]) {
+      animation: council-member-enter var(--member-transition) both;
+    }
+    @keyframes council-member-enter {
+      from { opacity: 0; translate: var(--member-enter-shift) 0; }
+      to { opacity: 1; translate: 0 0; }
+    }
+    .council-finale .celestia-reply-art {
+      grid-area: 1 / 1;
+      width: 100%;
+      height: min(37svh, 22rem);
+      margin: 0;
+      transform: none;
+      object-position: center;
+    }
+    .council-finale .celestia-reply-copy { grid-row: 2; margin: 0; max-height: none; overflow: visible; }
+    .council-finale .celestia-reply h3 { margin-bottom: .75rem; font-size: clamp(1.55rem, 2.1vw, 2.65rem); }
+    .council-finale .celestia-reply-element { margin-bottom: .4rem; font-size: .9rem; }
+    .council-finale .celestia-reply blockquote { font-size: clamp(.86rem, 1vw, 1rem); line-height: 1.5; }
+    .council-finale .celestia-reply figcaption { font-size: .85rem; }
+    .council-finale .future-vision p { font-size: .85rem; }
+    .celestia-reply-close {
+      position: sticky;
+      top: var(--detail-top-fade);
+      grid-area: 1 / 1;
+      align-self: start;
+      justify-self: start;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      width: 2.6rem;
+      aspect-ratio: 1;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #edc476;
+      cursor: pointer;
+    }
+    .celestia-reply-close::before,
+    .celestia-reply-close::after {
+      content: "";
+      grid-area: 1 / 1;
+      width: 132%;
+      height: 2px;
+      border-radius: 1px;
+      background: currentColor;
+      pointer-events: none;
+    }
+    .celestia-reply-close::before { rotate: 45deg; }
+    .celestia-reply-close::after { rotate: -45deg; }
+    .celestia-reply-close:hover { color: #ffe4a6; }
+    .celestia-reply-close:focus-visible { outline: 2px solid #edc476; outline-offset: 3px; }
+    .council-finale .celestia-reply-back { position: static; justify-self: start; margin-top: 1rem; font-size: .85rem; }
+    @media (min-width: 1051px) {
+      .council-finale::before { inset: 8svh 3vw 7svh 9vw; }
+      .council-finale[data-member] .council-result {
+        transform: translateX(-19.5vw);
+        opacity: 1;
+      }
+      .council-member-preview {
+        inset: 8% 1.5% auto auto;
+        width: min(calc((100% - 36rem) / 2 - 1rem), 34rem);
+        padding: clamp(1.15rem, 2.3vw, 2.75rem);
+      }
+      .council-member-preview[data-side="left"] { left: 1.5%; right: auto; }
+      .council-member-preview-art { height: min(32svh, 20rem); }
+      .council-finale .celestia-reply {
+        inset: 0 6.5% 0 auto;
+        width: min(42%, 48rem);
+        padding-inline: clamp(1.5rem, 3vw, 3rem);
+      }
+      .council-finale .celestia-reply-art { height: min(42svh, 25rem); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .council-finale { --member-enter-shift: 0px; }
+      .council-result { transition-property: opacity; }
+      .council-orbit .council-seat img { transition: none; }
+    }
+    .council-orbit {
+      position: relative;
+      width: min(100%, 36rem);
+      aspect-ratio: 1.2;
+      margin-inline: auto;
+      background: radial-gradient(ellipse closest-side, transparent 71%, #e4c58c28 71.4%, transparent 72%);
+    }
+    .vision-fusion[hidden] { display: none; }
+    .vision-fusion {
+      position: absolute;
+      inset: 0;
+      width: min(100%, 54rem);
+      margin-inline: auto;
+      z-index: 2;
+      container-type: size;
+      overflow: hidden;
+      animation: vision-unveil var(--fusion-duration) linear both;
+    }
+    .council-finale:has(.vision-fusion:not([hidden])) > :not(.vision-fusion) {
+      animation: vision-reveal-result var(--fusion-duration) linear both;
+    }
+    .vision-fusion-icon {
+      --radius: max(0px, calc(48cqmin - var(--glyph-size) / 2));
+      --sweep: 1.15turn;
+      --end-angle: calc(var(--start-angle) - var(--sweep));
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      width: var(--glyph-size);
+      aspect-ratio: 1;
+      animation: vision-spiral var(--fusion-duration) linear both;
+    }
+    .vision-fusion-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 .5rem var(--vision-light));
+    }
+    @keyframes vision-spiral {
+      0% {
+        opacity: 1;
+        transform: rotate(var(--start-angle)) translateX(var(--radius)) rotate(calc(0deg - var(--start-angle))) scale(1);
+        animation-timing-function: cubic-bezier(.35, .15, .78, 1);
+      }
+      84%, 100% {
+        transform: rotate(var(--end-angle)) translateX(0px) rotate(calc(0deg - var(--end-angle))) scale(.16);
+      }
+      82% { opacity: 1; }
+      86%, 100% { opacity: 0; }
+    }
+    .vision-fusion-core {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse closest-side, #fff 0%, #fff2cc 13%, #e9daffdc 36%, #c9b8f152 68%, transparent 100%);
+      animation: vision-flash var(--fusion-duration) ease-out both;
+    }
+    @keyframes vision-flash {
+      0%, 83% { opacity: 0; transform: scale(.15); }
+      89% { opacity: var(--flash-opacity, 1); transform: scale(1.08); }
+      100% { opacity: 0; transform: scale(1.24); }
+    }
+    @keyframes vision-unveil {
+      0%, 89% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes vision-reveal-result {
+      0%, 89% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .vision-fusion-status {
+      position: absolute;
+      inset: auto 0 3.7rem;
+      margin: 0;
+      color: #f6e3bc;
+      text-shadow: 0 1px 5px #111623;
+    }
+    .vision-fusion-skip { position: absolute; bottom: 1rem; left: 50%; translate: -50% 0; white-space: nowrap; }
+    .council-orbit .council-seat {
+      position: absolute;
+      left: var(--seat-x);
+      top: var(--seat-y);
+      translate: -50% -50%;
+      width: clamp(2.65rem, 8vw, 4.5rem);
+      overflow: visible;
+    }
+    .council-orbit .council-seat span {
+      position: absolute;
+      top: calc(100% + .18rem);
+      left: 50%;
+      translate: -50% 0;
+      width: 6rem;
+      color: #eee4d8;
+      font-size: .72rem;
+    }
+    .council-title {
+      position: absolute;
+      inset: 36% 24% auto;
+      margin: 0;
+      font-family: Georgia, "Leelawadee UI", serif;
+      font-size: clamp(1.1rem, 3vw, 2rem);
+      line-height: 1.3;
+      text-wrap: balance;
+    }
+    .council-title small { display: block; margin-bottom: .7rem; color: #c9bbd4; font: .75rem "Leelawadee UI", sans-serif; }
+    .council-future, .council-final-quote { max-width: 40rem; margin: .65rem auto; line-height: 1.65; }
+    .council-future { color: #c1c7db; font-size: .92rem; }
+    .council-final-quote { font-size: 1rem; }
+    .council-finale footer { position: static; margin: .6rem 0; color: #e3ca99; font-size: .8rem; }
+    @media (max-width: 680px) {
+      .council-progress { top: 1.15rem; }
+      .council-seats { gap: .5rem; }
+      .celestia-reply { padding-bottom: 3rem; }
+      .celestia-reply-art { max-height: 40svh; }
+      .celestia-reply h3 { font-size: 2rem; }
+      .celestia-reply blockquote { font-size: .95rem; line-height: 1.5; }
+      .future-vision { margin-top: .6rem; padding-top: .5rem; }
+      .council-orbit { width: 100%; aspect-ratio: 1; }
+      .council-title { inset: 35% 23% auto; }
+      .council-finale { padding: .7rem; }
+    }
 </style>
 </head>
 <body>
@@ -843,6 +1856,98 @@
       <a lang="en" href="https://www.youtube.com/watch?v=6gFCnMLSw-Y&amp;t=62s" target="_blank" rel="noopener">Trailer Genshin Impact Patch 7.2</a>
     </footer>
   </main>
+  <section class="successor-hall" id="successors" aria-labelledby="successor-heading">
+    <div class="successor-hall-backdrop" aria-hidden="true">
+      <img class="successor-hall-art" src="assets/successor-hall.png" alt="" decoding="async" loading="lazy">
+      <canvas class="successor-hall-atmosphere" width="1672" height="940"></canvas>
+      <div class="hall-tower-dusk"></div>
+      <div class="hall-tower-bloom"></div>
+    </div>
+    <div class="future-light" aria-hidden="true"></div>
+    <div class="council-progress">
+      <p class="council-count" role="status">เลือกแล้ว 0 / 7 ธาตุ</p>
+      <div class="council-seats" role="group" aria-label="เจ็ดที่นั่งของผู้สืบทอด"></div>
+      <button class="council-summary" type="button" hidden>ดูผู้สืบทอดทั้งเจ็ด</button>
+    </div>
+    <h2 id="successor-heading">โปรดเลือกผู้ครอบครองวิชั่นที่<br>คู่ควรมากที่สุดมาเจ็ดคนให้ครบ 7 ธาตุ</h2>
+    <ul class="gnosis-display" role="list" aria-label="Gnosis ทั้ง 7 ธาตุ">
+    <li class="gnosis-slot" style="--piece-tilt:33deg; --piece-x:9.6%; --piece-y:58%; --sprite-x:1.6489%; --piece-light:#ff784b80; --float-period:5.90s; --float-phase:0.00s"><button class="gnosis-trigger" type="button" data-element="1" aria-label="เลือกตัวละครธาตุไฟ" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:28deg; --piece-x:20%; --piece-y:71.5%; --sprite-x:17.8723%; --piece-light:#ffc76b80; --float-period:6.55s; --float-phase:-0.93s"><button class="gnosis-trigger" type="button" data-element="8" aria-label="เลือกตัวละครธาตุหิน" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:13deg; --piece-x:34.5%; --piece-y:65%; --sprite-x:33.8830%; --piece-light:#5beb9580; --float-period:7.20s; --float-phase:-1.86s"><button class="gnosis-trigger" type="button" data-element="3" aria-label="เลือกตัวละครธาตุไม้" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:-2deg; --piece-x:48%; --piece-y:80%; --sprite-x:50.0532%; --piece-light:#61dfdc80; --float-period:5.90s; --float-phase:-2.79s"><button class="gnosis-trigger" type="button" data-element="7" aria-label="เลือกตัวละครธาตุลม" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:-25deg; --piece-x:60.7%; --piece-y:68%; --sprite-x:65.9574%; --piece-light:#9ddcfd80; --float-period:6.55s; --float-phase:-3.72s"><button class="gnosis-trigger" type="button" data-element="5" aria-label="เลือกตัวละครธาตุน้ำแข็ง" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:-42deg; --piece-x:79.3%; --piece-y:77%; --sprite-x:81.9681%; --piece-light:#669df880; --float-period:7.20s; --float-phase:-4.65s"><button class="gnosis-trigger" type="button" data-element="2" aria-label="เลือกตัวละครธาตุน้ำ" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    <li class="gnosis-slot" style="--piece-tilt:-51deg; --piece-x:89.3%; --piece-y:63%; --sprite-x:98.1915%; --piece-light:#cb7fff80; --float-period:5.90s; --float-phase:-5.58s"><button class="gnosis-trigger" type="button" data-element="4" aria-label="เลือกตัวละครธาตุสายฟ้า" aria-haspopup="dialog" aria-controls="character-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
+    </ul>
+  </section>
+  <dialog class="council-finale" aria-labelledby="council-title">
+    <div class="vision-fusion" hidden>
+      <div class="vision-fusion-core" aria-hidden="true"></div>
+      <p class="vision-fusion-status" id="vision-fusion-status">กำลังรวมวิชั่นทั้งเจ็ด</p>
+      <button class="council-summary vision-fusion-skip" type="button">ข้ามไปดูผลลัพธ์</button>
+    </div>
+    <div class="council-result">
+    <div class="council-orbit">
+      <h3 class="council-title" id="council-title" tabindex="-1"><small>ผู้สืบทอดทั้งเจ็ด</small><span>เจ็ดเสาหลักธาตุผู้ถูกเลือก</span></h3>
+    </div>
+    <p class="council-future"></p>
+    <blockquote class="council-final-quote"></blockquote>
+    <footer>— Nukvah</footer>
+    <button class="council-finale-reset" type="button">เลือกผู้ครองวิชั่นใหม่</button>
+    </div>
+    <aside class="council-member-preview" aria-hidden="true" hidden>
+      <img class="council-member-preview-art" alt="">
+      <p class="celestia-reply-element"><img alt=""><span></span></p>
+      <h4></h4>
+      <blockquote></blockquote>
+    </aside>
+    <section class="celestia-reply" aria-labelledby="celestia-reply-heading" hidden>
+      <button class="celestia-reply-close" type="button" aria-label="ปิดรายละเอียดตัวละคร"></button>
+      <div class="celestia-reply-copy">
+        <p class="celestia-reply-element"><img alt=""><span></span></p>
+        <h3 id="celestia-reply-heading" tabindex="-1"></h3>
+        <figure>
+          <blockquote></blockquote>
+          <figcaption>— Nukvah</figcaption>
+        </figure>
+        <aside class="future-vision" aria-label="นิมิตอนาคต">
+          <h4>นิมิตอนาคต</h4>
+          <p></p>
+          <span class="future-vision-status"></span>
+          <div class="team-relation" hidden>
+            <h4>สายสัมพันธ์ในทีม</h4>
+            <p></p>
+          </div>
+        </aside>
+      </div>
+      <img class="celestia-reply-art" alt="" decoding="async">
+      <button class="celestia-reply-back" type="button">← กลับไปดูผลรวม</button>
+    </section>
+  </dialog>
+  <dialog class="character-picker" id="character-picker" aria-labelledby="character-picker-heading">
+    <header class="character-picker-header">
+      <h3 id="character-picker-heading"><img class="character-element-icon" alt=""><span>ตัวละครธาตุ<span></span></span></h3>
+      <button type="button" class="character-picker-control character-picker-close" aria-label="ปิดรายชื่อตัวละคร"></button>
+    </header>
+    <article class="character-profile">
+      <div class="character-elements" role="group" aria-label="เลือกธาตุ"></div>
+      <p class="character-profile-hint" hidden>ไม่มีตัวละครสำหรับธาตุนี้</p>
+      <div class="character-profile-details" hidden>
+        <div class="character-profile-copy">
+          <h4></h4>
+          <p class="character-profile-title"></p>
+          <dl></dl>
+        </div>
+        <img class="character-profile-art" alt="">
+      </div>
+    </article>
+    <div class="character-rail">
+      <button class="character-picker-control character-rail-arrow" type="button" data-direction="-1" aria-label="เลื่อนรายชื่อไปทางซ้าย" aria-controls="character-roster"></button>
+      <div class="character-roster" id="character-roster" role="group" aria-label="รายชื่อตัวละคร"></div>
+      <button class="character-picker-control character-rail-arrow" type="button" data-direction="1" aria-label="เลื่อนรายชื่อไปทางขวา" aria-controls="character-roster"></button>
+    </div>
+  </dialog>
+
   <script>
     const scheduledUpdate = document.querySelector("footer time");
     const deadline = Date.parse(scheduledUpdate.dateTime);
@@ -1332,12 +2437,17 @@
       if (dayTransition) drawDayTransition(now);
     }
 
+    let countdownMotionVisible = true;
+    new IntersectionObserver(([entry]) => {
+      countdownMotionVisible = entry.isIntersecting;
+    }).observe(scene);
+
     function animate(now) {
       if (previousFrame !== undefined) {
         elapsed = (elapsed + now - previousFrame) % loopDuration;
       }
       previousFrame = now;
-      renderMotion(now);
+      if (countdownMotionVisible && !document.documentElement.hasAttribute('data-page-sliding')) renderMotion(now);
       frame = requestAnimationFrame(animate);
     }
 
@@ -1353,7 +2463,8 @@
     });
     window.addEventListener("pageshow", tick);
     const opening = document.querySelector(".opening-sequence");
-    const playOpening = !document.hidden && !matchMedia("(max-width: 680px)").matches;
+    const isLocalPreview = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+    const playOpening = !isLocalPreview && !document.hidden && !matchMedia("(max-width: 680px)").matches;
     if (playOpening) {
       const scene = document.querySelector(".scene");
       scene.inert = true;
@@ -1714,6 +2825,13 @@
             description: "นักเดินทางกับ Paimon เดินทางไปช่วยแต่ละชาติรับมือภัยพิบัติและติดตามบททดสอบของเหล่าเทพ เมื่ออักขระทั้งหกดับลง ประตูสู่ Celestia ก็เปิดขึ้น นักเดินทางกับเหล่าเทพจึงขึ้นไปเจรจากับกฎแห่งสวรรค์ และได้รู้ว่าแผนรีเซ็ต Teyvat ยังเดินหน้าต่อ",
             heavenlyAwakening: true,
             hideSnow: true
+          },
+          {
+            epithet: "บทที่ 7: ฉากที่ 7",
+            title: "Coming Soon!",
+            description: "???",
+            image: "assets/regions/snezhnaya-act-seven.png",
+            alt: "ประตูท่ามกลางเสาหินและหมู่เมฆ"
           }
         ]
       },
@@ -2356,7 +3474,8 @@ function hideRegion(next) {
     const starEntranceStep = 100;
 
     function animateStarEntrance(star, viewportSize, delay) {
-      const origin = mobileStarGrid.matches ? "" : "translate(-50%, -50%) ";
+      const anchor = mobileStarGrid.matches ? "" : "translate(-50%, -50%) ";
+      const origin = anchor + "var(--star-scroll-transform) ";
       const order = starEntranceOrder.indexOf(star.textContent.trim());
       const stagger = order * starEntranceStep;
       const angle = Math.random() * Math.PI * 2;
@@ -2404,5 +3523,971 @@ function hideRegion(next) {
     });
     regionInfo.addEventListener("scroll", positionSelectedStar);
   </script>
+
+<script>
+  {
+    const countdownScene = document.querySelector('.scene');
+    const stars = [...countdownScene.querySelectorAll('.region-star')];
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const turn = Math.PI * 2;
+    const startAngle = Math.random() * turn;
+    const directions = stars.map((_, i) => startAngle + (i + Math.random() * .65) * turn / stars.length);
+    for (let i = directions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [directions[i], directions[j]] = [directions[j], directions[i]];
+    }
+    stars.forEach((star, index) => {
+      const radius = .72 + Math.random() * .28;
+      star.style.setProperty('--star-scatter-x', Math.cos(directions[index]) * radius);
+      star.style.setProperty('--star-scatter-y', Math.sin(directions[index]) * radius);
+    });
+    let scrollFrame = 0;
+    function starSpread(offset) {
+      const progress = Math.min(1, Math.max(0, offset / (innerHeight * .52)));
+      const reach = Math.min(210, innerWidth * .18, innerHeight * .26);
+      return (1 - (1 - progress) ** 2) * reach * (motionPreference.matches ? .55 : 1);
+    }
+
+    function updateStarScroll() {
+      scrollFrame = 0;
+      if (pageSliding) return;
+      countdownScene.style.setProperty('--star-scatter-distance', `${starSpread(window.scrollY)}px`);
+      countdownScene.style.setProperty('--star-scroll-opacity', 1 - Math.min(1, Math.max(0, window.scrollY / (innerHeight * .52))));
+      const light = hallLightAt(successorHall.getBoundingClientRect().top);
+      towerDusk.style.opacity = 1 - light;
+      towerBloom.style.opacity = light;
+    }
+    function scheduleStarScroll() {
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(updateStarScroll);
+    }
+    window.addEventListener('scroll', scheduleStarScroll, { passive: true });
+    window.addEventListener('resize', scheduleStarScroll);
+    motionPreference.addEventListener('change', scheduleStarScroll);
+
+    const successorHall = document.querySelector('#successors');
+    const characterPicker = document.querySelector('#character-picker');
+    let lastWheel = -Infinity;
+    let pageSliding = false;
+    const pageScrollDuration = 800;
+    const backdrop = successorHall.querySelector('.successor-hall-backdrop');
+    const towerDusk = backdrop.querySelector('.hall-tower-dusk');
+    const towerBloom = backdrop.querySelector('.hall-tower-bloom');
+
+    function hallLightAt(hallTop) {
+      return Math.max(0, Math.min(1, 1 - hallTop / innerHeight));
+    }
+
+    updateStarScroll();
+
+    async function scrollBetweenPages(destination) {
+      const origin = window.scrollY;
+      const delta = destination - origin;
+      const hallTop = successorHall.getBoundingClientRect().top + origin;
+      const sourceLight = hallLightAt(hallTop - origin);
+      const targetLight = hallLightAt(hallTop - destination);
+      const anchor = innerWidth <= 680 ? '' : 'translate(-50%, -50%) ';
+      const transition = { duration: pageScrollDuration, easing: 'ease', fill: 'both' };
+      const lightTransition = { ...transition, duration: 600 };
+      pageSliding = true;
+      document.documentElement.setAttribute('data-page-sliding', '');
+      const slide = [{ transform: 'translateY(0px)' }, { transform: `translateY(${-delta}px)` }];
+      const slideAnimations = [
+        countdownScene.animate(slide, transition),
+        successorHall.animate(slide, transition),
+        towerDusk.animate([{ opacity: 1 - sourceLight }, { opacity: 1 - targetLight }], lightTransition),
+        towerBloom.animate([{ opacity: sourceLight }, { opacity: targetLight }], lightTransition),
+        ...stars.map(star => {
+          const x = Number(star.style.getPropertyValue('--star-scatter-x'));
+          const y = Number(star.style.getPropertyValue('--star-scatter-y'));
+          return star.animate([0, .25, .5, .75, 1].map(offset => {
+            const distance = starSpread(origin + offset * delta);
+            const opacity = 1 - Math.min(1, Math.max(0, (origin + offset * delta) / (innerHeight * .52)));
+            return { offset, opacity, transform: anchor + `translate(${x * distance}px, ${y * distance}px)` };
+          }), transition);
+        }),
+      ];
+      if (CSS.supports('animation-timeline: view()') && !motionPreference.matches) {
+        const backdropTransform = scrollY => {
+          const appearance = hallLightAt(hallTop - scrollY);
+          return `translateY(${-4 * (1 - appearance)}%) scale(1.09)`;
+        };
+        slideAnimations.push(backdrop.animate([
+          { transform: backdropTransform(origin) }, { transform: backdropTransform(destination) }
+        ], transition));
+      }
+      try {
+        await slideAnimations[0].finished;
+        if (!document.querySelector('.council-finale[open]')) {
+          window.scrollTo({ top: destination, behavior: 'instant' });
+        }
+      } finally {
+        slideAnimations.forEach(animation => animation.cancel());
+        pageSliding = false;
+        document.documentElement.removeAttribute('data-page-sliding');
+        updateStarScroll();
+      }
+    }
+
+    function isInsideScrollablePane(target) {
+      for (let node = target; node && node !== document.body; node = node.parentElement) {
+        if (node.scrollHeight > node.clientHeight + 1 && /^(auto|scroll)$/.test(getComputedStyle(node).overflowY)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    window.addEventListener('wheel', event => {
+      if (!event.cancelable || event.defaultPrevented || event.ctrlKey || event.shiftKey ||
+          Math.abs(event.deltaX) >= Math.abs(event.deltaY) || characterPicker.open ||
+          document.querySelector('.opening-sequence:not([hidden]), .council-finale[open]')) return;
+      if (isInsideScrollablePane(event.target)) return;
+
+      event.preventDefault();
+      const now = performance.now();
+      const previousWheel = lastWheel;
+      lastWheel = now;
+      // A wheel detent or a trackpad burst moves at most one page.
+      if (pageSliding || now - previousWheel < 160) return;
+
+      const scroller = document.scrollingElement;
+      const hallBottom = successorHall.getBoundingClientRect().bottom + window.scrollY;
+      const hallStop = Math.min(hallBottom, scroller.scrollHeight) - scroller.clientHeight;
+      const destination = event.deltaY > 0 ? Math.max(0, hallStop) : 0;
+      if (Math.abs(window.scrollY - destination) <= 1) return;
+      scrollBetweenPages(destination);
+    }, { passive: false });
+  }
+</script>
+
+<script>
+  {
+    const hall = document.querySelector('.successor-hall');
+    const heading = hall.querySelector('h2');
+    if ('IntersectionObserver' in window) {
+      let nextHazeDrift;
+      let hazeAngle = Math.random() * 2 * Math.PI;
+      function driftHeadingHaze() {
+        const turn = (Math.random() < .5 ? -1 : 1) * (.4 + Math.random() * .45) * Math.PI;
+        hazeAngle += turn;
+        heading.style.setProperty('--heading-haze-x', `${5 * Math.cos(hazeAngle)}%`);
+        heading.style.setProperty('--heading-haze-y', `${8 * Math.sin(hazeAngle)}%`);
+        nextHazeDrift = setTimeout(driftHeadingHaze, 7500);
+      }
+
+      heading.dataset.headingReveal = 'waiting';
+      new IntersectionObserver(([entry]) => {
+        const headingVisible = entry.isIntersecting && entry.intersectionRatio >= .25;
+        heading.dataset.headingReveal = headingVisible ? 'visible' : 'waiting';
+        clearTimeout(nextHazeDrift);
+        if (headingVisible) driftHeadingHaze();
+      }, { threshold: .25, rootMargin: '0px 0px -56px 0px' }).observe(heading);
+    }
+    const nukvahMessage = document.querySelector('.celestia-reply');
+    const constellationLayer = document.createElement('canvas');
+    constellationLayer.className = 'heading-constellations';
+    constellationLayer.setAttribute('aria-hidden', 'true');
+    constellationLayer.width = 680;
+    constellationLayer.height = 240;
+    const starInk = constellationLayer.getContext('2d');
+    const skyLanes = [{ x: 122 }, { x: 558 }];
+
+    function createHeadingConstellation(lane, now) {
+      const duration = .5 + Math.random();
+      const x = lane.x + (Math.random() - .5) * 110;
+      const y = 120 + (Math.random() - .5) * 135;
+      const turn = Math.random() * Math.PI * 2;
+      const count = 3 + Math.floor(Math.random() * 3);
+      const stars = Array.from({ length: count }, (_, i) => {
+        const along = (i - (count - 1) / 2) * (12 + Math.random() * 7);
+        const across = (Math.random() - .5) * 28;
+        return {
+          x: x + along * Math.cos(turn) - across * Math.sin(turn),
+          y: y + along * Math.sin(turn) + across * Math.cos(turn),
+          radius: 1.25 + Math.random() * 1.2,
+        };
+      });
+      return { started: now, duration, stars, branch: count > 3 && Math.random() < .45 };
+    }
+
+    function paintHeadingConstellations(now) {
+      if (!starInk) return;
+      const message = nukvahMessage.hidden ? heading : nukvahMessage;
+      if (message.hidden || (message === heading && heading.dataset.headingReveal === 'waiting')) return;
+      if (constellationLayer.parentElement !== message) {
+        message.append(constellationLayer);
+        for (const lane of skyLanes) {
+          lane.pattern = null;
+          lane.nextAt = now + Math.random() * .6;
+        }
+      }
+
+      starInk.clearRect(0, 0, constellationLayer.width, constellationLayer.height);
+      for (const lane of skyLanes) {
+        if (lane.pattern && now >= lane.pattern.started + lane.pattern.duration) {
+          lane.pattern = null;
+          lane.nextAt = now + .15 + Math.random() * .8;
+        }
+        if (!lane.pattern && now >= lane.nextAt) lane.pattern = createHeadingConstellation(lane, now);
+        const pattern = lane.pattern;
+        if (!pattern) continue;
+
+        const progress = (now - pattern.started) / pattern.duration;
+        const visibility = Math.min(1, progress / .2, (1 - progress) / .33);
+        const drawn = Math.min(1, progress / .5);
+        const { stars } = pattern;
+        starInk.lineWidth = 1;
+        starInk.strokeStyle = '#dbe4ff';
+        starInk.globalAlpha = visibility * .7;
+        for (let i = 1; i < stars.length; i++) {
+          const fraction = Math.max(0, Math.min(1, drawn * (stars.length - 1) - (i - 1)));
+          if (!fraction) continue;
+          const from = stars[pattern.branch && i === stars.length - 1 ? i - 2 : i - 1];
+          const to = stars[i];
+          starInk.beginPath();
+          starInk.moveTo(from.x, from.y);
+          starInk.lineTo(from.x + (to.x - from.x) * fraction, from.y + (to.y - from.y) * fraction);
+          starInk.stroke();
+        }
+
+        starInk.globalAlpha = visibility * .94;
+        starInk.fillStyle = '#f4efff';
+        starInk.shadowColor = '#a6bbff';
+        starInk.shadowBlur = 6;
+        for (const star of stars) {
+          starInk.beginPath();
+          starInk.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          starInk.fill();
+        }
+        starInk.shadowBlur = 0;
+      }
+      starInk.globalAlpha = 1;
+    }
+    const hallCanvas = hall.querySelector('.successor-hall-atmosphere');
+    const atmosphere = hallCanvas.getContext('2d');
+    const hallArt = hall.querySelector('.successor-hall-art');
+
+    // Lamp centers and radii in the coordinates of the background image.
+    const wallLamps = [
+      [410,13,1.6], [93,15,2.3], [303,15,2], [207,20,1.6], [209,23,2], [396,39,1.6], [272,44,2.3], [276,48,2.3],
+      [442,57,1.6], [152,79,4.1], [323,95,2], [379,113,2], [461,117,3], [1368,121,1.6], [207,135,3.7], [365,138,3.4],
+      [415,153,2], [491,153,2], [535,161,2.3], [1581,166,3.6], [1295,170,1.6], [401,176,2.8], [260,181,4.2], [566,188,3.6],
+      [1260,189,1.6], [1223,190,1.6], [1591,196,1.6], [1589,199,2], [697,207,2], [1225,206,1.6], [555,208,1.6], [558,212,2.3],
+      [596,214,2.3], [484,217,3], [93,225,4.2], [307,223,2.8], [586,237,2.5], [626,237,2.5], [1474,239,2.3], [472,244,2.8],
+      [518,246,3], [1227,244,1.6], [1638,249,2.3], [655,257,2], [617,259,2], [59,267,4.2], [1160,266,2.3], [1421,267,2.3],
+      [506,270,3], [550,270,2.8], [686,276,2.8], [648,278,2.3], [693,282,2.3], [1578,285,4.9], [1375,288,3.4], [584,292,2.3],
+      [397,294,1.6], [542,295,2.5], [1427,294,1.6], [679,297,2.3], [129,309,4.1], [1329,308,3.4], [27,310,1.6], [615,312,1.6],
+      [708,313,2.5], [1377,315,3.7], [618,315,1.6], [1517,317,4.7], [574,317,2.5], [439,321,3.7], [1285,323,2], [721,330,1.6],
+      [1330,335,3.4], [1244,337,4.2], [606,337,2.5], [274,342,2.3], [1460,343,4.5], [426,347,3.6], [479,346,3.6], [1205,347,3.6],
+      [1287,350,1.6], [1524,352,3], [101,352,1.6], [639,355,2.3], [1166,356,2], [1244,361,3.4], [1129,362,3.4], [710,364,3],
+      [1093,366,3.4], [516,368,2.3], [520,370,2.3], [1204,371,2.8], [467,372,1.6], [1466,376,3.2], [35,379,2], [1165,379,2],
+      [1128,383,2.5], [1359,383,2.5], [702,385,2.5], [1090,387,2.5], [557,391,2], [508,395,2.8], [735,397,3], [1313,397,2],
+      [1413,397,2.8], [1310,399,1.6], [373,402,1.6], [594,408,2.3], [1266,409,3.6], [305,408,1.6], [590,409,1.6], [106,414,3.2],
+      [1362,412,2.3], [229,416,1.6], [1223,417,3], [415,423,2.3], [628,425,3.2], [1183,424,3.4], [1312,423,2.8], [1143,430,3.2],
+      [1648,432,5.9], [354,434,3.6], [584,433,2.8], [1033,434,3.4], [1106,433,2.8], [1267,436,3.4], [664,441,3], [285,442,3.6],
+      [173,444,3.4], [1225,443,2.5], [1220,445,1.6], [620,450,3], [1182,449,2.5], [699,454,3], [1143,454,3.2], [1572,455,4.4],
+      [399,456,2.5], [996,456,3.2], [1031,457,3.6], [1104,458,3.4], [1067,459,2], [79,460,1.6], [502,465,3], [336,465,2.3],
+      [656,465,2.5], [1508,475,3.4], [768,476,3], [610,477,2.5], [692,478,3], [1660,478,3], [541,483,2], [384,487,1.6],
+      [149,488,1.6], [648,491,2.5], [1579,493,2.3], [489,495,2.3], [582,499,3], [761,501,2.3], [684,503,2.5], [530,512,2],
+      [622,514,3.2], [948,516,3.4], [982,520,3.4], [1019,522,3.4], [1229,522,3.6], [1182,525,3.4], [476,525,2.5], [1057,525,3],
+      [1096,526,2.8], [1138,526,3], [365,526,1.6], [571,527,2], [755,526,1.6], [695,537,2.3], [945,539,2], [519,541,2.3],
+      [612,541,3], [978,545,3], [1228,550,3.7], [1016,550,3], [443,550,1.6], [1054,552,3.2], [1181,553,3.9], [649,553,2.3],
+      [1095,554,3.4], [1136,554,3.2], [561,556,1.6], [686,565,3], [602,570,3], [939,568,1.6], [974,572,2], [1010,575,1.6],
+      [725,577,2], [1050,580,2.3], [639,581,3], [1093,582,1.6], [1228,584,3.2], [1135,584,1.6], [555,589,2], [676,593,2.3],
+      [1559,598,3.4], [592,599,2.5], [951,599,2.3], [989,603,2.3], [1028,608,3], [1071,612,3.2], [1122,615,2.5], [1174,617,1.6],
+      [1306,617,1.6], [1227,618,1.6], [1255,619,2], [912,623,1.6], [946,628,3], [985,633,2.3], [599,634,1.6], [1024,638,3.2],
+      [1068,642,3], [1120,646,3.2], [1569,644,1.6], [1570,648,2.3], [1173,650,3.4], [1255,654,1.6], [941,657,2.3], [1307,656,1.6],
+      [979,661,2], [981,663,2], [1021,667,2], [1067,673,2], [1119,677,2], [1173,682,1.6], [1307,695,2], [1309,697,2],
+      [1098,707,1.6], [1160,713,1.6], [1634,750,2.3], [1646,809,2.5]
+    ].map(([x, y, radius], index) => ({
+      x, y, radius,
+      frequency: .58 + (index % 13) * .085,
+      phase: index * 2.39996
+    }));
+
+    function makeGlow(stops) {
+      const sprite = document.createElement('canvas');
+      sprite.width = sprite.height = 128;
+      const paint = sprite.getContext('2d');
+      const gradient = paint.createRadialGradient(64, 64, 0, 64, 64, 64);
+      stops.forEach(([offset, color]) => gradient.addColorStop(offset, color));
+      paint.fillStyle = gradient;
+      paint.fillRect(0, 0, 128, 128);
+      return sprite;
+    }
+
+    function startHallAtmosphere() {
+      if (!atmosphere) return;
+      const lampGlow = makeGlow([[0, '#fff3c6'], [.27, '#ffbd69d9'], [.6, '#f37a3740'], [1, '#f37a3700']]);
+      const lampShade = makeGlow([[0, '#171727'], [.4, '#332334be'], [1, '#33233400']]);
+      const sunGlow = makeGlow([[0, '#ffe8b4'], [.37, '#ffd19583'], [1, '#ffd19500']]);
+      const fogGlow = makeGlow([[0, '#8e9ed8a8'], [.4, '#778bc573'], [1, '#778bc500']]);
+
+      function paintGlow(sprite, x, y, width, height, angle, opacity) {
+        atmosphere.save();
+        atmosphere.translate(x, y);
+        atmosphere.rotate(angle);
+        atmosphere.globalAlpha = opacity;
+        atmosphere.drawImage(sprite, -width / 2, -height / 2, width, height);
+        atmosphere.restore();
+      }
+
+      function paintWallLamps(time) {
+        for (const {x, y, radius, frequency, phase} of wallLamps) {
+          const pulse = Math.sin(time * frequency + phase);
+          const bright = pulse >= 0;
+          const size = radius * (bright ? 5.5 : 3.6);
+          atmosphere.globalAlpha = Math.abs(pulse) * (bright ? .78 : .64);
+          atmosphere.drawImage(bright ? lampGlow : lampShade, x - size/2, y - size/2, size, size);
+        }
+        atmosphere.globalAlpha = 1;
+      }
+
+      function paintTowerLight(time) {
+        const sourceX = 925;
+        const sourceY = 68;
+        const motionTime = time * 1.3;
+        const sway = Math.sin(motionTime * .24);
+        paintGlow(sunGlow, sourceX + 22.4 * sway, 140, 580, 420, 0, .13 + .05 * Math.sin(time * .24));
+        for (let i = 0; i < 4; i++) {
+          const angle = .1 + i * .16 + .182 * Math.sin(motionTime * (.19 + i * .03) + i * 1.7);
+          const reach = 230 + 25 * i;
+          paintGlow(sunGlow,
+            sourceX - Math.sin(angle) * reach,
+            sourceY + Math.cos(angle) * reach,
+            92 + i * 23, 580 + i * 44, angle,
+            .17 + .09 * Math.sin(time * .43 + i * 1.13));
+        }
+      }
+
+      function paintFloorMist(time) {
+        const plumeCount = 5;
+        const edgePadding = 380;
+        const span = hallCanvas.width + 2 * edgePadding;
+        for (let i = 0; i < plumeCount; i++) {
+          // Wrap outside the image so a plume never jumps across the visible floor.
+          const travel = time * 42 + i * span / plumeCount + 35 * Math.sin(time * .27 + i);
+          const distance = travel % span;
+          const x = hallCanvas.width + edgePadding - distance;
+          const y = 716 + x * .104 + 13 * Math.sin(time * .28 + i);
+          paintGlow(fogGlow, x, y, 730 - i * 35, 105 - i * 7, .116, (.27 + .07 * Math.sin(time * .5 + i)) * 1.25);
+        }
+      }
+
+      let visible = false;
+      let frame = 0;
+      let lastPaint = 0;
+      function render(now) {
+        frame = requestAnimationFrame(render);
+        if (now - lastPaint < 32 || document.documentElement.hasAttribute('data-page-sliding')) return;
+        lastPaint = now;
+        const time = now / 1000;
+        atmosphere.clearRect(0, 0, hallCanvas.width, hallCanvas.height);
+        paintWallLamps(time);
+        paintTowerLight(time);
+        paintHeadingConstellations(time);
+        paintFloorMist(time);
+      }
+
+      function updatePlayback() {
+        if (visible && !document.hidden) {
+          if (!frame) frame = requestAnimationFrame(render);
+        } else if (frame) {
+          cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      }
+
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        updatePlayback();
+      }).observe(hall);
+      document.addEventListener('visibilitychange', updatePlayback);
+    }
+
+    if (hallArt.complete && hallArt.naturalWidth) startHallAtmosphere();
+    else hallArt.addEventListener('load', startHallAtmosphere, { once: true });
+  }
+</script>
+
+<script>
+  {
+    const elements = {"1":{"name":"ไฟ","color":"#ff926d"},"2":{"name":"น้ำ","color":"#8bbdff"},"3":{"name":"ไม้","color":"#87dc9a"},"4":{"name":"สายฟ้า","color":"#d5a7ff"},"5":{"name":"น้ำแข็ง","color":"#b8e5ff"},"7":{"name":"ลม","color":"#85e3d3"},"8":{"name":"หิน","color":"#ebc185"}};
+    // Snapshot of the Gachabase beta list and character profiles.
+    const characters = [{"id":"502","name":"Aether","elements":[1],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/502/aether?lang=en&branch=beta"},{"id":"503","name":"Aether","elements":[2],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/503/aether?lang=en&branch=beta"},{"id":"504","name":"Aether","elements":[7],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/504/aether?lang=en&branch=beta"},{"id":"505","name":"Aether","elements":[5],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/505/aether?lang=en&branch=beta"},{"id":"506","name":"Aether","elements":[8],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/506/aether?lang=en&branch=beta"},{"id":"507","name":"Aether","elements":[4],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/507/aether?lang=en&branch=beta"},{"id":"508","name":"Aether","elements":[3],"icon":"assets/characters/b975440a1ea06e378d525c68c67a3fae.webp","art":"assets/characters/aether-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000005/508/aether?lang=en&branch=beta"},{"id":"12101","name":"Aino","elements":[2],"icon":"assets/characters/a546e138386207a469665543a976064a.webp","art":"assets/characters/231c88ca0af3368429889d5244e6f1e5.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Clinky-Clank Gadgets-A-Gogo","birthday":[21,9],"link":"https://gi.gachabase.net/characters/10000121/aino?lang=en&branch=beta"},{"id":"3801","name":"Albedo","elements":[8],"icon":"assets/characters/9e80de34871edcc116f21670e9196153.webp","art":"assets/characters/92f25995c686fd889ef901e7da9a82e2.webp","rarity":5,"weapon":"ดาบ","title":"Kreideprinz","birthday":[13,9],"link":"https://gi.gachabase.net/characters/10000038/albedo?lang=en&branch=beta"},{"id":"7801","name":"Alhaitham","elements":[3],"icon":"assets/characters/893f9fb93ba900600020b3ad0ad79015.webp","art":"assets/characters/7b4b33758940f57f0ea9b673332027e8.webp","rarity":5,"weapon":"ดาบ","title":"Admonishing Instruction","birthday":[11,2],"link":"https://gi.gachabase.net/characters/10000078/alhaitham?lang=en&branch=beta"},{"id":"6201","name":"Aloy","elements":[5],"icon":"assets/characters/cb5cddfb0c8dc0d959bac94c7a4f0337.webp","art":"assets/characters/465d679373e9db2b442bda7f575bf0a4.webp","rarity":4,"weapon":"ธนู","title":"Savior From Another World","birthday":[4,4],"link":"https://gi.gachabase.net/characters/10000062/aloy?lang=en&branch=beta"},{"id":"14801","name":"Alyosha","elements":[4],"icon":"assets/characters/aebdd40d2ccdecf25bbfe9a7b8da9b06.webp","art":"assets/characters/cdc8923cdff647bb1acdfc6a08bdffcc.webp","rarity":4,"weapon":"หอก","title":"Swift-Striding Hound","birthday":[9,2],"link":"https://gi.gachabase.net/characters/10000148/alyosha?lang=en&branch=beta"},{"id":"2101","name":"Amber","elements":[1],"icon":"assets/characters/11a50b0ac0b21cc36cc50646ab5d20c5.webp","art":"assets/characters/c52ffe0344bc5ccce4af0be75fd712ec.webp","rarity":4,"weapon":"ธนู","title":"Gliding Champion","birthday":[10,8],"link":"https://gi.gachabase.net/characters/10000021/amber?lang=en&branch=beta"},{"id":"14901","name":"Anastasya","elements":[5],"icon":"assets/characters/e5337e123927ed861e5863dcaf027702.webp","art":"assets/characters/7d45a97221f1bab0b57a641ff1a25710.webp","rarity":5,"weapon":"ธนู","title":"Frostcrown Revival","birthday":[1,1],"link":"https://gi.gachabase.net/characters/10000149/anastasya?lang=en&branch=beta"},{"id":"5701","name":"Arataki Itto","elements":[8],"icon":"assets/characters/d6429728dc64d53118c4a93b9d387e99.webp","art":"assets/characters/12b72cccc13dfc2001578fc9e42bf930.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Hanamizaka Heroics","birthday":[1,6],"link":"https://gi.gachabase.net/characters/10000057/arataki-itto?lang=en&branch=beta"},{"id":"9601","name":"Arlecchino","elements":[1],"icon":"assets/characters/f7faaaa3a6722483d84a39b0fde402a8.webp","art":"assets/characters/a84179c522c722f480c322dd155b1c90.webp","rarity":5,"weapon":"หอก","title":"Dire Balemoon","birthday":[22,8],"link":"https://gi.gachabase.net/characters/10000096/arlecchino?lang=en&branch=beta"},{"id":"8201","name":"Baizhu","elements":[3],"icon":"assets/characters/98105886ec95f94592010a7e7a890f13.webp","art":"assets/characters/468b47fa28b44da9d5801bca713fc001.webp","rarity":5,"weapon":"สื่อเวท","title":"Beyond Mortality","birthday":[25,4],"link":"https://gi.gachabase.net/characters/10000082/baizhu?lang=en&branch=beta"},{"id":"1401","name":"Barbara","elements":[2],"icon":"assets/characters/d690017cf3871d16861837597d56402c.webp","art":"assets/characters/2209dc6c7eda6942dc62d646caf49b96.webp","rarity":4,"weapon":"สื่อเวท","title":"Shining Idol","birthday":[5,7],"link":"https://gi.gachabase.net/characters/10000014/barbara?lang=en&branch=beta"},{"id":"2401","name":"Beidou","elements":[4],"icon":"assets/characters/ee41d4446a1e6ce2bbb6df163b30dfd9.webp","art":"assets/characters/7da4beb15d3e27edbbeb835ac6452a78.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Uncrowned Lord of the Ocean","birthday":[14,2],"link":"https://gi.gachabase.net/characters/10000024/beidou?lang=en&branch=beta"},{"id":"3201","name":"Bennett","elements":[1],"icon":"assets/characters/8d3cfc558dd1eb14368774751519b3af.webp","art":"assets/characters/265613568f0fe15a30cce32ce2e39fbf.webp","rarity":4,"weapon":"ดาบ","title":"Trial by Fire","birthday":[29,2],"link":"https://gi.gachabase.net/characters/10000032/bennett?lang=en&branch=beta"},{"id":"7201","name":"Candace","elements":[2],"icon":"assets/characters/b331f74419fb5164af17f77b8b523cc1.webp","art":"assets/characters/0df9f0503f0bf1fe74ee4d43a0b55dac.webp","rarity":4,"weapon":"หอก","title":"Golden Vow","birthday":[3,5],"link":"https://gi.gachabase.net/characters/10000072/candace?lang=en&branch=beta"},{"id":"8801","name":"Charlotte","elements":[5],"icon":"assets/characters/73a973925c974c8995e0aa857851bedd.webp","art":"assets/characters/e95d541d398433b8d08cac6772c04646.webp","rarity":4,"weapon":"สื่อเวท","title":"Lens of Verity","birthday":[10,4],"link":"https://gi.gachabase.net/characters/10000088/charlotte?lang=en&branch=beta"},{"id":"10401","name":"Chasca","elements":[7],"icon":"assets/characters/980764869d5ec95ad36fdc7340858712.webp","art":"assets/characters/af29e7153e983296e71b29b672e239b9.webp","rarity":5,"weapon":"ธนู","title":"Skyborne Arbiter","birthday":[10,12],"link":"https://gi.gachabase.net/characters/10000104/chasca?lang=en&branch=beta"},{"id":"9001","name":"Chevreuse","elements":[1],"icon":"assets/characters/54287f20d20b1614a963f9df2b695d83.webp","art":"assets/characters/3cb4850bdb17961b41b74160d342f425.webp","rarity":4,"weapon":"หอก","title":"Executor of Justice","birthday":[10,1],"link":"https://gi.gachabase.net/characters/10000090/chevreuse?lang=en&branch=beta"},{"id":"9401","name":"Chiori","elements":[8],"icon":"assets/characters/e4b7bf68459c46c1f98f1b8e6f024272.webp","art":"assets/characters/854c0db163c9948fb8eadd2c76500835.webp","rarity":5,"weapon":"ดาบ","title":"The Thundering Seamstress","birthday":[17,8],"link":"https://gi.gachabase.net/characters/10000094/chiori?lang=en&branch=beta"},{"id":"3601","name":"Chongyun","elements":[5],"icon":"assets/characters/66680e97e0fd238372b9d9844c150cec.webp","art":"assets/characters/03c6509de6d5eaa352c98d2580b1d94b.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Frozen Ardor","birthday":[7,9],"link":"https://gi.gachabase.net/characters/10000036/chongyun?lang=en&branch=beta"},{"id":"10701","name":"Citlali","elements":[5],"icon":"assets/characters/77170c0e23dca3c0f3d20961bf21c37e.webp","art":"assets/characters/666defe2ef37b01f0b7b7a9c69e66072.webp","rarity":5,"weapon":"สื่อเวท","title":"Obsidian Opalstar","birthday":[20,1],"link":"https://gi.gachabase.net/characters/10000107/citlali?lang=en&branch=beta"},{"id":"9801","name":"Clorinde","elements":[4],"icon":"assets/characters/b5fd12aeb068c49e2f2b3d80222edc1f.webp","art":"assets/characters/3bdff6349b777a8fd6da44b6aa265c2d.webp","rarity":5,"weapon":"ดาบ","title":"Candlebearer, Shadowhunter","birthday":[20,9],"link":"https://gi.gachabase.net/characters/10000098/clorinde?lang=en&branch=beta"},{"id":"6701","name":"Collei","elements":[3],"icon":"assets/characters/81c977ea85b332a69b215a43753de307.webp","art":"assets/characters/0cf1944815df1d6aa25ac166bfc3ce4d.webp","rarity":4,"weapon":"ธนู","title":"Sprout of Rebirth","birthday":[8,5],"link":"https://gi.gachabase.net/characters/10000067/collei?lang=en&branch=beta"},{"id":"12501","name":"Columbina","elements":[2],"icon":"assets/characters/5923697771179ff746614be63c61821b.webp","art":"assets/characters/7cd2c23ae798292779e96c96c309f3c1.webp","rarity":5,"weapon":"สื่อเวท","title":"Welkin Moon's Homecoming","birthday":[14,1],"link":"https://gi.gachabase.net/characters/10000125/columbina?lang=en&branch=beta"},{"id":"7101","name":"Cyno","elements":[4],"icon":"assets/characters/c47c5e1a5f73834a2f72e7b27913d610.webp","art":"assets/characters/4a2ba15d77e116402602600982da2f42.webp","rarity":5,"weapon":"หอก","title":"Judicator of Secrets","birthday":[23,6],"link":"https://gi.gachabase.net/characters/10000071/cyno?lang=en&branch=beta"},{"id":"11501","name":"Dahlia","elements":[2],"icon":"assets/characters/de1bf953d128be55051e2155ed8b7415.webp","art":"assets/characters/5ec412f71e1b160b1307cf071048b281.webp","rarity":4,"weapon":"ดาบ","title":"Ode and Oblation","birthday":[25,5],"link":"https://gi.gachabase.net/characters/10000115/dahlia?lang=en&branch=beta"},{"id":"14701","name":"Danica","elements":[4],"icon":"assets/characters/86c4cbe06ed7831ea555f4545fd62413.webp","art":"assets/characters/511fe3f27cd0857f3d7592d370fabddb.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Winter Palace's Attendant Shadow","birthday":[1,1],"link":"https://gi.gachabase.net/characters/10000147/danica?lang=en&branch=beta"},{"id":"7901","name":"Dehya","elements":[1],"icon":"assets/characters/9aade853d43808255b7305ffaf99f2fc.webp","art":"assets/characters/6c9fac98b3ed59d9aef06580798ea865.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Flame-Mane","birthday":[7,4],"link":"https://gi.gachabase.net/characters/10000079/dehya?lang=en&branch=beta"},{"id":"1601","name":"Diluc","elements":[1],"icon":"assets/characters/799a9c50a2b4849ff346cff02b2f3653.webp","art":"assets/characters/050ec4150e9cafb3a10c0945ad66a787.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Dark Side of Dawn","birthday":[30,4],"link":"https://gi.gachabase.net/characters/10000016/diluc?lang=en&branch=beta"},{"id":"3901","name":"Diona","elements":[5],"icon":"assets/characters/5eecedb6e8e542b1602f283fb4824f1a.webp","art":"assets/characters/2a9f92529be74f8bf56cf78307632678.webp","rarity":4,"weapon":"ธนู","title":"Kätzlein Cocktail","birthday":[18,1],"link":"https://gi.gachabase.net/characters/10000039/diona?lang=en&branch=beta"},{"id":"6801","name":"Dori","elements":[4],"icon":"assets/characters/97cc9ff2f8da61adf3bb6d2d4cf6938c.webp","art":"assets/characters/5048ba969d080d079bf4122028c566c5.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Treasure of Dream Garden","birthday":[21,12],"link":"https://gi.gachabase.net/characters/10000068/dori?lang=en&branch=beta"},{"id":"12301","name":"Durin","elements":[1],"icon":"assets/characters/db8c9b5cd4b2bf432f950aa1e30620d2.webp","art":"assets/characters/b530466f809c87039c4a7dde48cdb40f.webp","rarity":5,"weapon":"ดาบ","title":"\"The Undying Fire\"","birthday":[14,3],"link":"https://gi.gachabase.net/characters/10000123/durin?lang=en&branch=beta"},{"id":"9901","name":"Emilie","elements":[3],"icon":"assets/characters/76668f2eb3ed2410df833a2fcbcdfc8b.webp","art":"assets/characters/467cc7a3cdb8fd11d5c937b3f6cfd772.webp","rarity":5,"weapon":"หอก","title":"A Thousand Scents Traced","birthday":[22,9],"link":"https://gi.gachabase.net/characters/10000099/emilie?lang=en&branch=beta"},{"id":"11201","name":"Escoffier","elements":[5],"icon":"assets/characters/5f075987f83a290fc059ae18cd167f94.webp","art":"assets/characters/3c5b78af2b5cdc5831579ae0b702f6be.webp","rarity":5,"weapon":"หอก","title":"Tasteful Excellence","birthday":[8,6],"link":"https://gi.gachabase.net/characters/10000112/escoffier?lang=en&branch=beta"},{"id":"5101","name":"Eula","elements":[5],"icon":"assets/characters/f68c6ff36bb24e82547ead3c2aec4ea8.webp","art":"assets/characters/75073cb31552e482934ba75e2e2c0001.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Dance of the Shimmering Wave","birthday":[25,10],"link":"https://gi.gachabase.net/characters/10000051/eula?lang=en&branch=beta"},{"id":"7601","name":"Faruzan","elements":[7],"icon":"assets/characters/de258beef931732f33536a86f9c6bc13.webp","art":"assets/characters/6b7751f4ad1ea14570e356f58f4b271d.webp","rarity":4,"weapon":"ธนู","title":"Enigmatic Machinist","birthday":[20,8],"link":"https://gi.gachabase.net/characters/10000076/faruzan?lang=en&branch=beta"},{"id":"3101","name":"Fischl","elements":[4],"icon":"assets/characters/6c6b4b40a120e9b6e0dffe24313fc802.webp","art":"assets/characters/b0c217a6992a7011ddb032587da273b7.webp","rarity":4,"weapon":"ธนู","title":"Prinzessin der Verurteilung!","birthday":[27,5],"link":"https://gi.gachabase.net/characters/10000031/fischl?lang=en&branch=beta"},{"id":"12001","name":"Flins","elements":[4],"icon":"assets/characters/9efa822fbf062ba1e013f94ccd953cd0.webp","art":"assets/characters/0e1ce45edac22c516e582c0313fb97b8.webp","rarity":5,"weapon":"หอก","title":"Shadowy Lights, Stranger Wights","birthday":[31,10],"link":"https://gi.gachabase.net/characters/10000120/flins?lang=en&branch=beta"},{"id":"8501","name":"Freminet","elements":[5],"icon":"assets/characters/606cd6a1f4bf51fa41b7c472a2f66271.webp","art":"assets/characters/b5755aaa1adb7ea96dd87f244d36ce4f.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Yearning for Unseen Depths","birthday":[24,9],"link":"https://gi.gachabase.net/characters/10000085/freminet?lang=en&branch=beta"},{"id":"8901","name":"Furina","elements":[2],"icon":"assets/characters/f112999e1c2a371f11cb162fa97dd67d.webp","art":"assets/characters/215bb9a5f77391a7834ff950afc006a8.webp","rarity":5,"weapon":"ดาบ","title":"Endless Solo of Solitude","birthday":[13,10],"link":"https://gi.gachabase.net/characters/10000089/furina?lang=en&branch=beta"},{"id":"9201","name":"Gaming","elements":[1],"icon":"assets/characters/e76de9ab492c7de8f963a1ebf2a1360c.webp","art":"assets/characters/e0718f729f00dee8bf1957ec43e504da.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Leonine Vanguard","birthday":[22,12],"link":"https://gi.gachabase.net/characters/10000092/gaming?lang=en&branch=beta"},{"id":"3701","name":"Ganyu","elements":[5],"icon":"assets/characters/298b511471311ef3cfee8e65e14c017f.webp","art":"assets/characters/c16c04ff66ba586ce49af1db36369598.webp","rarity":5,"weapon":"ธนู","title":"Plenilune Gaze","birthday":[2,12],"link":"https://gi.gachabase.net/characters/10000037/ganyu?lang=en&branch=beta"},{"id":"5501","name":"Gorou","elements":[8],"icon":"assets/characters/2f8d5e6dfc0f8db4a36171dcc3c0c445.webp","art":"assets/characters/5e9f521770ec804d9fb771e8239cbb42.webp","rarity":4,"weapon":"ธนู","title":"Canine Warrior","birthday":[18,5],"link":"https://gi.gachabase.net/characters/10000055/gorou?lang=en&branch=beta"},{"id":"4601","name":"Hu Tao","elements":[1],"icon":"assets/characters/a38b6e8409527edd799672a26fe610f6.webp","art":"assets/characters/8eb0cce79ab76c26b3ad864479270dff.webp","rarity":5,"weapon":"หอก","title":"Fragrance in Thaw","birthday":[15,7],"link":"https://gi.gachabase.net/characters/10000046/hu-tao?lang=en&branch=beta"},{"id":"11001","name":"Iansan","elements":[4],"icon":"assets/characters/631b5707d1857bbd3de4990594c00f96.webp","art":"assets/characters/9bbef74f85aaa7b3776bf04489ca917a.webp","rarity":4,"weapon":"หอก","title":"Tempered in Molten Stone","birthday":[8,8],"link":"https://gi.gachabase.net/characters/10000110/iansan?lang=en&branch=beta"},{"id":"11301","name":"Ifa","elements":[7],"icon":"assets/characters/c66efae2e66989bd32f7210e2cecf8d9.webp","art":"assets/characters/7e65d0e105d97f8f53f4c0a926ec22f1.webp","rarity":4,"weapon":"สื่อเวท","title":"In the Wake of Wandering Winds","birthday":[23,3],"link":"https://gi.gachabase.net/characters/10000113/ifa?lang=en&branch=beta"},{"id":"12701","name":"Illuga","elements":[8],"icon":"assets/characters/9d91b2895834ae2dab59bb8045009be4.webp","art":"assets/characters/eefbcbc87bfc7e8142564d167393eb54.webp","rarity":4,"weapon":"หอก","title":"Nightmare's Burning Heart","birthday":[23,12],"link":"https://gi.gachabase.net/characters/10000127/illuga?lang=en&branch=beta"},{"id":"11601","name":"Ineffa","elements":[4],"icon":"assets/characters/43b0d0c23d86c889aae11bdeb8e5bfd5.webp","art":"assets/characters/73a5ab8b1d77f429c0877402537306a1.webp","rarity":5,"weapon":"หอก","title":"Boom Boom Thunderwave","birthday":[2,4],"link":"https://gi.gachabase.net/characters/10000116/ineffa?lang=en&branch=beta"},{"id":"12401","name":"Jahoda","elements":[7],"icon":"assets/characters/c94f69f2df7ae215f9c8a77ebfb03896.webp","art":"assets/characters/029461ecc23082659d04f769ca5bae95.webp","rarity":4,"weapon":"ธนู","title":"Windthreading Shadow","birthday":[5,1],"link":"https://gi.gachabase.net/characters/10000124/jahoda?lang=en&branch=beta"},{"id":"301","name":"Jean","elements":[7],"icon":"assets/characters/c0325d28aa7e0e0f19c0b4bd69ecda15.webp","art":"assets/characters/7936fdb27ff90ea2b0ae68b2c9ab3580.webp","rarity":5,"weapon":"ดาบ","title":"Dandelion Knight","birthday":[14,3],"link":"https://gi.gachabase.net/characters/10000003/jean?lang=en&branch=beta"},{"id":"10001","name":"Kachina","elements":[8],"icon":"assets/characters/86647f6e046b5eac533358657797e799.webp","art":"assets/characters/89103462b133ea9cfcf0e4b788157f39.webp","rarity":4,"weapon":"หอก","title":"Mottled Gold Yet Unsmelted","birthday":[22,4],"link":"https://gi.gachabase.net/characters/10000100/kachina?lang=en&branch=beta"},{"id":"4701","name":"Kaedehara Kazuha","elements":[7],"icon":"assets/characters/2268d7a8859be8ee186eae0e0ddeacba.webp","art":"assets/characters/9efc12c5fc64022dff0f6616f299e3b2.webp","rarity":5,"weapon":"ดาบ","title":"Scarlet Leaves Pursue Wild Waves","birthday":[29,10],"link":"https://gi.gachabase.net/characters/10000047/kaedehara-kazuha?lang=en&branch=beta"},{"id":"1501","name":"Kaeya","elements":[5],"icon":"assets/characters/a2dbd4a96ccbd206f302f85f637ee9db.webp","art":"assets/characters/f685581ed79ee5a71e8d192d21cdb70e.webp","rarity":4,"weapon":"ดาบ","title":"Frostwind Swordsman","birthday":[30,11],"link":"https://gi.gachabase.net/characters/10000015/kaeya?lang=en&branch=beta"},{"id":"201","name":"Kamisato Ayaka","elements":[5],"icon":"assets/characters/01bd1655584d890ceffd290891f24380.webp","art":"assets/characters/213b2d2981c6ceb5a4c256f3b345b887.webp","rarity":5,"weapon":"ดาบ","title":"Frostflake Heron","birthday":[28,9],"link":"https://gi.gachabase.net/characters/10000002/kamisato-ayaka?lang=en&branch=beta"},{"id":"6601","name":"Kamisato Ayato","elements":[2],"icon":"assets/characters/b6159a135c6789b906cb99d1f405da97.webp","art":"assets/characters/c43280fd9e1c4b04f1aaad48ce11d2c9.webp","rarity":5,"weapon":"ดาบ","title":"Pillar of Fortitude","birthday":[26,3],"link":"https://gi.gachabase.net/characters/10000066/kamisato-ayato?lang=en&branch=beta"},{"id":"8101","name":"Kaveh","elements":[3],"icon":"assets/characters/060f3485f377c49aebdb66838c9b5228.webp","art":"assets/characters/e622bdc2a96da9a1adf85f6b3772295b.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Empyrean Reflection","birthday":[9,7],"link":"https://gi.gachabase.net/characters/10000081/kaveh?lang=en&branch=beta"},{"id":"4201","name":"Keqing","elements":[4],"icon":"assets/characters/338eacfa72dd31a450fc76efd9d94ef6.webp","art":"assets/characters/7ae22cc270aa03322dc80f09171551d6.webp","rarity":5,"weapon":"ดาบ","title":"Driving Thunder","birthday":[20,11],"link":"https://gi.gachabase.net/characters/10000042/keqing?lang=en&branch=beta"},{"id":"10101","name":"Kinich","elements":[3],"icon":"assets/characters/d6950a854d5130492f84a551bdfce55b.webp","art":"assets/characters/6f1b53cd775e66af29046026ade3297b.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Turnfire Hunt","birthday":[11,11],"link":"https://gi.gachabase.net/characters/10000101/kinich?lang=en&branch=beta"},{"id":"6101","name":"Kirara","elements":[3],"icon":"assets/characters/ae55937f905d5888ade8b3c75e234b84.webp","art":"assets/characters/380e2467334d50a40574b52656eb4f61.webp","rarity":4,"weapon":"ดาบ","title":"Cat Upon the Eaves","birthday":[22,1],"link":"https://gi.gachabase.net/characters/10000061/kirara?lang=en&branch=beta"},{"id":"2901","name":"Klee","elements":[1],"icon":"assets/characters/cd653c87fea3815f44edcb71db110647.webp","art":"assets/characters/dc5d65b2fbce18ce62efb0031aa6464d.webp","rarity":5,"weapon":"สื่อเวท","title":"Fleeing Sunlight","birthday":[27,7],"link":"https://gi.gachabase.net/characters/10000029/klee?lang=en&branch=beta"},{"id":"5601","name":"Kujou Sara","elements":[4],"icon":"assets/characters/5cde6d06b72e99e8b3c48ea47eb1d919.webp","art":"assets/characters/e5df85d9484d88a760a6ea5311ea28b4.webp","rarity":4,"weapon":"ธนู","title":"Crowfeather Kaburaya","birthday":[14,7],"link":"https://gi.gachabase.net/characters/10000056/kujou-sara?lang=en&branch=beta"},{"id":"6501","name":"Kuki Shinobu","elements":[4],"icon":"assets/characters/33f26c448a00e68210e073187b996a79.webp","art":"assets/characters/f2f8648d2b043009e9dceb4b81552d56.webp","rarity":4,"weapon":"ดาบ","title":"Mender of Tribulations","birthday":[27,7],"link":"https://gi.gachabase.net/characters/10000065/kuki-shinobu?lang=en&branch=beta"},{"id":"10801","name":"Lan Yan","elements":[7],"icon":"assets/characters/d97909b68e6f8bfe4584a15262b8fbbe.webp","art":"assets/characters/78d4e1fbb4c1e8224fdc5a455890ff2d.webp","rarity":4,"weapon":"สื่อเวท","title":"Spring Woven From Jade","birthday":[6,1],"link":"https://gi.gachabase.net/characters/10000108/lan-yan?lang=en&branch=beta"},{"id":"11901","name":"Lauma","elements":[3],"icon":"assets/characters/42c646d9ff4960b4522e3cb1b86e6c27.webp","art":"assets/characters/c949feb9af537c0f5f59b7da4667e18e.webp","rarity":5,"weapon":"สื่อเวท","title":"Evermoon's Sacrament Song","birthday":[1,3],"link":"https://gi.gachabase.net/characters/10000119/lauma?lang=en&branch=beta"},{"id":"7401","name":"Layla","elements":[5],"icon":"assets/characters/155f840948bc37aba33d27dd41bf1690.webp","art":"assets/characters/f3159d1cefee502898502ef08bc85bdc.webp","rarity":4,"weapon":"ดาบ","title":"Fantastical Evening Star","birthday":[19,12],"link":"https://gi.gachabase.net/characters/10000074/layla?lang=en&branch=beta"},{"id":"13001","name":"Linnea","elements":[8],"icon":"assets/characters/ba7bd044b7a67c92189abbf73587dd1a.webp","art":"assets/characters/85c1945e9cfbec68b08af3281f8f9934.webp","rarity":5,"weapon":"ธนู","title":"Augur of Wonders","birthday":[23,5],"link":"https://gi.gachabase.net/characters/10000130/linnea?lang=en&branch=beta"},{"id":"601","name":"Lisa","elements":[4],"icon":"assets/characters/56f7a290a7bdc85efcd70871f0710f0d.webp","art":"assets/characters/38ef9e4e8bc4cf9d89da87b890d2c43f.webp","rarity":4,"weapon":"สื่อเวท","title":"Witch of Purple Rose","birthday":[9,6],"link":"https://gi.gachabase.net/characters/10000006/lisa?lang=en&branch=beta"},{"id":"12901","name":"Lohen","elements":[5],"icon":"assets/characters/a2d466b12c8542f1b6d8871baebc1ab5.webp","art":"assets/characters/5430d0685ce6d84fb6a9a4bcbe8c29c6.webp","rarity":5,"weapon":"หอก","title":"Sharpened Arrowhead","birthday":[3,4],"link":"https://gi.gachabase.net/characters/10000129/lohen?lang=en&branch=beta"},{"id":"702","name":"Lumine","elements":[1],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/702/lumine?lang=en&branch=beta"},{"id":"703","name":"Lumine","elements":[2],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/703/lumine?lang=en&branch=beta"},{"id":"704","name":"Lumine","elements":[7],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/704/lumine?lang=en&branch=beta"},{"id":"705","name":"Lumine","elements":[5],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/705/lumine?lang=en&branch=beta"},{"id":"706","name":"Lumine","elements":[8],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/706/lumine?lang=en&branch=beta"},{"id":"707","name":"Lumine","elements":[4],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/707/lumine?lang=en&branch=beta"},{"id":"708","name":"Lumine","elements":[3],"icon":"assets/characters/1222e1d08252962c17c921d789879977.webp","art":"assets/characters/lumine-full.png","rarity":5,"weapon":"ดาบ","birthday":null,"link":"https://gi.gachabase.net/characters/10000007/708/lumine?lang=en&branch=beta"},{"id":"8301","name":"Lynette","elements":[7],"icon":"assets/characters/0514a776ec048ef4297d62dc7bf95c9e.webp","art":"assets/characters/0d4469aef04facd9b479c0c730b78517.webp","rarity":4,"weapon":"ดาบ","title":"Elegance in the Shadows","birthday":[2,2],"link":"https://gi.gachabase.net/characters/10000083/lynette?lang=en&branch=beta"},{"id":"8401","name":"Lyney","elements":[1],"icon":"assets/characters/ff2d1d21568ba441b844b8f2dc550ebc.webp","art":"assets/characters/80cad918be4f658e214adfdbd2a8bd61.webp","rarity":5,"weapon":"ธนู","title":"Spectacle of Phantasmagoria","birthday":[2,2],"link":"https://gi.gachabase.net/characters/10000084/lyney?lang=en&branch=beta"},{"id":"10601","name":"Mavuika","elements":[1],"icon":"assets/characters/dc852c2f79f480f36fd9f05cfc5d5614.webp","art":"assets/characters/effb2bc40edcf17d27641dd0bb21e648.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Night-Igniting Flame","birthday":[28,8],"link":"https://gi.gachabase.net/characters/10000106/mavuika?lang=en&branch=beta"},{"id":"8001","name":"Mika","elements":[5],"icon":"assets/characters/3cd2d8b36a536442b9173e72051121e1.webp","art":"assets/characters/bbb487eb35833848a8d6f4513a5b3793.webp","rarity":4,"weapon":"หอก","title":"Coordinates of Clear Frost","birthday":[11,8],"link":"https://gi.gachabase.net/characters/10000080/mika?lang=en&branch=beta"},{"id":"13601","name":"Mitya","elements":[4],"icon":"assets/characters/55316264625932aec26f2789e3065af5.webp","art":"assets/characters/4ec27ea406265269b013af811aea6097.webp","rarity":5,"weapon":"สื่อเวท","title":"Rules Set at Naught","birthday":[8,2],"link":"https://gi.gachabase.net/characters/10000136/mitya?lang=en&branch=beta"},{"id":"4101","name":"Mona","elements":[2],"icon":"assets/characters/0fa4c59c1028ac78c14d567c3aafee0e.webp","art":"assets/characters/40159aa5804d78a7678d88ee7b2caa5b.webp","rarity":5,"weapon":"สื่อเวท","title":"Astral Reflection","birthday":[31,8],"link":"https://gi.gachabase.net/characters/10000041/mona?lang=en&branch=beta"},{"id":"10201","name":"Mualani","elements":[2],"icon":"assets/characters/0b2be6f46cda5fa7e2582857b3f7e619.webp","art":"assets/characters/63063d849c7591c98d6ebb005a278248.webp","rarity":5,"weapon":"สื่อเวท","title":"Splish-Splash Wavechaser","birthday":[3,8],"link":"https://gi.gachabase.net/characters/10000102/mualani?lang=en&branch=beta"},{"id":"7301","name":"Nahida","elements":[3],"icon":"assets/characters/e86b940e2a1b156607a76601c10e9f9b.webp","art":"assets/characters/6e4686efd57f3b2e9e1e95df2f25030a.webp","rarity":5,"weapon":"สื่อเวท","title":"Physic of Purity","birthday":[27,10],"link":"https://gi.gachabase.net/characters/10000073/nahida?lang=en&branch=beta"},{"id":"9101","name":"Navia","elements":[8],"icon":"assets/characters/a6387a0860c270ce9b1d2a41503cb3b4.webp","art":"assets/characters/513b324e2af2f170e69c5845bd0c95ac.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Helm of the Radiant Rose","birthday":[16,8],"link":"https://gi.gachabase.net/characters/10000091/navia?lang=en&branch=beta"},{"id":"12201","name":"Nefer","elements":[3],"icon":"assets/characters/e81f91fc7c32cfc1bda5081eb4f4ea2a.webp","art":"assets/characters/055b0874a9528bd5b82650c9c6f2a31e.webp","rarity":5,"weapon":"สื่อเวท","title":"Secret Beneath the Sands","birthday":[9,5],"link":"https://gi.gachabase.net/characters/10000122/nefer?lang=en&branch=beta"},{"id":"8701","name":"Neuvillette","elements":[2],"icon":"assets/characters/1bfbee94fc42bfc1467a1c2aa99b5f02.webp","art":"assets/characters/be299873cc1247f7f2349866ca84f46f.webp","rarity":5,"weapon":"สื่อเวท","title":"Ordainer of Inexorable Judgment","birthday":[18,12],"link":"https://gi.gachabase.net/characters/10000087/neuvillette?lang=en&branch=beta"},{"id":"13101","name":"Nicole","elements":[1],"icon":"assets/characters/833692cb4e6ce9947f542124487dc04f.webp","art":"assets/characters/4b630764b8bca96ac2a0b6334b1d7b68.webp","rarity":5,"weapon":"สื่อเวท","title":"Clamor Within","birthday":[29,9],"link":"https://gi.gachabase.net/characters/10000131/nicole?lang=en&branch=beta"},{"id":"7001","name":"Nilou","elements":[2],"icon":"assets/characters/962205780471379857eea4e82cbdeddd.webp","art":"assets/characters/d6357b36649831f96e8194b8d2801b0a.webp","rarity":5,"weapon":"ดาบ","title":"Dance of Lotuslight","birthday":[3,12],"link":"https://gi.gachabase.net/characters/10000070/nilou?lang=en&branch=beta"},{"id":"2701","name":"Ningguang","elements":[8],"icon":"assets/characters/4170d1625b9740a71052030297527639.webp","art":"assets/characters/781861788b619b2b6624adadeee7ac9a.webp","rarity":4,"weapon":"สื่อเวท","title":"Eclipsing Star","birthday":[26,8],"link":"https://gi.gachabase.net/characters/10000027/ningguang?lang=en&branch=beta"},{"id":"3401","name":"Noelle","elements":[8],"icon":"assets/characters/6adf6bebd61db037c8990cf2a925be94.webp","art":"assets/characters/1d4a8e4d3c61438190a85c7b69d57582.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Chivalric Blossom","birthday":[21,3],"link":"https://gi.gachabase.net/characters/10000034/noelle?lang=en&branch=beta"},{"id":"15001","name":"Odette","elements":[5],"icon":"assets/characters/4edcfaa343fb70b2b6ec162f583389d0.webp","art":"assets/characters/e8772b892364e4f12a8cc896a824fcaa.webp","rarity":5,"weapon":"ดาบ","title":"Swirling Snow","birthday":[20,2],"link":"https://gi.gachabase.net/characters/10000150/odette?lang=en&branch=beta"},{"id":"10501","name":"Ororon","elements":[4],"icon":"assets/characters/fbc5826159a5fa593819c076b58de639.webp","art":"assets/characters/3b85efd21a8e4e3f0791d71ac1e35913.webp","rarity":4,"weapon":"ธนู","title":"Shadow of the Night-Wind","birthday":[14,10],"link":"https://gi.gachabase.net/characters/10000105/ororon?lang=en&branch=beta"},{"id":"13201","name":"Prune","elements":[7],"icon":"assets/characters/08f1bb1047faccb1fef6c98eb3ad1ef8.webp","art":"assets/characters/ff8119d75245d72bddec92659cc3dba1.webp","rarity":4,"weapon":"สื่อเวท","title":"Childlike Dreams Cherished","birthday":[20,11],"link":"https://gi.gachabase.net/characters/10000132/prune?lang=en&branch=beta"},{"id":"3501","name":"Qiqi","elements":[5],"icon":"assets/characters/68b9e869712b02ff116a99d62c4873d4.webp","art":"assets/characters/04ae7f19ded0d41a35142c4714c5085c.webp","rarity":5,"weapon":"ดาบ","title":"Icy Resurrection","birthday":[3,3],"link":"https://gi.gachabase.net/characters/10000035/qiqi?lang=en&branch=beta"},{"id":"5201","name":"Raiden Shogun","elements":[4],"icon":"assets/characters/ec1e5cb4edd2aee8c1ffb16fd0e494cd.webp","art":"assets/characters/da8a392c34fa440b9f2876cb2b73a3d5.webp","rarity":5,"weapon":"หอก","title":"Plane of Euthymia","birthday":[26,6],"link":"https://gi.gachabase.net/characters/10000052/raiden-shogun?lang=en&branch=beta"},{"id":"2001","name":"Razor","elements":[4],"icon":"assets/characters/9df5679f6bc44e8560d7fceed5732818.webp","art":"assets/characters/7d72ff9db538f27b4951894a4904e915.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Wolf Boy","birthday":[9,9],"link":"https://gi.gachabase.net/characters/10000020/razor?lang=en&branch=beta"},{"id":"4501","name":"Rosaria","elements":[5],"icon":"assets/characters/94b95d328ff72167358405eb5d38e239.webp","art":"assets/characters/31dfa71af4daf1d5ffccf9858838fcc9.webp","rarity":4,"weapon":"หอก","title":"Thorny Benevolence","birthday":[24,1],"link":"https://gi.gachabase.net/characters/10000045/rosaria?lang=en&branch=beta"},{"id":"13301","name":"Sandrone","elements":[5],"icon":"assets/characters/01d114df1f18f71a75763b1f27ea2a81.webp","art":"assets/characters/d27dbdd677e0b2a6f3060c6a2ee907d5.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Mirrored Analysis","birthday":[13,1],"link":"https://gi.gachabase.net/characters/10000133/sandrone?lang=en&branch=beta"},{"id":"5401","name":"Sangonomiya Kokomi","elements":[2],"icon":"assets/characters/f25319fda509e043a6fba7211ab92845.webp","art":"assets/characters/dfd67db309c80a3ad5ebfb6c42a903e9.webp","rarity":5,"weapon":"สื่อเวท","title":"Pearl of Wisdom","birthday":[22,2],"link":"https://gi.gachabase.net/characters/10000054/sangonomiya-kokomi?lang=en&branch=beta"},{"id":"5301","name":"Sayu","elements":[7],"icon":"assets/characters/7d2632f2e9c4d13fde72f5a90cd4551e.webp","art":"assets/characters/25ee0083be2dad495a5b472bc5fd8eda.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Mujina Ninja","birthday":[19,10],"link":"https://gi.gachabase.net/characters/10000053/sayu?lang=en&branch=beta"},{"id":"9701","name":"Sethos","elements":[4],"icon":"assets/characters/9c2493f2aedbe499185dd90c44b45724.webp","art":"assets/characters/4facd5c84dfd5db3c10395584e1ee104.webp","rarity":4,"weapon":"ธนู","title":"Wisdom's Measure","birthday":[31,5],"link":"https://gi.gachabase.net/characters/10000097/sethos?lang=en&branch=beta"},{"id":"6301","name":"Shenhe","elements":[5],"icon":"assets/characters/5e53b80e0145b8bb0d5ce75163424851.webp","art":"assets/characters/2a72b1a1dd0231223f9c48de50058db0.webp","rarity":5,"weapon":"หอก","title":"Lonesome Transcendence","birthday":[10,3],"link":"https://gi.gachabase.net/characters/10000063/shenhe?lang=en&branch=beta"},{"id":"5901","name":"Shikanoin Heizou","elements":[7],"icon":"assets/characters/b1c2e4c7655d919ebdc3b8d81eddc654.webp","art":"assets/characters/62f3bd37bf83a6dead7ea02e9ef681c2.webp","rarity":4,"weapon":"สื่อเวท","title":"Analytical Harmony","birthday":[24,7],"link":"https://gi.gachabase.net/characters/10000059/shikanoin-heizou?lang=en&branch=beta"},{"id":"9501","name":"Sigewinne","elements":[2],"icon":"assets/characters/0f51b6607e926c5d598e638bcd9da5e2.webp","art":"assets/characters/243c3557129c8bef1e47518d6864c1b7.webp","rarity":5,"weapon":"ธนู","title":"Wondrous Dragonheir","birthday":[30,3],"link":"https://gi.gachabase.net/characters/10000095/sigewinne?lang=en&branch=beta"},{"id":"11401","name":"Skirk","elements":[5],"icon":"assets/characters/94c9c9ee9bda9ba314c1235a093b5446.webp","art":"assets/characters/78fa57ce8263565ad80754e9e31257e6.webp","rarity":5,"weapon":"ดาบ","title":"Void Star","birthday":[5,11],"link":"https://gi.gachabase.net/characters/10000114/skirk?lang=en&branch=beta"},{"id":"4301","name":"Sucrose","elements":[7],"icon":"assets/characters/efe38ee19c398b2440c3b8a2471f91e7.webp","art":"assets/characters/b370715b6695ce35b7426efd2dcc05f8.webp","rarity":4,"weapon":"สื่อเวท","title":"Harmless Sweetie","birthday":[26,11],"link":"https://gi.gachabase.net/characters/10000043/sucrose?lang=en&branch=beta"},{"id":"3301","name":"Tartaglia","elements":[2],"icon":"assets/characters/4c79e19610d2659a303c61cc0d1eb69e.webp","art":"assets/characters/5ef6b9a77059dc0a27bd2dd37fa5da2f.webp","rarity":5,"weapon":"ธนู","title":"Childe","birthday":[20,7],"link":"https://gi.gachabase.net/characters/10000033/tartaglia?lang=en&branch=beta"},{"id":"5001","name":"Thoma","elements":[1],"icon":"assets/characters/20ff2eba5ce6f155848e7823a2d1746c.webp","art":"assets/characters/5f4da6709843b1429893c604e76bc0a2.webp","rarity":4,"weapon":"หอก","title":"Protector From Afar","birthday":[9,1],"link":"https://gi.gachabase.net/characters/10000050/thoma?lang=en&branch=beta"},{"id":"6901","name":"Tighnari","elements":[3],"icon":"assets/characters/49015403586b9188e4c40e03cf975ae1.webp","art":"assets/characters/cb4509079568f5fcfdcc6238500152ff.webp","rarity":5,"weapon":"ธนู","title":"Verdant Strider","birthday":[29,12],"link":"https://gi.gachabase.net/characters/10000069/tighnari?lang=en&branch=beta"},{"id":"13701","name":"Valeriy","elements":[4],"icon":"assets/characters/30b7be483206b877a88677c31e25a9bb.webp","art":"assets/characters/72aee06522e6ccd1e9ec0e1def021a1d.webp","rarity":4,"weapon":"ดาบ","title":"Fort Fulguration","birthday":[24,3],"link":"https://gi.gachabase.net/characters/10000137/valeriy?lang=en&branch=beta"},{"id":"11101","name":"Varesa","elements":[4],"icon":"assets/characters/1531ed5375271187daf71a7e06986fd8.webp","art":"assets/characters/bdcdd3722590ff84bad1492f7d84d4fd.webp","rarity":5,"weapon":"สื่อเวท","title":"Strength in Serenity","birthday":[15,11],"link":"https://gi.gachabase.net/characters/10000111/varesa?lang=en&branch=beta"},{"id":"12801","name":"Varka","elements":[7],"icon":"assets/characters/3b9cefb01ad79ac65edd444a0a413c2e.webp","art":"assets/characters/d001a79576e3fb75cd72c166defba778.webp","rarity":5,"weapon":"ดาบใหญ่","title":"Knight of Boreas","birthday":[17,2],"link":"https://gi.gachabase.net/characters/10000128/varka?lang=en&branch=beta"},{"id":"2201","name":"Venti","elements":[7],"icon":"assets/characters/d15fb2b55d19526020703ced81f85f7d.webp","art":"assets/characters/1e2e4a28b1ff81542690067520e6a759.webp","rarity":5,"weapon":"ธนู","title":"Windborne Bard","birthday":[16,6],"link":"https://gi.gachabase.net/characters/10000022/venti?lang=en&branch=beta"},{"id":"14301","name":"Vesna","elements":[7],"icon":"assets/characters/673f828e16f466cb3fffa5dac8b9f8a5.webp","art":"assets/characters/ab884768a04a3960b428cf079e76e8c7.webp","rarity":5,"weapon":"ดาบ","title":"Snowy Banquet's Sharp Blade","birthday":[4,2],"link":"https://gi.gachabase.net/characters/10000143/vesna?lang=en&branch=beta"},{"id":"14001","name":"Vodyanitsa","elements":[2],"icon":"assets/characters/940dbabba932ce86461b16150c846335.webp","art":"assets/characters/48ebd3a7044431ca257ba4ae299aef48.webp","rarity":5,"weapon":"สื่อเวท","title":"Lingering Siren-Song","birthday":[29,3],"link":"https://gi.gachabase.net/characters/10000140/vodyanitsa?lang=en&branch=beta"},{"id":"7501","name":"Wanderer","elements":[7],"icon":"assets/characters/8ca70815f72a5b273d27d30ac13dbd45.webp","art":"assets/characters/0cce6d14eaf979dae4ae5d2b9fa8d2ec.webp","rarity":5,"weapon":"สื่อเวท","title":"Eons Adrift","birthday":[3,1],"link":"https://gi.gachabase.net/characters/10000075/wanderer?lang=en&branch=beta"},{"id":"8601","name":"Wriothesley","elements":[5],"icon":"assets/characters/163a7355cca82dc5b3c9a36c70b7dedd.webp","art":"assets/characters/833b709c7e4de694016881b35ed86143.webp","rarity":5,"weapon":"สื่อเวท","title":"Emissary of Solitary Iniquity","birthday":[23,11],"link":"https://gi.gachabase.net/characters/10000086/wriothesley?lang=en&branch=beta"},{"id":"2301","name":"Xiangling","elements":[1],"icon":"assets/characters/ab2f94b2b8410db31c18b0501f01302b.webp","art":"assets/characters/0caef73a93e509e6a11803224e0e3941.webp","rarity":4,"weapon":"หอก","title":"Exquisite Delicacy","birthday":[2,11],"link":"https://gi.gachabase.net/characters/10000023/xiangling?lang=en&branch=beta"},{"id":"9301","name":"Xianyun","elements":[7],"icon":"assets/characters/426d23d0277d63d652c0f8390d713eb4.webp","art":"assets/characters/88c6eb8925a7f1d049ee2268a1a9f740.webp","rarity":5,"weapon":"สื่อเวท","title":"Passerine Herald","birthday":[11,4],"link":"https://gi.gachabase.net/characters/10000093/xianyun?lang=en&branch=beta"},{"id":"2601","name":"Xiao","elements":[7],"icon":"assets/characters/a78a380ad0ee9d2be1b6b684c21c2527.webp","art":"assets/characters/568309f88942d1596dd197a30c7c0403.webp","rarity":5,"weapon":"หอก","title":"Vigilant Yaksha","birthday":[17,4],"link":"https://gi.gachabase.net/characters/10000026/xiao?lang=en&branch=beta"},{"id":"10301","name":"Xilonen","elements":[8],"icon":"assets/characters/4142693e6b710818f8da1757bb8abe26.webp","art":"assets/characters/eea13ef45099786f97f247eb17f14443.webp","rarity":5,"weapon":"ดาบ","title":"Ardent Flames Forge the Soul","birthday":[13,3],"link":"https://gi.gachabase.net/characters/10000103/xilonen?lang=en&branch=beta"},{"id":"2501","name":"Xingqiu","elements":[2],"icon":"assets/characters/132649d7a199f717fce6c7a6ab22caef.webp","art":"assets/characters/5ec26e0c117717ccd2cf8135e7fc21ee.webp","rarity":4,"weapon":"ดาบ","title":"Juvenile Galant","birthday":[9,10],"link":"https://gi.gachabase.net/characters/10000025/xingqiu?lang=en&branch=beta"},{"id":"4401","name":"Xinyan","elements":[1],"icon":"assets/characters/a87b7d0ea3bca4e5e4fbf1b4e74a5a49.webp","art":"assets/characters/f782a2b5dcca6de0fecabdb4eeb66ede.webp","rarity":4,"weapon":"ดาบใหญ่","title":"Blazing Riff","birthday":[16,10],"link":"https://gi.gachabase.net/characters/10000044/xinyan?lang=en&branch=beta"},{"id":"5801","name":"Yae Miko","elements":[4],"icon":"assets/characters/9af3a07a5100bc9b1401fad7ac1d71cc.webp","art":"assets/characters/dfa6086559d8d046d16b187429df2337.webp","rarity":5,"weapon":"สื่อเวท","title":"Astute Amusement","birthday":[27,6],"link":"https://gi.gachabase.net/characters/10000058/yae-miko?lang=en&branch=beta"},{"id":"4801","name":"Yanfei","elements":[1],"icon":"assets/characters/f7160bf8a60d8b3c702a02314e74300c.webp","art":"assets/characters/6930dc9dd2dd189cef58cf8c679a8a97.webp","rarity":4,"weapon":"สื่อเวท","title":"Wise Innocence","birthday":[28,7],"link":"https://gi.gachabase.net/characters/10000048/yanfei?lang=en&branch=beta"},{"id":"7701","name":"Yaoyao","elements":[3],"icon":"assets/characters/aa70751d15f29ce548523e8659c89c10.webp","art":"assets/characters/ff98c616272ebea367d53c107f848353.webp","rarity":4,"weapon":"หอก","title":"Burgeoning Grace","birthday":[6,3],"link":"https://gi.gachabase.net/characters/10000077/yaoyao?lang=en&branch=beta"},{"id":"6001","name":"Yelan","elements":[2],"icon":"assets/characters/85548926dc60f5706038db74d916b6fd.webp","art":"assets/characters/12469685aef0cde4659300d1c5d976af.webp","rarity":5,"weapon":"ธนู","title":"Valley Orchid","birthday":[20,4],"link":"https://gi.gachabase.net/characters/10000060/yelan?lang=en&branch=beta"},{"id":"4901","name":"Yoimiya","elements":[1],"icon":"assets/characters/87c16170d2f965e17475efb5ef02da2e.webp","art":"assets/characters/ff4b5ffe15b918c026ea4c17ed11b9b2.webp","rarity":5,"weapon":"ธนู","title":"Frolicking Flames","birthday":[21,6],"link":"https://gi.gachabase.net/characters/10000049/yoimiya?lang=en&branch=beta"},{"id":"10901","name":"Yumemizuki Mizuki","elements":[7],"icon":"assets/characters/b4331429163935d4d908b690aff9ba77.webp","art":"assets/characters/06e93291e1018a6eb442520fd134fbd2.webp","rarity":5,"weapon":"สื่อเวท","title":"Embrace of Enchanting Dreams","birthday":[16,3],"link":"https://gi.gachabase.net/characters/10000109/yumemizuki-mizuki?lang=en&branch=beta"},{"id":"6401","name":"Yun Jin","elements":[8],"icon":"assets/characters/14d7b4e597225cbb1363358d89006c2a.webp","art":"assets/characters/66103c48f0da25cb08c3079ab4c866bd.webp","rarity":4,"weapon":"หอก","title":"Stage Lucida","birthday":[21,5],"link":"https://gi.gachabase.net/characters/10000064/yun-jin?lang=en&branch=beta"},{"id":"3001","name":"Zhongli","elements":[8],"icon":"assets/characters/37de10beba5ba9b67d9fcc44d5de6574.webp","art":"assets/characters/28c2c4258b503cdb6a592e27d2f7bb71.webp","rarity":5,"weapon":"หอก","title":"Vago Mundo","birthday":[31,12],"link":"https://gi.gachabase.net/characters/10000030/zhongli?lang=en&branch=beta"},{"id":"12601","name":"Zibai","elements":[8],"icon":"assets/characters/34a19ba96316e4711d8f5cc9b0588643.webp","art":"assets/characters/d6c0e1a137f7ab1003c73f72b8471cea.webp","rarity":5,"weapon":"ดาบ","title":"White Horse's Fleeting Spring","birthday":[15,5],"link":"https://gi.gachabase.net/characters/10000126/zibai?lang=en&branch=beta"}];
+    const picker = document.querySelector('#character-picker');
+    const heading = picker.querySelector('#character-picker-heading span span');
+    const elementIcon = picker.querySelector('.character-picker-header img');
+    const arrows = [...picker.querySelectorAll('.character-rail-arrow')];
+    const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+    const roster = picker.querySelector('.character-roster');
+    const details = picker.querySelector('.character-profile-details');
+    const hint = picker.querySelector('.character-profile-hint');
+    const art = details.querySelector('img');
+    const name = details.querySelector('h4');
+    const title = details.querySelector('.character-profile-title');
+    const facts = details.querySelector('dl');
+    const confirmCharacter = document.createElement('button');
+    confirmCharacter.className = 'character-picker-confirm';
+    confirmCharacter.type = 'button';
+    confirmCharacter.textContent = 'เลือกตัวละครนี้';
+    const hall = document.querySelector('#successors');
+    const reply = document.querySelector('.council-finale .celestia-reply');
+    const replyHeading = reply.querySelector('#celestia-reply-heading');
+    const replyArt = reply.querySelector('.celestia-reply-art');
+    const replyElement = reply.querySelector('.celestia-reply-element');
+    const otherResponses = {"201":"เจ้าปฏิบัติต่อผู้คนด้วยความจริงใจและแบกรับหน้าที่ด้วยความเข้มแข็ง","502":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","503":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","505":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","506":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","507":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","508":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยื่นมือช่วยผู้คนที่พบระหว่างทาง แม้จะไม่รู้ว่าเส้นทางข้างหน้าจะพาไปที่ใด","601":"เจ้ามีความรู้มากพอ แต่หากเอกสารรีเซ็ตค้างคืน ข้าคงต้องส่งบรรณารักษ์ไปทวงถึงห้องสมุด","702":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","703":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","705":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","706":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","707":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","708":"เจ้าข้ามฟ้ามาตามหาพี่ชาย และยังไม่ทอดทิ้งผู้คนที่พบระหว่างทาง","1401":"เสียงเพลงและความห่วงใยของเจ้าช่วยปลอบโยนชาว Mondstadt","1501":"รอยยิ้มของเจ้าทำให้ทุกคนสบายใจ แต่ข้ายังสงสัยว่าเจ้ากำลังซ่อนแผนใดไว้","1601":"แม้ในค่ำคืนที่ไร้ผู้เห็น เจ้าก็ยังปกป้องเมืองที่ตนรัก","2001":"เจ้าซื่อสัตย์ต่อครอบครัวและปกป้องพวกพ้องไม่ว่าจะเป็นมนุษย์หรือหมาป่า","2101":"แม้จะเป็น Outrider คนสุดท้าย เจ้าก็ยังออกลาดตระเวนด้วยรอยยิ้มเพื่อปกป้อง Mondstadt","2301":"ความคิดสร้างสรรค์ในครัวของเจ้าชวนตื่นตา แต่ข้าไม่แน่ใจว่า Gnosis ควรเป็นวัตถุดิบชิ้นต่อไป","2401":"เจ้านำลูกเรือฝ่าคลื่นด้วยความกล้าหาญและได้รับความไว้วางใจจากพวกเขา","2501":"เจ้าใฝ่หาคุณธรรมในหนังสือและพยายามนำมันไปช่วยเหลือผู้คนจริงๆ","2701":"เจ้ามีทั้งปัญญาและความมั่งคั่ง แต่ข้าเกรงว่าไม่นาน Celestia จะกลายเป็นส่วนหนึ่งของธุรกิจเจ้า","2901":"เจ้าหนูน้อยผู้รักการระเบิด หากส่ง Gnosis ให้เจ้า Celestia คงต้องสร้างใหม่ตั้งแต่ฐาน","3001":"เจ้ารอบรู้เรื่องสัญญาเป็นอย่างดี แต่ข้าเกรงว่าค่าพิธีแต่งตั้งจะตกเป็นภาระของผู้อื่น","3101":"เจ้าหญิงแห่งแดนสนธยาเอ๋ย ข้ายังต้องการใครสักคนแปลคำประกาศของเจ้าก่อนจะมอบอำนาจนี้","3201":"หัวใจนักผจญภัยของเจ้าน่ายกย่อง แต่หากระบบรีเซ็ตโชคร้ายตามเจ้าไปด้วย ข้าคงไม่อาจเสี่ยง","3301":"เจ้าทุ่มเทเพื่อครอบครัว แต่ความกระหายการต่อสู้ของเจ้าอาจพา Gnosis ไปอยู่กลางสนามรบ","3401":"เจ้าช่วยเหลือผู้คนอย่างไม่ลังเล แม้ยังรอวันที่จะได้เป็นอัศวิน","3501":"เจ้าน่ารักและขยันเก็บสมุนไพร แต่หากเจ้าลืมวันรีเซ็ต ข้าคงต้องเขียนบันทึกติดตัวเจ้าไว้","3601":"เจ้าเพียรควบคุมพลังของตนเพื่อช่วยผู้คน แม้จะต้องระวังตัวอยู่เสมอ","3701":"เจ้าอดทนดูแลงานของ Liyue มายาวนานและใส่ใจทั้งมนุษย์กับเซียน","3801":"เจ้าใช้สติปัญญาและความใฝ่รู้ค้นหาความจริงอย่างรอบคอบ","3901":"เจ้าปรารถนาจะทำลายวงการสุรา แต่กลับชงเครื่องดื่มได้ยอดเยี่ยมเกินห้ามใจ ข้าเกรงว่าแผนของเจ้าจะย้อนผลอีก","4101":"นักโหราศาสตร์ผู้ทำนายดวงดาวได้แม่นยำ แต่เจ้าอาจใช้เงินดูแล Gnosis หมดก่อนสิ้นเดือน","4201":"เจ้ากล้าตั้งคำถามต่อเทพและลงมือสร้างอนาคตด้วยมือตนเอง","4401":"เจ้ากล้าปล่อยเสียงดนตรีท้าทายอคติและทำให้ผู้คนเปิดใจ","4501":"เจ้าทำหน้าที่ในแบบของตน แต่ข้าไม่แน่ใจว่าจะพบตัวเจ้าได้เมื่อถึงเวลาประชุมหรือไม่","4601":"เจ้าจัดงานศพเก่งนัก แต่ข้ายังไม่อยากให้ระบบรีเซ็ตกลายเป็นลูกค้ารายต่อไปของเจ้าสำนัก","4801":"เจ้าใช้ความรู้เรื่องกฎหมายช่วยให้ผู้คนเข้าใจสิทธิของตน","4901":"ดอกไม้ไฟของเจ้าอยู่เพียงชั่วครู่ แต่เจ้าทำให้ความหวังของผู้คนสว่างอยู่ได้นานกว่านั้น","5001":"ผู้ที่คอยช่วยเหลือผู้อื่นโดยไม่รอคำขอบคุณย่อมเป็นหลักให้ผู้คนได้","5101":"เจ้าเลือกพิสูจน์ตนผ่านการกระทำ แม้ต้องเผชิญอคติที่สืบทอดมาจากตระกูล","5201":"เจ้าแสวงหานิรันดร์ แต่หน้าที่นี้ต้องยอมรับการเปลี่ยนแปลงเมื่อเวลามาถึง","5401":"เจ้าใช้สติปัญญาดูแลทั้งแผ่นดินและผู้คนที่ฝากความหวังไว้กับเจ้า","5501":"เจ้าคือแม่ทัพที่ลูกน้องเชื่อมั่น เพราะเจ้ายืนเคียงข้างพวกเขาจริงๆ","5601":"เจ้ายืนหยัดในหน้าที่และต่อสู้ด้วยความเด็ดเดี่ยว","5701":"หัวหน้าพรรคผู้ยิ่งใหญ่เอ๋ย หากเจ้าลืมเวลานัดเพราะแข่งแมลงอีกครั้ง ใครจะกดรีเซ็ตแทน","5801":"บรรณาธิการผู้เจ้าเล่ห์เอ๋ย ข้าไม่อยากเห็นบันทึกความลับแห่ง Celestia วางขายเป็นนิยายเล่มใหม่","6001":"เจ้าเก็บความลับเก่งเสียจนข้าไม่แน่ใจว่ากำลังมอบ Gnosis ให้ใครกันแน่","6101":"เจ้าทุ่มเทส่งของถึงมือผู้รับและผูกมิตรกับผู้คนตลอดเส้นทาง","6201":"แม้ถูกผลักไส เจ้าก็ยังเลือกออกล่าเพื่อปกป้องผู้คนและทำสิ่งที่ถูกต้อง","6301":"แม้เจ้าจะเติบโตอย่างโดดเดี่ยว เจ้าก็ยังเรียนรู้ที่จะปกป้องผู้คน","6401":"เจ้าถ่ายทอดเรื่องราวของผู้คนผ่านการแสดงด้วยความประณีตและจริงใจ","6501":"เจ้าคอยดูแลพรรคพวกอย่างรอบคอบ แม้พวกเขาจะสร้างเรื่องให้เจ้าปวดหัวเสมอ","6601":"เจ้าวางแผนได้แยบยลนัก แต่ข้าสงสัยว่าแผนที่แท้จริงของเจ้าคือสิ่งใดกันแน่","6701":"เจ้าผ่านช่วงเวลาที่เจ็บปวดมาได้ และยังเลือกดูแลผู้คนกับผืนป่าต่อไป","6801":"เจ้าอาจต่อรองเก่ง แต่ Gnosis ไม่ใช่สินค้าที่ข้าจะให้เจ้านำไปตั้งราคา","6901":"เจ้าสั่งสอนผู้หลงทางด้วยคำตรงไปตรงมา และคอยดูแลผืนป่าอย่างจริงใจ","7001":"การเต้นรำของเจ้าทำให้ผู้คนพบความสุขและกล้ายืนหยัดเพื่อสิ่งที่รัก","7101":"เจ้าบังคับใช้กฎได้เคร่งครัดนัก แต่หากต้องฟังมุกของเจ้าทุกครั้งที่รีเซ็ต ข้าคงทนไม่ไหว","7201":"เจ้ายืนหยัดปกป้องหมู่บ้าน Aaru และผู้ที่มาขอความช่วยเหลือ","7301":"แม้จะถูกกักขัง เจ้าก็ยังอยากเรียนรู้และช่วยให้ผู้คนได้ใช้ชีวิตตามความฝัน","7401":"เจ้าศึกษาดวงดาวจนแทบไม่ได้นอน ข้าจะให้เจ้าพักก่อนรับหน้าที่ที่ต้องตื่นตรงเวลา","7701":"เจ้ายังเล็กแต่รู้จักดูแลผู้คนรอบตัวด้วยความอ่อนโยน","7801":"เจ้าฉลาดพอจะเข้าใจภาระนี้ แต่ข้าสงสัยว่าเจ้าจะยอมรับงานที่รบกวนเวลาส่วนตัวหรือไม่","7901":"เจ้ามีทั้งความกล้าหาญของทหารรับจ้างและหัวใจที่พร้อมปกป้องผู้อื่น","8001":"เจ้าสำรวจเส้นทางอย่างรอบคอบเพื่อให้เพื่อนร่วมทางเดินต่อได้อย่างปลอดภัย","8101":"เจ้าสนใจความฝันและความทุกข์ของผู้คน แม้มันจะทำให้ชีวิตของเจ้าเองยากขึ้น","8201":"แม้ร่างกายอ่อนแอ เจ้าก็ยังทุ่มเทความรู้รักษาผู้ป่วย","8401":"คำพูดของเจ้าไพเราะราวมายากล แต่ข้ายังไม่มั่นใจว่าสิ่งที่ซ่อนอยู่หลังม่านจะปลอดภัย","8501":"ภายใต้ความเงียบ เจ้าซ่อนหัวใจอ่อนโยนและความกล้าที่จะดำดิ่งเพื่อผู้อื่น","8601":"เจ้าดูแลผู้คนในป้อมปราการและให้โอกาสพวกเขาเริ่มต้นใหม่","8701":"เจ้าตัดสินคดีด้วยความเที่ยงธรรม และรับฟังความทุกข์ของผู้คน แม้บนบ่าของเจ้าจะมีเรื่องราวที่เหล่าผู้มายืนต่อหน้าศาลไม่มีวันล่วงรู้","8801":"เจ้าตามหาความจริงไม่หยุดหย่อน แต่ข้าไม่ต้องการเห็นขั้นตอนรีเซ็ตขึ้นหน้าหนึ่งของหนังสือพิมพ์","8901":"แม้ต้องอยู่บนเวทีเพียงลำพังมานาน เจ้าก็ยังอดทนเพื่อผู้คนของ Fontaine","9001":"เจ้าชี้ปืนไปยังผู้กระทำผิดและยืนหยัดเพื่อความยุติธรรม","9101":"เจ้าดูแลผู้คนใน Spina di Rosula ด้วยความรับผิดชอบและหัวใจที่อบอุ่น","9201":"เจ้านำทั้งความปลอดภัยและความรื่นเริงไปให้ผู้คนระหว่างทาง","9401":"ฝีมือการตัดเย็บของเจ้าไร้ที่ติ แต่ข้าไม่ต้องการให้ระเบียบแห่ง Celestia ถูกตัดตามแบบของเจ้า","9501":"เจ้าดูแลผู้คนในป้อมปราการด้วยความเมตตาไม่ว่าพวกเขาจะมีอดีตเช่นไร","9601":"เจ้าเป็นบิดาที่เด็กๆ พึ่งพาได้ แต่ความเยือกเย็นของเจ้าทำให้ข้าไม่กล้าฝากชะตาผู้คนไว้ในมือเจ้า","9701":"เจ้ารู้จักเก็บความลับ แต่ข้ายังอยากรู้ว่ารอยยิ้มของเจ้าซ่อนแผนใดไว้อีก","9801":"เจ้าถือดาบปกป้องความยุติธรรมโดยไม่ทอดทิ้งหน้าที่","9901":"เจ้าบรรจุความลับไว้ในขวดน้ำหอมได้ แต่ข้ายังไม่พร้อมให้ความลับของ Celestia กลายเป็นกลิ่นใหม่","10001":"ทุกครั้งที่ล้ม เจ้าก็ลุกขึ้นและพยายามต่อด้วยหัวใจอ่อนโยน","10101":"เจ้านับต้นทุนทุกอย่างอย่างรอบคอบ แต่ข้าไม่แน่ใจว่าค่าจ้างผู้สืบทอดของเจ้าจะสูงเพียงใด","10201":"เจ้าพาผู้คนฝ่าคลื่นด้วยความชำนาญและรอยยิ้ม","10301":"เจ้ารับผิดชอบงานสำคัญและยังรู้จักแบ่งเวลาให้ชีวิตของตน","10501":"เจ้ารับฟังธรรมชาติและคอยดูแลสิ่งมีชีวิตรอบตัวด้วยวิธีของเจ้า","10601":"เจ้ายอมแบกรับเปลวเพลิงและความหวังของ Natlan เพื่อส่องทางให้คนรุ่นต่อไป","10701":"ผู้อาวุโสผู้ทรงปัญญา ข้าเกรงว่าเมื่อเจ้าอารมณ์เสีย Celestia จะหนาวกว่าที่เคย","11001":"เจ้าฝึกฝนตนเองและช่วยให้ผู้อื่นแข็งแกร่งขึ้นด้วยความมุ่งมั่น","11101":"เจ้ามีหัวใจของวีรบุรุษ แม้จะต้องเติมพลังด้วยอาหารจานใหญ่ก่อนออกเดินทาง","11201":"มาตรฐานในครัวของเจ้าสูงนัก แต่ข้ายังไม่พร้อมให้เจ้านำ Gnosis ไปชั่งตวงเป็นสูตรอาหาร","11401":"ฝีมือของเจ้านั้นยากจะหาผู้ใดเทียบ เส้นทางที่เจ้าผ่านมาคงยาวไกลเกินกว่าที่ข้าจะเห็นจากที่นี่","11501":"เจ้ารับใช้โบสถ์อย่างกระตือรือร้น แต่ข้ายังอยากเห็นว่าเจ้าจะดูแลหน้าที่นี้ได้โดยไม่วอกแวกหรือไม่","11601":"แม้เวลาจะผ่านไปเนิ่นนาน เจ้าก็ยังดูแลผู้คนด้วยหัวใจที่อบอุ่น","11901":"เจ้าเฝ้าดูแลทั้งผืนป่าและความหวังของผู้คนใต้แสงจันทร์","12001":"เจ้าเฝ้าประภาคารและดูแลผู้ล่วงลับด้วยความสงบและอ่อนโยน","12101":"เจ้าเป็นนักประดิษฐ์ผู้เปี่ยมความคิด แต่ข้ายังไม่พร้อมเห็นระบบรีเซ็ตกลายเป็นเครื่องทดลองชิ้นใหม่","12201":"เจ้ารอบรู้และเก็บความลับได้ดีเกินไป ข้ายังไม่พร้อมเล่นเกมปริศนากับเจ้า","12301":"แม้เรื่องราวของเจ้าจะเริ่มจากปลายปากกา เจ้าก็เลือกที่จะเขียนบทต่อไปด้วยตนเอง","12501":"แสงจันทร์นำเจ้ากลับบ้าน และเจ้าก็มอบความหวังให้ผู้คนที่รอคอย","12601":"แม้เรื่องราวของเจ้าจะปกคลุมด้วยตำนาน เจ้าก็ยังเป็นความหวังให้ผู้คนที่รอคอย","12701":"แม้อายุยังน้อย เจ้าก็รับผิดชอบทีมสืบสวนและนำทางผู้อื่นท่ามกลางความมืด","12901":"กลยุทธ์นอกแบบของเจ้าน่าสนใจ แต่ข้าขอดูแผนสำรองก่อนมอบระบบรีเซ็ตให้","13001":"เจ้าศึกษาธรรมชาติและนำความรู้มาช่วยเหลือนักผจญภัย","13101":"เสียงของเจ้าปรากฏในยามผู้คนหลงทาง แต่แม้แต่ข้าก็ยังไม่อาจรู้ว่าเจ้าซ่อนสิ่งใดไว้","13301":"เจ้าคำนวณได้ละเอียด แต่ข้าไม่พร้อมให้ระบบรีเซ็ตถูกแยกชิ้นส่วนเพื่อพิสูจน์ทฤษฎี","13601":"ผู้เชี่ยวชาญด้านพลังงานที่ชำนาญการหลบตารางงาน หากถึงเวลารีเซ็ตเจ้าจะอยู่ที่ใดกัน","13701":"เจ้ารู้จักปกป้องผู้คนและทำให้ภารกิจเดินหน้าต่อในยามคับขัน","14001":"เสียงร้องของเจ้าสะกดเวทีได้ แต่ข้ายังไม่แน่ใจว่าเจ้าจะยอมให้ผู้ใดกำหนดชะตานอกจากตนเอง","14701":"เงาของเจ้ารับใช้ Winter Palace อย่างเงียบงัน แต่ข้ายังมองไม่เห็นความปรารถนาของเจ้าเอง","14801":"ภายใต้ความสงบนั้น เจ้ายังยึดมั่นในอุดมการณ์ของตนท่ามกลางหิมะ","14901":"มงกุฎแห่งน้ำแข็งย่อมมาพร้อมภาระ แต่ข้ายังต้องเห็นว่าเจ้าจะใช้มันเพื่อผู้ใด","15001":"เจ้ามอบความงดงามให้ผู้คนผ่านการเต้นรำท่ามกลางความหนาวเหน็บ"};
+    const anemoResponses = {"301":"เจ้ารับแม้กระทั่งเรื่องเล็กน้อยของชาวเมืองไว้บนบ่า","504":"เจ้าข้ามฟ้ามาตามหาน้องสาว และยังยื่นมือให้ผู้คนที่พบระหว่างทาง แม้โลกนี้จะมิใช่บ้านของเจ้า","704":"เจ้าผ่านโลกที่ไม่รู้จักเพื่อตามหาพี่ชาย และเรื่องราวของผู้คนที่พบก็ยังเดินทางไปกับเจ้า","2201":"นักกวีเอ๋ย เจ้าเคยถือครองสายลมแล้วเลือกปล่อยให้ผู้คนกำหนดทางเดินของตน","2601":"เจ้าต่อสู้ให้ผู้คนได้หลับอย่างสงบมานานแล้ว","4301":"เจ้าอาจไม่กล้าสบตาข้า แต่ถ้ามีสิ่งที่ยังอธิบายไม่ได้ เจ้าจะตามหาคำตอบจนพบ","4701":"เจ้าฟังเสียงลมได้โดยไม่คิดจะสั่งให้มันเชื่อฟัง และเดินตามหลักของตนแม้ในวันที่เส้นทางยากเย็น","5301":"เจ้าเพิ่งมาถึงก็เอาแต่มองหาที่งีบ ข้าสงสัยว่าเจ้าซ่อนตัวอย่างแนบเนียนได้อย่างไรทั้งที่ยังง่วงอยู่เช่นนี้","5901":"ข้ายังถามไม่จบ เจ้าก็เริ่มสืบสวนคนตั้งคำถามเสียแล้ว","7501":"ปากของเจ้าคมเสียจนข้าเกือบไม่อยากฟังต่อ แต่เจ้ารู้ดีว่าความผิดพลาดมีราคาเท่าไร","7601":"เจ้าคงอยากให้ข้าเรียกว่า “ท่านรุ่นพี่” สินะ เจ้าผ่านเวลานับร้อยปีแล้วยังมีใจจะสอนคนรุ่นหลัง","8301":"ข้าเห็นเจ้าทำหุ่นยนต์พังมามากพอแล้ว Lynette หากฝากการรีเซ็ตไว้ในมือเจ้า กลไกของ Celestia คงพังตามไปด้วย","9301":"เจ้าชอบเล่าเรื่องศิษย์ด้วยท่าทีเคร่งขรึม แต่ข้าได้ยินความเอ็นดูอยู่ในทุกคำ","10401":"เจ้าเคยอยู่ท่ามกลางความขัดแย้ง แต่กลับเป็นคนที่ผู้อื่นเรียกหาเมื่ออยากให้มันยุติ ผู้ที่หยุดศึกได้ย่อมเหมาะจะถือครองพลังแห่งลม","10801":"มือของเจ้าสานหวายให้โค้งได้โดยไม่หัก ใจของเจ้าก็อ่อนโยนเช่นนั้น","10901":"เจ้ารู้จักความฝันร้ายดีพอจะนั่งฟังคนที่ไม่กล้าบอกใคร","11301":"เจ้าฟังเสียงของเหล่า Saurian ในยามที่คนอื่นได้ยินเพียงเสียงคำราม เมื่อเห็นชีวิตเล็กๆ บาดเจ็บ เจ้าก็ยอมก้มลงช่วย","12401":"เจ้าทำหน้ามั่นใจได้ดี แม้ในใจจะยังลังเลอยู่บ้าง ข้าเห็นว่าเจ้าก้าวต่อทั้งที่กลัว นั่นแหละคือความกล้าที่ข้าตามหา","12801":"เจ้าคงไม่อยู่ฟังพิธีแต่งตั้งจนจบด้วยซ้ำ แต่หากคนของเจ้าต้องการความช่วยเหลือ ข้ารู้ว่าเจ้าจะอยู่ตรงนั้น","13201":"นักล่าแม่มดที่ลงเอยด้วยการเป็นเพื่อนกับผู้ที่ตนหมายจะล่าอย่างนั้นหรือ ดีแล้วที่เจ้ายอมเปลี่ยนใจเมื่อเห็นความจริง","14301":"มุกของเจ้าต่ำต้อยเสียจนข้าไม่อยากหัวเราะ แต่เจ้ารู้วิธีทำให้พวกพ้องยิ้ม และเมื่อถึงคราวคับขันเจ้าก็พร้อมเสียสละเพื่อพวกเขา"};
+    const council = new Map();
+    const seatOrder = [7, 8, 4, 3, 2, 1, 5];
+    const councilSeats = hall.querySelector('.council-seats');
+    const councilCount = hall.querySelector('.council-count');
+    const summaryButton = hall.querySelector('.council-summary');
+    const finale = document.querySelector('.council-finale');
+    const orbit = finale.querySelector('.council-orbit');
+    const result = finale.querySelector('.council-result');
+    const memberPreview = finale.querySelector('.council-member-preview');
+    const memberPreviewArt = memberPreview.querySelector('.council-member-preview-art');
+    const wideFinale = matchMedia('(min-width: 1051px)');
+    let activeMemberSeat;
+    const vision = reply.querySelector('.future-vision p');
+    const visionStatus = reply.querySelector('.future-vision-status');
+    const relationship = reply.querySelector('.team-relation');
+    const personalVisions = {
+      hope: name => 'ความเอื้ออาทรของ ' + name + ' ทำให้ผู้คนกล้าพึ่งพากันอีกครั้ง',
+      freedom: name => name + ' เปิดเส้นทางใหม่ให้ผู้คนเลือกอนาคตของตนเอง',
+      wisdom: name => name + ' ใช้ความรู้เปลี่ยนความกลัวของผู้คนให้เป็นความเข้าใจ',
+      resolve: name => name + ' ยืนหยัดเฝ้าดูแลเมืองจนผู้คนกลับบ้านได้อย่างปลอดภัย',
+    };
+    const knownRelations = [
+      { pair: ['Kaeya', 'Diluc'], line: 'เจ้าสองคนคงช่วยเมืองได้ก่อนยอมตกลงกันว่าใครเป็นคนวางแผน ให้คนอื่นเป็นผู้คุมการประชุมเถิด' },
+      { pair: ['Albedo', 'Sucrose'], line: 'เมื่อคนหนึ่งตั้งคำถาม อีกคนก็พร้อมทดลอง ข้าเพียงหวังว่าพวกเจ้าจะยอมออกจากห้องทดลองก่อนฟ้าสาง' },
+      { pair: ['Xingqiu', 'Chongyun'], line: 'คนหนึ่งเสนอแผนด้วยรอยยิ้ม อีกคนลงมืออย่างจริงจัง ข้าขอให้พวกเจ้าอ่านรายละเอียดของแผนด้วยกันก่อนออกเดินทาง' },
+    ];
+    function describeRelationship(character, element, role) {
+      const teammates = [...council].filter(([seat, member]) => seat !== element && member.name !== character.name);
+      for (const {pair, line} of knownRelations) {
+        if (!pair.includes(character.name)) continue;
+        const match = teammates.find(([, member]) => pair.includes(member.name));
+        if (match) return match[1].name + ' · ' + line;
+      }
+      const latest = teammates.at(-1);
+      if (!latest) return '';
+      const member = latest[1];
+      const otherRole = characterArchetype(member);
+      const pair = [role, otherRole].sort().join(':');
+      const dynamics = {
+        'freedom:resolve': 'คนหนึ่งอยากเปลี่ยนแผนตามสถานการณ์ อีกคนอยากยึดแผนเดิม คงต้องมีคนคอยช่วยตกลงว่าเมื่อไรควรเปลี่ยนทาง',
+        'freedom:wisdom': 'คนหนึ่งพร้อมลองเส้นทางใหม่ อีกคนจะขอหลักฐานก่อน ข้าว่าพวกเจ้าคงโต้กันตลอดทาง แต่แผนจะรอบคอบขึ้น',
+        'hope:resolve': 'คนหนึ่งจะคอยดูว่ามีใครตกหล่น อีกคนจะพาทุกคนฝ่าทางอันตราย พวกเจ้าจะช่วยกันได้ดี',
+        'hope:wisdom': 'คนหนึ่งรู้ว่าผู้คนต้องการอะไร อีกคนรู้ว่าจะทำให้เกิดขึ้นได้อย่างไร ข้าอยากเห็นพวกเจ้าลองวางแผนด้วยกัน',
+        'freedom:hope': 'คนหนึ่งมองหาทางออกที่ยังไม่มีใครเห็น อีกคนจะเดินกลับไปรับคนที่ตามไม่ทัน',
+        'resolve:wisdom': 'คนหนึ่งพร้อมลงมือ ส่วนอีกคนจะช่วยมองว่าจุดไหนยังเสี่ยง ข้าว่าพวกเจ้าจะแบ่งงานกันได้ดี',
+        'freedom:freedom': 'เจ้าสองคนคงเสนอเส้นทางใหม่พร้อมกัน ให้ตกลงจุดนัดพบไว้ก่อนจะแยกกันคนละทาง',
+        'hope:hope': 'เจ้าสองคนจะคอยดูแลคนในทีม แต่ข้าขอให้แบ่งเวรกันพักด้วย',
+        'resolve:resolve': 'เจ้าสองคนพร้อมรับภาระเดียวกัน ควรให้เพื่อนอีกคนช่วยแบ่งหน้าที่ก่อนจะแย่งกันลงมือ',
+        'wisdom:wisdom': 'เจ้าสองคนคงช่วยกันตรวจทุกทางเลือก ข้าขอเพียงให้ตกลงกันว่าเมื่อไรถึงเวลาลงมือ',
+      };
+      return member.name + ' · ' + dynamics[pair];
+    }
+    const archetypes = {
+      hope: {
+        vision: 'ยามรุ่งสาง หน้าต่างบ้านเรือนกลับมีแสงไฟ ผู้ที่เคยหลงทางเริ่มเรียกหากันด้วยชื่ออีกครั้ง',
+        quote: 'เจ้ารู้จักดูแลชีวิตเล็กๆ จนกลายเป็นกำลังให้โลกนี้ดำเนินต่อ ข้าขอมอบรุ่งอรุณครั้งถัดไปไว้กับพวกเจ้า',
+      },
+      resolve: {
+        vision: 'พายุยังไม่สงบ แต่ประตูเมืองยังเปิดอยู่ ผู้เฝ้ากำแพงรู้ว่าจะมีใครสักคนยืนเคียงข้างจนฟ้าสาง',
+        quote: 'พวกเจ้ารับภาระไว้ด้วยความกล้า จงจำไว้ว่าโลกที่เจ้าปกป้องยังต้องการทั้งดาบและมือที่ยื่นออกไป',
+      },
+      freedom: {
+        vision: 'เสียงเพลงดังตามถนนที่เคยเงียบงัน ผู้คนเริ่มออกเดินทาง และมีเส้นทางใหม่ปรากฏบนแผนที่',
+        quote: 'พวกเจ้ากล้าเปิดทางให้ผู้คนเลือกอนาคตของตนเอง ข้าจะรอดูว่าโลกนี้จะเดินไปได้ไกลเพียงใด',
+      },
+      wisdom: {
+        vision: 'แสงในห้องสมุดส่องอยู่ตลอดคืน เครื่องจักรที่เคยหยุดนิ่งเริ่มหมุน และเด็กๆ เริ่มถามถึงสิ่งที่อยู่พ้นขอบฟ้า',
+        quote: 'พวกเจ้ายอมเรียนรู้แม้ต้องตั้งคำถามต่อสิ่งที่เคยเชื่อ จงใช้คำตอบที่พบเพื่อลดความทุกข์ของผู้คน',
+      },
+    };
+    const temperament = {
+      hope: ['Barbara','Yaoyao','Noelle','Thoma','Jean','Baizhu','Sigewinne','Vesna','Ifa','Lan Yan','Nilou','Nahida','Candace','Ganyu','Navia','Kirara','Yumemizuki Mizuki'],
+      freedom: ['Venti','Kaedehara Kazuha','Xinyan','Yoimiya','Gaming','Mualani','Yun Jin','Varka','Aether','Lumine','Wanderer','Prune'],
+      wisdom: ['Albedo','Tighnari','Sucrose','Faruzan','Shikanoin Heizou','Xilonen','Linnea','Mika','Illuga'],
+    };
+    function characterArchetype(character) {
+      return Object.keys(temperament).find(key => temperament[key].includes(character.name)) || 'resolve';
+    }
+    function teamArchetype() {
+      const totals = {hope: 0, resolve: 0, freedom: 0, wisdom: 0};
+      council.forEach(character => totals[characterArchetype(character)]++);
+      return Object.keys(totals).sort((a, b) => totals[b] - totals[a])[0];
+    }
+    const seatButtons = new Map();
+    for (const element of seatOrder) {
+      const button = document.createElement('button');
+      button.className = 'council-seat';
+      button.type = 'button';
+      const image = document.createElement('img');
+      image.alt = '';
+      button.append(image);
+      button.addEventListener('click', () => hall.querySelector('.gnosis-trigger[data-element="' + element + '"]').click());
+      seatButtons.set(element, button);
+      councilSeats.append(button);
+    }
+    function updateCouncil() {
+      for (const [element, button] of seatButtons) {
+        const member = council.get(element);
+        button.dataset.filled = String(Boolean(member));
+        button.querySelector('img').src = member ? member.icon : 'assets/characters/element-' + element + '.webp';
+        button.setAttribute('aria-label', 'ธาตุ' + elements[element].name + (member ? ' · ' + member.name + ' · กดเพื่อเปลี่ยน' : ' · ยังไม่มีผู้สืบทอด'));
+        button.title = button.getAttribute('aria-label');
+      }
+      councilCount.textContent = 'เลือกแล้ว ' + council.size + ' / 7 ธาตุ';
+      summaryButton.hidden = council.size !== 7;
+    }
+    function setCouncilFuture() {
+      if (council.size) hall.dataset.future = teamArchetype();
+      else delete hall.dataset.future;
+    }
+    const fusion = finale.querySelector('.vision-fusion');
+    const fusionSkip = fusion.querySelector('button');
+    const finaleTitle = finale.querySelector('.council-title');
+    const resultContent = [...finale.children].filter(child => child !== fusion);
+
+    function finishVisionFusion(reveal) {
+      fusion.hidden = true;
+      resultContent.forEach(child => { child.inert = false; });
+      finale.setAttribute('aria-labelledby', finaleTitle.id);
+      if (reveal && finale.open) finaleTitle.focus({preventScroll: true});
+    }
+
+    function showCouncilFinale(animate = false) {
+      if (council.size !== 7 || finale.open) return;
+      hideCharacterReply();
+      finishVisionFusion(false);
+      fusion.querySelectorAll('.vision-fusion-icon').forEach(icon => icon.remove());
+      const story = archetypes[teamArchetype()];
+      finale.querySelector('.council-future').textContent = story.vision;
+      finale.querySelector('.council-final-quote').textContent = '“' + story.quote + '”';
+      orbit.querySelectorAll('.council-seat').forEach(button => button.remove());
+      seatOrder.forEach((element, index) => {
+        const member = council.get(element);
+        const angle = -Math.PI / 2 + index * Math.PI * 2 / 7;
+        const seat = seatButtons.get(element).cloneNode(true);
+        seat.querySelector('img').src = member.icon;
+        seat.setAttribute('aria-label', member.name + ' · ธาตุ' + elements[element].name);
+        seat.setAttribute('aria-controls', reply.id);
+        seat.setAttribute('aria-expanded', 'false');
+        seat.style.setProperty('--seat-x', (50 + Math.cos(angle) * 36) + '%');
+        seat.style.setProperty('--seat-y', (47 + Math.sin(angle) * 34) + '%');
+        const name = document.createElement('span');
+        name.textContent = member.name;
+        seat.append(name);
+        const previewMember = () => {
+          if (!reply.hidden || !fusion.hidden) return;
+          setMemberHeading(memberPreview, element, member);
+          if (memberPreviewArt.dataset.artSource !== member.art) setCharacterArt(memberPreviewArt, member.art);
+          memberPreview.dataset.side = index <= 3 ? 'right' : 'left';
+          memberPreview.hidden = false;
+        };
+        const hidePreview = () => { memberPreview.hidden = true; };
+        seat.addEventListener('pointerenter', event => {
+          if (event.pointerType !== 'touch') previewMember();
+        });
+        seat.addEventListener('pointerleave', hidePreview);
+        seat.addEventListener('focus', () => {
+          if (seat.matches(':focus-visible')) previewMember();
+        });
+        seat.addEventListener('blur', hidePreview);
+        seat.addEventListener('click', () => showMemberDetails(element, member, seat));
+        orbit.append(seat);
+        const icon = document.createElement('span');
+        icon.className = 'vision-fusion-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        const glyph = document.createElement('img');
+        glyph.alt = '';
+        glyph.src = 'assets/characters/element-' + element + '.webp';
+        icon.append(glyph);
+        icon.style.setProperty('--start-angle', angle + 'rad');
+        icon.style.setProperty('--vision-light', elements[element].color);
+        fusion.append(icon);
+      });
+      if (animate) {
+        playVisionFusion();
+      } else {
+        finale.showModal();
+        finaleTitle.focus({preventScroll: true});
+      }
+    }
+    function playVisionFusion() {
+      resultContent.forEach(child => { child.inert = true; });
+      finale.setAttribute('aria-labelledby', 'vision-fusion-status');
+      fusion.hidden = false;
+      if (!finale.open) finale.showModal();
+      fusionSkip.focus({preventScroll: true});
+      if (!fusion.getAnimations().length) finishVisionFusion(true);
+    }
+    fusion.addEventListener('animationend', event => {
+      if (event.target === fusion && event.animationName === 'vision-unveil' && finale.open) finishVisionFusion(true);
+    });
+    fusionSkip.addEventListener('click', () => finishVisionFusion(true));
+    finale.addEventListener('close', () => {
+      if (!finale.open) {
+        finishVisionFusion(false);
+        hideCharacterReply();
+      }
+    });
+    finale.addEventListener('cancel', event => {
+      if (reply.hidden) return;
+      event.preventDefault();
+      closeMemberDetails();
+    });
+    summaryButton.addEventListener('click', () => showCouncilFinale());
+    finale.addEventListener('click', event => {
+      if (event.target !== finale) return;
+      const rect = finale.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) finale.close();
+    });
+    updateCouncil();
+    const artCache = new Map();
+    const artRequests = new WeakMap();
+    function normalizedCharacterArt(source) {
+      if (artCache.has(source)) return artCache.get(source);
+      const ready = (async () => {
+        const image = new Image();
+        image.src = source;
+        await image.decode();
+        const probe = document.createElement('canvas');
+        const scale = Math.min(1, 512 / Math.max(image.naturalWidth, image.naturalHeight));
+        probe.width = Math.ceil(image.naturalWidth * scale);
+        probe.height = Math.ceil(image.naturalHeight * scale);
+        const ink = probe.getContext('2d', { willReadFrequently: true });
+        ink.drawImage(image, 0, 0, probe.width, probe.height);
+        const rgba = ink.getImageData(0, 0, probe.width, probe.height).data;
+        let left = probe.width, top = probe.height, right = -1, bottom = -1;
+        for (let y = 0; y < probe.height; y++) {
+          for (let x = 0; x < probe.width; x++) {
+            if (rgba[(y * probe.width + x) * 4 + 3] < 28) continue;
+            left = Math.min(left, x); right = Math.max(right, x);
+            top = Math.min(top, y); bottom = Math.max(bottom, y);
+          }
+        }
+        if (right < left) return source;
+        left = Math.max(0, left - 3); top = Math.max(0, top - 3);
+        right = Math.min(probe.width, right + 4); bottom = Math.min(probe.height, bottom + 4);
+        const output = document.createElement('canvas');
+        output.width = Math.max(1, Math.round((right - left) / probe.width * image.naturalWidth));
+        output.height = Math.max(1, Math.round((bottom - top) / probe.height * image.naturalHeight));
+        const maxSize = Math.min(1, 1400 / Math.max(output.width, output.height));
+        output.width = Math.round(output.width * maxSize);
+        output.height = Math.round(output.height * maxSize);
+        output.getContext('2d').drawImage(image,
+          left / probe.width * image.naturalWidth, top / probe.height * image.naturalHeight,
+          (right - left) / probe.width * image.naturalWidth, (bottom - top) / probe.height * image.naturalHeight,
+          0, 0, output.width, output.height);
+        const blob = await new Promise(resolve => output.toBlob(resolve, 'image/webp', .95));
+        return blob ? URL.createObjectURL(blob) : source;
+      })();
+      artCache.set(source, ready);
+      ready.catch(() => artCache.delete(source));
+      return ready;
+    }
+    async function setCharacterArt(target, source) {
+      const request = {};
+      artRequests.set(target, request);
+      target.style.opacity = '0';
+      target.dataset.artState = 'loading';
+      target.dataset.artSource = source;
+      try {
+        const normalized = await normalizedCharacterArt(source);
+        if (artRequests.get(target) !== request) return;
+        target.src = normalized;
+        await target.decode();
+        if (artRequests.get(target) !== request) return;
+        target.dataset.artState = 'ready';
+      } catch {
+        if (artRequests.get(target) !== request) return;
+        target.src = source;
+        target.dataset.artState = 'fallback';
+      }
+      target.style.opacity = '1';
+    }
+    let previewedCharacter;
+    let showFinaleOnPickerClose = false;
+
+    confirmCharacter.addEventListener('click', () => {
+      if (!picker.open || !previewedCharacter || confirmCharacter.hidden) return;
+      for (const [element, character] of council) {
+        if (element !== selectedElement && character.name === previewedCharacter.name) {
+          council.delete(element);
+        }
+      }
+      council.set(selectedElement, previewedCharacter);
+      updateCouncil();
+      setCouncilFuture();
+
+      const index = seatOrder.indexOf(selectedElement);
+      const next = [...seatOrder.slice(index + 1), ...seatOrder.slice(0, index)]
+        .find(element => !council.has(element));
+      if (next !== undefined) {
+        showElement(next);
+        elementButtons.get(next).focus({preventScroll: true});
+      } else {
+        showFinaleOnPickerClose = true;
+        picker.close();
+      }
+    });
+
+    function setMemberHeading(panel, element, member) {
+      const line = (element === 7 ? anemoResponses : otherResponses)[member.id];
+      panel.style.setProperty('--element-accent', elements[element].color);
+      panel.querySelector('h3, h4').textContent = member.name;
+      panel.querySelector('.celestia-reply-element span').textContent = 'ธาตุ' + elements[element].name;
+      panel.querySelector('.celestia-reply-element img').src = 'assets/characters/element-' + element + '.webp';
+      panel.querySelector('blockquote').textContent = '“' + line + '”';
+    }
+
+    function showMemberDetails(element, member, seat) {
+      const switchingMember = !reply.hidden && activeMemberSeat !== seat;
+      setMemberHeading(reply, element, member);
+      memberPreview.hidden = true;
+      activeMemberSeat?.setAttribute('aria-expanded', 'false');
+      activeMemberSeat = seat;
+      seat.setAttribute('aria-expanded', 'true');
+      const role = characterArchetype(member);
+      const relation = describeRelationship(member, element, role);
+      setCharacterArt(replyArt, member.art);
+      relationship.hidden = !relation;
+      relationship.querySelector('p').textContent = relation;
+      vision.textContent = personalVisions[role](member.name);
+      visionStatus.textContent = 'บันทึกผู้สืบทอดธาตุ' + elements[element].name;
+      reply.hidden = false;
+      reply.scrollTop = 0;
+      finale.dataset.member = '';
+      result.inert = !wideFinale.matches;
+      if (switchingMember) {
+        const entrance = reply.getAnimations().find(animation => animation.animationName === 'council-member-enter');
+        if (entrance) {
+          entrance.currentTime = 0;
+          entrance.play();
+        }
+      }
+      if (!motionPreference.matches) {
+        seat.querySelector('img').animate([{scale: '.9'}, {scale: '1'}], {duration: 180, easing: 'ease-out'});
+      }
+      replyHeading.focus({preventScroll: true});
+    }
+
+    function hideCharacterReply() {
+      memberPreview.hidden = true;
+      reply.hidden = true;
+      reply.getAnimations().forEach(animation => animation.cancel());
+      delete finale.dataset.member;
+      result.inert = false;
+      activeMemberSeat?.setAttribute('aria-expanded', 'false');
+      activeMemberSeat = undefined;
+    }
+
+    function closeMemberDetails() {
+      const seat = activeMemberSeat;
+      hideCharacterReply();
+      seat?.focus({preventScroll: true});
+      memberPreview.hidden = true;
+    }
+    wideFinale.addEventListener('change', () => {
+      if (!reply.hidden) result.inert = !wideFinale.matches;
+    });
+
+    finale.querySelector('.council-finale-reset').addEventListener('click', () => {
+      council.clear();
+      updateCouncil();
+      previousTrigger = undefined;
+      previewedCharacter = undefined;
+      selectedElement = undefined;
+      selectedCard = null;
+      hideCharacterReply();
+      setCouncilFuture();
+      artRequests.delete(replyArt);
+      replyArt.removeAttribute('src');
+      finale.close();
+      seatButtons.get(seatOrder[0]).focus({preventScroll: true});
+    });
+
+    reply.querySelector('.celestia-reply-back').addEventListener('click', closeMemberDetails);
+    reply.querySelector('.celestia-reply-close').addEventListener('click', closeMemberDetails);
+    const dateFormat = new Intl.DateTimeFormat('th-TH', {day:'numeric',month:'long',timeZone:'UTC'});
+    let selectedElement;
+    let previousTrigger;
+    let selectedCard;
+
+    function updateArrows() {
+      arrows[0].disabled = roster.scrollLeft <= 1;
+      arrows[1].disabled = roster.scrollLeft + roster.clientWidth >= roster.scrollWidth - 1;
+    }
+
+    roster.addEventListener('scroll', updateArrows, { passive: true });
+    let rosterWheelIdle;
+    picker.querySelector('.character-rail').addEventListener('wheel', event => {
+      if (event.ctrlKey || event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY) ||
+          roster.scrollWidth <= roster.clientWidth + 1) return;
+
+      event.preventDefault();
+      roster.dataset.wheelScrolling = '';
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? roster.clientWidth : 1;
+      roster.scrollBy({left: event.deltaY * unit, behavior: 'instant'});
+      clearTimeout(rosterWheelIdle);
+      rosterWheelIdle = setTimeout(() => { delete roster.dataset.wheelScrolling; }, 180);
+    }, { passive: false });
+    new ResizeObserver(updateArrows).observe(roster);
+    for (const arrow of arrows) {
+      arrow.addEventListener('click', () => {
+        roster.scrollBy({
+          left: Number(arrow.dataset.direction) * roster.clientWidth * .78,
+          behavior: motionPreference.matches ? 'instant' : 'smooth',
+        });
+      });
+    }
+
+    function showCharacter(character, card) {
+      previewedCharacter = character;
+      confirmCharacter.hidden = !(selectedElement === 7 ? anemoResponses : otherResponses)[character.id];
+      selectedCard?.setAttribute('aria-pressed', 'false');
+      selectedCard = card;
+      card.setAttribute('aria-pressed', 'true');
+      card.after(confirmCharacter);
+      art.alt = character.name;
+      setCharacterArt(art, character.art);
+      name.textContent = character.name;
+      title.textContent = character.title || '';
+      title.hidden = !character.title;
+      facts.replaceChildren();
+      const birthday = character.birthday;
+      for (const [type, label, value] of [
+        ['element', 'ธาตุ', elements[selectedElement].name],
+        ['weapon', 'อาวุธ', character.weapon],
+        ['rarity', 'ระดับ', character.rarity],
+        ['date', 'วันเกิด', birthday ? dateFormat.format(new Date(Date.UTC(2000,birthday[1]-1,birthday[0]))) : ''],
+      ]) {
+        if (!value) continue;
+        const row = document.createElement('div');
+        row.className = 'character-profile-' + type;
+        const term = document.createElement('dt');
+        const description = document.createElement('dd');
+        term.textContent = label;
+        description.textContent = type === 'rarity' ? value + ' ดาว' : value;
+        if (type === 'element') {
+          const icon = elementIcon.cloneNode();
+          description.prepend(icon);
+        } else if (type === 'rarity') {
+          description.className = 'character-rating';
+          description.textContent = '';
+          description.setAttribute('aria-label', value + ' ดาว');
+          for (let i = 0; i < value; i++) {
+            const star = document.createElement('i');
+            star.setAttribute('aria-hidden', 'true');
+            description.append(star);
+          }
+        }
+        row.append(term,description);
+        facts.append(row);
+      }
+      hint.hidden = true;
+      details.hidden = false;
+
+    }
+
+    function buildCard(character) {
+      const slot = document.createElement('div');
+      slot.className = 'character-slot';
+      const card = document.createElement('button');
+      card.className = 'character-option';
+      card.type = 'button';
+      card.setAttribute('aria-pressed','false');
+      const portrait = document.createElement('img');
+      portrait.alt = '';
+      portrait.loading = 'lazy';
+      portrait.decoding = 'async';
+      portrait.src = character.icon;
+      const label = document.createElement('span');
+      label.textContent = character.name;
+      card.append(portrait,label);
+      card.addEventListener('click', () => showCharacter(character,card));
+      slot.append(card);
+      return slot;
+    }
+
+    const elementRail = picker.querySelector('.character-elements');
+    const elementButtons = new Map();
+    for (const id of seatOrder) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.element = id;
+      button.style.setProperty('--element-color', elements[id].color);
+      const glyph = document.createElement('img');
+      glyph.src = 'assets/characters/element-' + id + '.webp';
+      glyph.alt = '';
+      button.append(glyph);
+      button.addEventListener('click', () => showElement(id));
+      elementButtons.set(id, button);
+      elementRail.append(button);
+    }
+
+    function showElement(id) {
+      selectedElement = id;
+      previewedCharacter = undefined;
+      selectedCard = null;
+      const element = elements[id];
+      heading.textContent = element.name;
+      elementIcon.src = 'assets/characters/element-' + id + '.webp';
+      picker.style.setProperty('--element-accent', element.color);
+      details.hidden = true;
+      artRequests.delete(art);
+      art.removeAttribute('src');
+      const available = characters.filter(character => character.elements.includes(id));
+      hint.hidden = available.length > 0;
+      roster.replaceChildren(...available.map(buildCard));
+      const savedIndex = available.indexOf(council.get(id));
+      const index = Math.max(0, savedIndex);
+      if (available.length) showCharacter(available[index], roster.children[index].firstElementChild);
+      for (const [elementId, button] of elementButtons) {
+        const member = council.get(elementId);
+        button.querySelector('img').src = member ? member.icon : 'assets/characters/element-' + elementId + '.webp';
+        button.dataset.filled = String(Boolean(member));
+        button.setAttribute('aria-pressed', String(elementId === id));
+        button.setAttribute('aria-label', 'ธาตุ' + elements[elementId].name + (member ? ' · เลือก ' + member.name + ' แล้ว' : ' · ยังไม่ได้เลือก'));
+      }
+      roster.scrollLeft = 0;
+      picker.scrollTop = 0;
+      if (savedIndex > 0) {
+        const card = roster.children[savedIndex];
+        roster.scrollLeft = card.getBoundingClientRect().left - roster.getBoundingClientRect().left;
+      }
+      updateArrows();
+    }
+
+    document.querySelectorAll('.gnosis-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        previousTrigger = trigger;
+        if (!reply.hidden) hideCharacterReply();
+        picker.showModal();
+        showElement(Number(trigger.dataset.element));
+      });
+    });
+
+    picker.querySelector('.character-picker-close').addEventListener('click', () => picker.close());
+    picker.addEventListener('click', event => {
+      if (event.target !== picker) return;
+      const box = picker.getBoundingClientRect();
+      if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) picker.close();
+    });
+    picker.addEventListener('close', () => {
+      if (showFinaleOnPickerClose) {
+        showFinaleOnPickerClose = false;
+        showCouncilFinale(true);
+      } else {
+        previousTrigger?.focus({preventScroll: true});
+      }
+    });
+  }
+</script>
 </body>
 </html>
