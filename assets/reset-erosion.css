@@ -1,0 +1,94 @@
+.scene[data-eroding] .region-star:not([data-region="nod-krai"]),
+.scene[data-eroding] .region-reveal:not([data-region="nod-krai"]) :is(.region-memory, .region-vision) {
+  --erosion-mask: var(--material-mask);
+}
+
+.city-atmosphere[data-effect="nod-krai"] { --sky-remnant: 1; }
+
+.scene .star-glyph::before {
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%, 100% var(--erosion-sheet-height, 100%);
+  mask-position: center, center var(--erosion-position, 100%);
+}
+
+.scene .region-star--trim-glyph .star-glyph::before {
+  mask-size: 100% 100%, 100% 100%, 100% var(--erosion-sheet-height, 100%);
+  mask-position: center, center, center var(--erosion-position, 100%);
+}
+
+.region-memory { position: relative; }
+.region-material { display: flow-root; }
+
+.scene[data-eroding] :is(.region-material, .region-picture, .star-name) {
+  mask-image: var(--erosion-mask, none);
+  mask-size: 100% var(--erosion-sheet-height);
+  mask-position: center var(--erosion-position);
+  mask-repeat: no-repeat;
+}
+
+.erosion-filaments {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.scene:not([data-eroding]) .erosion-filaments,
+.region-reveal[data-region="nod-krai"] .erosion-filaments { display: none; }
+
+.erosion-preview {
+  position: absolute;
+  z-index: 4;
+  top: max(.75rem, env(safe-area-inset-top));
+  left: max(.75rem, env(safe-area-inset-left));
+  font-size: .82rem;
+}
+.erosion-preview[hidden] { display: none; }
+.erosion-preview summary, .erosion-controls {
+  color: #e9e6f5;
+  border: 1px solid #c9c0dd53;
+  background: #171722ef;
+  border-radius: .35rem;
+}
+.erosion-preview summary {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 .85rem;
+  cursor: pointer;
+}
+.erosion-preview summary::-webkit-details-marker { display: none; }
+.erosion-preview summary::after {
+  content: "";
+  width: .4rem;
+  height: .4rem;
+  border: solid currentColor;
+  border-width: 0 1px 1px 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+.erosion-preview[open] summary::after { transform: translateY(2px) rotate(225deg); }
+.erosion-controls {
+  position: absolute;
+  top: 0;
+  left: calc(100% + .35rem);
+  width: min(13rem, calc(100vw - 12.5rem));
+  height: 44px;
+  padding: .125rem .65rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  align-items: center;
+}
+.erosion-controls output { color: #e0eeff; font-weight: 600; }
+.erosion-controls input {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  height: 1.125rem;
+  accent-color: #b9d9ed;
+  cursor: pointer;
+}
+.erosion-preview :focus-visible { outline: 1px solid #f4eaff; outline-offset: 2px; }
