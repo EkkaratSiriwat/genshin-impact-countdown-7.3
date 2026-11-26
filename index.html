@@ -2608,6 +2608,7 @@
             epithet: "อารัมภบท: ฉากที่ 2",
             video: "assets/regions/mondstadt-act-two.mp4",
             videoRange: [2],
+            preloadEarly: true,
             title: "เพื่อวันพรุ่งนี้ที่ไม่มีน้ำตา",
             description: "Venti เปิดเผยว่ามังกรที่ชาวเมืองเรียกว่า Stormterror คือ Dvalin นักเดินทางและพรรคพวกจึงตามหาพิณศักดิ์สิทธิ์และชำระผลึกน้ำตาของมังกร หวังใช้บทเพลงเรียก Dvalin กลับมา แต่จอมเวทแห่ง Abyss เข้าขัดขวางก่อนที่แผนจะสำเร็จ"
           },
@@ -3265,12 +3266,12 @@ function hideRegion(next) {
       });
     }
 
-    function animateRegionFrames(version, paint, complete) {
+    function animateRegionFrames(version, paint, complete, duration = 500) {
       let start;
       function revealFrame(now) {
         if (version !== imageRevealVersion) return;
         start ??= now;
-        const progress = Math.min(1, (now - start) / 500);
+        const progress = Math.min(1, (now - start) / duration);
         const eased = progress * progress * (3 - 2 * progress);
         paint(eased);
         if (progress < 1) requestAnimationFrame(revealFrame);
@@ -3323,7 +3324,12 @@ function hideRegion(next) {
     function preloadRegionChapter(event) {
       const button = event.target.closest(".story-point");
       if (!selectedStar || !button || button.getAttribute("aria-pressed") === "true") return;
-      const page = regionChapter(Number(button.dataset.chapter));
+      const priorityChapter = activeRegion.stories?.find(chapter => chapter.preloadEarly);
+      if (priorityChapter?.video === preloadVideo.getAttribute("src")) return;
+      preloadRegionMedia(regionChapter(Number(button.dataset.chapter)));
+    }
+
+    function preloadRegionMedia(page) {
       const src = page.video;
       if (!src || src === regionVideo.getAttribute("src") || src === preloadVideo.getAttribute("src")) return;
       preloadVideo.preload = "auto";
@@ -3395,7 +3401,7 @@ function hideRegion(next) {
         regionVision.style.opacity = String(progress);
         regionVision.style.setProperty("--region-spread", `${progress * 100}%`);
         regionVision.style.setProperty("--region-blur", `${blur * (1 - progress)}px`);
-      });
+      }, undefined, page.preloadEarly ? 250 : 500);
     }
 
     function renderRegionCopy(page) {
@@ -3424,6 +3430,10 @@ function hideRegion(next) {
         button.setAttribute("aria-pressed", String(Number(button.dataset.chapter) === index));
       }
       fadeRegionMedia(page);
+      if (page.video) {
+        const priorityChapter = activeRegion.stories?.find(chapter => chapter.preloadEarly);
+        if (priorityChapter) preloadRegionMedia(priorityChapter);
+      }
     }
 
     document.addEventListener('site-language-change', () => {

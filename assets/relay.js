@@ -627,38 +627,6 @@
   function totals(){
     return statNames.map((_,i)=>marks.reduce((sum,mark)=>sum+mark.pick.stats[i],0));
   }
-  function progress(){
-    const box=node('section','');box.className='relay-forecast';
-    box.append(node('strong',siteFormat('พลังสะสม · {0}', 'Accumulated power · {0}', siteText(encounter.name))));
-    const scores = totals();
-    const updateBars = scores.map((score,i)=>{
-      const row=node('div','');row.className='relay-bar';
-      const bar=document.createElement('progress');bar.max=encounter.need[i];bar.value=score;bar.setAttribute('aria-label',siteText(statNames[i]));
-      const track = node('span', '');
-      track.className = 'relay-meter';
-      const ghost = node('span', '');
-      ghost.className = 'relay-projection';
-      ghost.setAttribute('aria-hidden', 'true');
-      const value = node('span', score + ' / ' + bar.max);
-      track.append(bar, ghost);
-      row.append(statLabel(i),track,value);box.append(row);
-      return (projected) => {
-        const percent = amount => Math.max(0, Math.min(100, amount / bar.max * 100));
-        const start = percent(Math.min(score, projected));
-        ghost.style.left = start + '%';
-        ghost.style.width = Math.abs(percent(projected) - percent(score)) + '%';
-        ghost.classList.toggle('loss', projected < score);
-        value.textContent = projected + ' / ' + bar.max;
-      };
-    });
-    body.append(box);
-    return (pick, current) => {
-      box.classList.toggle('has-preview', Boolean(pick));
-      updateBars.forEach((update, i) => update(
-        pick ? scores[i] - (current?.stats[i] ?? 0) + pick.stats[i] : scores[i]
-      ));
-    };
-  }
   const picker=document.querySelector('#relay-picker');
   const triggers=[...hall.querySelectorAll('.gnosis-trigger')];
   const progressRow=hall.querySelector('.council-seats');
@@ -703,7 +671,7 @@
       const img=new Image();img.src='assets/characters/'+artist.icon+'.webp';img.alt='';
       el.prepend(img);list.append(el);
     }
-    body.append(list);progress();
+    body.append(list);
   }
   triggers.forEach((trigger,i)=>trigger.onclick=()=>{
     picker.showModal();syncAtmosphere();roster(gnoses[i],Number(trigger.dataset.element));
@@ -718,16 +686,12 @@
     panel(artist.name+' · '+g.name,'จะฝากสิ่งใดไว้ในแผนต่อต้าน?');
     const current = marks.find(mark => mark.person === g)?.pick;
     const beforeChoice = totals().map((score, i) => score - (current?.stats[i] ?? 0));
-    let hovered, focused;
-    const showPreview = () => preview(hovered ?? focused, current);
     artist.items.forEach((label,index)=>{
       const profile=signatureStats[artist.name]?.[index];
       const baseStats = profile ? Array.from(profile, Number) : g.items[index].stats;
       let stats = itemStatOverrides[label] ?? baseStats;
-      let effect = '';
       if (artist.name === 'Lynette') {
         const fillsMeters = label === 'กล่องแมววิเศษ';
-        effect = fillsMeters ? 'เติมทั้งสามหลอดจนเต็ม' : 'เพิ่มครึ่งหนึ่งของแต้มปัจจุบันในแต่ละหลอด';
         stats = beforeChoice.map((score, i) => fillsMeters
           ? Math.max(0, encounter.need[i] - score)
           : Math.max(0, score) / 2);
@@ -745,28 +709,10 @@
         if(marks.length===7) revealResult();
         else triggers.find((t,i)=>!marks.some(mark=>mark.person===gnoses[i]))?.focus({preventScroll:true});
       },'relay-choice');
-      el.onpointerenter = event => {
-        if (event.pointerType === 'touch') return;
-        hovered = pick;
-        showPreview();
-      };
-      el.onpointerleave = () => { hovered = undefined; showPreview(); };
-      el.onfocus = () => { focused = pick; showPreview(); };
-      el.onblur = () => { focused = undefined; showPreview(); };
       const copy=node('span','');copy.append(node('strong',label));
-      if (effect) copy.append(node('small', effect));
-      const ratings=node('span','');ratings.className='relay-ratings';
-      pick.stats.forEach((value,i)=>{
-        const item = statLabel(i);
-        item.append(' ' + signedScore(value));
-        item.classList.toggle('stat-penalty', value < 0);
-        ratings.append(item);
-      });
-      copy.append(ratings);
       el.append(itemDrawing(label),copy);body.append(el);
     });
     body.append(button('← เปลี่ยนตัวละคร',()=>roster(g,artist.element),'relay-back'));
-    const preview = progress();
   }
   async function revealResult() {
     const fusion = node('dialog', '');
@@ -807,13 +753,18 @@
       return piece.animate(frames, {duration: totalDuration - 120, fill: 'both'});
     });
     const flare = flash.animate(
-      [{opacity: 0}, {opacity: 1, offset: .68}, {opacity: 1}],
-      {delay: totalDuration - flashDuration, duration: flashDuration, fill: 'forwards'}
+      [{opacity: 0}, {opacity: 1}],
+      {delay: totalDuration - flashDuration, duration: flashDuration, easing: 'ease-in-out', fill: 'forwards'}
     );
     await Promise.allSettled([...paths, flare].map(animation => animation.finished));
-    fusion.remove();
     hall.append(game);
     finish();
+    fusion.classList.add('is-revealing');
+    const fade = flash.animate([{opacity: 1}, {opacity: 0}],
+      {duration: 450, easing: 'ease-in-out', fill: 'forwards'});
+    await Promise.allSettled([fade.finished]);
+    fusion.remove();
+    heading.focus({preventScroll:true});
   }
   function statLabel(index){
     const label=node('span','');
@@ -2120,7 +2071,7 @@
     showSpeaker(activeSpeaker);
     return section;
   }
-  function finish({activeSpeaker = 0, expanded = false, scroll = true} = {}){
+  function finish({activeSpeaker = 0, expanded = false, contributionsOpen = false, scroll = true} = {}){
     const scores=totals();
     const passed=scores.filter((score,i)=>score>=encounter.need[i]).length;
     const endings=[
@@ -2159,7 +2110,10 @@
     details.append(node('summary','ดูภาพวาดและพลังทั้ง 7 ธาตุ'), game.querySelector('.globe-stage').cloneNode(true));
     const members = node('table', '');
     members.className = 'relay-contributions';
-    members.append(node('caption', 'พลังจากผู้ถือวิชั่นทั้งเจ็ด'));
+    const contributions = node('details', '');
+    contributions.className = 'relay-breakdown relay-contributions-panel';
+    contributions.open = contributionsOpen;
+    contributions.append(node('summary', 'พลังจากผู้ถือวิชั่นทั้งเจ็ด'), members);
     const columns = members.createTHead().insertRow();
     for (const title of ['ผู้ถือวิชั่น', ...statNames]) {
       const column = node('th', title);
@@ -2202,7 +2156,7 @@
         cell.append(track);
       }
     }
-    body.append(dialoguePanel(passed, activeSpeaker),table,members,details,button('วางแผนต่อต้านใหม่',()=>{start();triggers[0].focus({preventScroll:true});}));
+    body.append(dialoguePanel(passed, activeSpeaker),table,contributions,details,button('วางแผนต่อต้านใหม่',()=>{start();triggers[0].focus({preventScroll:true});}));
     if (scroll) game.scrollIntoView({block:'start',behavior:'instant'});
   }
   function start(){
@@ -2217,7 +2171,12 @@
     else if (hall.dataset.verdict) {
       const speakers = [...body.querySelectorAll('.relay-speaker')];
       const activeSpeaker = Math.max(0, speakers.findIndex(speaker => speaker.getAttribute('aria-pressed') === 'true'));
-      finish({activeSpeaker, expanded: Boolean(body.querySelector('.relay-breakdown')?.open), scroll: false});
+      finish({
+        activeSpeaker,
+        expanded: Boolean(body.querySelector('.relay-breakdown:not(.relay-contributions-panel)')?.open),
+        contributionsOpen: Boolean(body.querySelector('.relay-contributions-panel')?.open),
+        scroll: false
+      });
     }
   });
   start();
