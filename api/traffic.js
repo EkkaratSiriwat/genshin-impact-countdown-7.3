@@ -4,14 +4,21 @@ const sections = ["countdown", "regions", "hall", "planner", "results"];
 const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const retention = 35 * 86400;
 const sessionAge = 8 * 3600;
+const presenceWindow = 75000;
+const presenceKey = "traffic:presence";
 const record = `
   if not redis.call('SET', KEYS[1], '1', 'EX', 3600, 'NX') then return 0 end
   redis.call('PFADD', KEYS[2], ARGV[1])
   redis.call('EXPIRE', KEYS[2], ARGV[2])
-  for i=3,#ARGV,2 do
+  for i=5,#ARGV,2 do
     redis.call('HINCRBY', KEYS[3], ARGV[i], ARGV[i+1])
   end
   redis.call('EXPIRE', KEYS[3], ARGV[2])
+  if tonumber(ARGV[3]) > 0 then
+    redis.call('ZADD', KEYS[4], ARGV[3], ARGV[1])
+    redis.call('ZREMRANGEBYSCORE', KEYS[4], '-inf', ARGV[4])
+    redis.call('EXPIRE', KEYS[4], 120)
+  end
   return 1
 `;
 const rateLimit = `
@@ -69,18 +76,19 @@ module.exports = async function traffic(req, res) {
         return res.status(401).end();
       }
       const dates = Array.from({length: 7}, (_, i) => dateKey(i));
-      const [visitors, today, ...daily] = await Promise.all([
+      const [visitors, today, activeNow, ...daily] = await Promise.all([
         redis(["PFCOUNT", ...dates.map(date => `traffic:visitors:${date}`)]),
         redis(["PFCOUNT", `traffic:visitors:${dates[0]}`]),
+        redis(["ZCOUNT", presenceKey, Date.now() - presenceWindow, "+inf"]),
         ...dates.map(date => redis(["HMGET", `traffic:duration:${date}`, ...sections]))
       ]);
       const sectionsMs = Object.fromEntries(sections.map((section, i) =>
         [section, daily.reduce((total, values) => total + Number(values[i] || 0), 0)]));
-      return res.json({visitors, today, sectionsMs});
+      return res.json({visitors, today, activeNow, sectionsMs});
     }
 
     if (action || req.method !== "POST") return res.status(405).end();
-    const {visitor, event, duration} = req.body || {};
+    const {visitor, event, duration, active} = req.body || {};
     if (typeof visitor !== "string" || !uuid.test(visitor) ||
         typeof event !== "string" || !uuid.test(event) || !duration || typeof duration !== "object") {
       return res.status(400).end();
@@ -89,8 +97,10 @@ module.exports = async function traffic(req, res) {
     if (!values.every(value => Number.isInteger(value) && value >= 0 && value <= 60000) ||
         values.reduce((total, value) => total + value, 0) > 60000) return res.status(400).end();
     const date = dateKey();
-    await redis(["EVAL", record, 3, `traffic:event:${event}`, `traffic:visitors:${date}`,
-      `traffic:duration:${date}`, visitor, retention, ...sections.flatMap((section, i) => [section, values[i]])]);
+    const now = Date.now();
+    await redis(["EVAL", record, 4, `traffic:event:${event}`, `traffic:visitors:${date}`,
+      `traffic:duration:${date}`, presenceKey, visitor, retention, active === true ? now : 0,
+      now - presenceWindow, ...sections.flatMap((section, i) => [section, values[i]])]);
     return res.status(204).end();
   } catch {
     return res.status(503).end();

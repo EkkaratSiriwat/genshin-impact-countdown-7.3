@@ -53,11 +53,11 @@
     section = visibleSection();
   }
 
-  function send() {
+  function send(active) {
     sample();
     const duration = Object.fromEntries(Object.entries(pending).map(([key, ms]) => [key, Math.round(ms)]));
     pending = {};
-    const body = JSON.stringify({visitor, event: crypto.randomUUID(), duration});
+    const body = JSON.stringify({visitor, event: crypto.randomUUID(), duration, active});
     const payload = new Blob([body], {type: "application/json"});
     if (!navigator.sendBeacon("/api/traffic", payload)) {
       fetch("/api/traffic", {method: "POST", body: payload, keepalive: true}).catch(() => {});
@@ -69,8 +69,8 @@
   observer.observe(hall, {attributes: true, attributeFilter: ["data-verdict"]});
   observer.observe(reveal, {attributes: true, attributeFilter: ["hidden"]});
   window.addEventListener("scroll", sample, {passive: true});
-  document.addEventListener("visibilitychange", send);
-  window.addEventListener("pagehide", send);
-  setInterval(() => { if (!document.hidden) send(); }, 30000);
-  if (!document.hidden) send();
+  document.addEventListener("visibilitychange", () => send(!document.hidden));
+  window.addEventListener("pagehide", () => send(false));
+  setInterval(() => { if (!document.hidden) send(true); }, 30000);
+  if (!document.hidden) send(true);
 })();

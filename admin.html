@@ -28,6 +28,7 @@
   <p id="status" role="status">กำลังโหลด…</p>
   <section id="summary" hidden>
     <dl>
+      <div><dt>กำลังใช้งานตอนนี้</dt><dd id="active-now"></dd></div>
       <div><dt>ผู้เข้าชมวันนี้</dt><dd id="today"></dd></div>
       <div><dt>ผู้เข้าชม 7 วันล่าสุด</dt><dd id="visitors"></dd></div>
       <div><dt>เวลาเฉลี่ยต่อผู้เข้าชม</dt><dd id="average"></dd></div>
@@ -37,6 +38,7 @@
       <thead><tr><th scope="col">ส่วนของเว็บไซต์</th><th scope="col">นาที</th></tr></thead>
       <tbody></tbody>
     </table>
+    <p>กำลังใช้งานตอนนี้นับจากเบราว์เซอร์ที่ส่งสัญญาณใน 75 วินาทีล่าสุด สถิติอัปเดตทุก 30 วินาทีขณะเปิดหน้านี้</p>
     <p>จำนวนผู้เข้าชมเป็นค่าประมาณตามเบราว์เซอร์ เวลานับเฉพาะขณะที่หน้าเว็บมองเห็นได้ วันเริ่มเวลา 00:00 น. ตามเวลาไทย</p>
     <button type="button" id="refresh">อัปเดตสถิติ</button>
   </section>
@@ -52,7 +54,10 @@
     results: "สรุปผลการต่อสู้"
   };
   const number = new Intl.NumberFormat("th-TH", {maximumFractionDigits: 2});
+  let loading = false;
   async function load() {
+    if (loading) return;
+    loading = true;
     try {
       const response = await fetch("/api/traffic?action=summary");
       if (response.status === 401) {
@@ -61,9 +66,10 @@
         return;
       }
       if (!response.ok) throw new Error();
-      const {today, visitors, sectionsMs} = await response.json();
+      const {today, visitors, activeNow, sectionsMs} = await response.json();
       const total = Object.values(sectionsMs).reduce((sum, ms) => sum + ms, 0);
       document.querySelector("#today").textContent = number.format(today);
+      document.querySelector("#active-now").textContent = number.format(activeNow);
       document.querySelector("#visitors").textContent = number.format(visitors);
       document.querySelector("#average").textContent = number.format(visitors ? total / visitors / 60000 : 0) + " นาที";
       const rows = Object.entries(labels).map(([key, label]) => {
@@ -80,9 +86,13 @@
       status.textContent = "อัปเดต " + new Date().toLocaleTimeString("th-TH");
     } catch {
       status.textContent = "โหลดสถิติไม่ได้ในขณะนี้";
+    } finally {
+      loading = false;
     }
   }
   document.querySelector("#refresh").addEventListener("click", load);
+  setInterval(() => { if (!document.hidden && !summary.hidden) load(); }, 30000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
   load();
 </script>
 </body>
