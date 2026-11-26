@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>สถิติผู้เข้าชม · Teyvat</title>
+  <style>
+    :root { color-scheme: dark; font: 16px system-ui, sans-serif; background: #111722; color: #f4eddb; }
+    main { max-width: 48rem; margin: 6vh auto; padding: 1.5rem; }
+    a, button { color: #f2ce8c; }
+    button { background: #202d3c; border: 1px solid #667589; border-radius: .35rem; padding: .6rem 1rem; cursor: pointer; }
+    dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
+    dl div { padding: 1rem; background: #1a2533; border-radius: .4rem; }
+    dd { margin: .4rem 0 0; font-size: 1.65rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
+    caption, th { text-align: left; }
+    caption { font-weight: bold; padding-bottom: .75rem; }
+    th, td { padding: .65rem .4rem; border-bottom: 1px solid #455269; }
+    td, th:last-child { text-align: right; }
+    p { color: #c7ced9; }
+  </style>
+</head>
+<body>
+<main>
+  <a href="/">← กลับหน้าหลัก</a>
+  <h1>สถิติผู้เข้าชม</h1>
+  <p id="status" role="status">กำลังโหลด…</p>
+  <section id="summary" hidden>
+    <dl>
+      <div><dt>ผู้เข้าชมวันนี้</dt><dd id="today"></dd></div>
+      <div><dt>ผู้เข้าชม 7 วันล่าสุด</dt><dd id="visitors"></dd></div>
+      <div><dt>เวลาเฉลี่ยต่อผู้เข้าชม</dt><dd id="average"></dd></div>
+    </dl>
+    <table>
+      <caption>เวลารวมในแต่ละส่วนตลอด 7 วันล่าสุด</caption>
+      <thead><tr><th scope="col">ส่วนของเว็บไซต์</th><th scope="col">นาที</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p>จำนวนผู้เข้าชมเป็นค่าประมาณตามเบราว์เซอร์ เวลานับเฉพาะขณะที่หน้าเว็บมองเห็นได้ วันเริ่มเวลา 00:00 น. ตามเวลาไทย</p>
+    <button type="button" id="refresh">อัปเดตสถิติ</button>
+  </section>
+</main>
+<script>
+  const summary = document.querySelector("#summary");
+  const status = document.querySelector("#status");
+  const labels = {
+    countdown: "หน้าหลักและตัวนับถอยหลัง",
+    regions: "รายละเอียดภูมิภาค",
+    hall: "ห้องเลือก Gnosis",
+    planner: "แผนต่อต้าน Celestia",
+    results: "สรุปผลการต่อสู้"
+  };
+  const number = new Intl.NumberFormat("th-TH", {maximumFractionDigits: 2});
+  async function load() {
+    try {
+      const response = await fetch("/api/traffic?action=summary");
+      if (response.status === 401) {
+        summary.hidden = true;
+        status.textContent = "กลับหน้าหลักแล้วพิมพ์รหัสเพื่อเข้าสู่ระบบ";
+        return;
+      }
+      if (!response.ok) throw new Error();
+      const {today, visitors, sectionsMs} = await response.json();
+      const total = Object.values(sectionsMs).reduce((sum, ms) => sum + ms, 0);
+      document.querySelector("#today").textContent = number.format(today);
+      document.querySelector("#visitors").textContent = number.format(visitors);
+      document.querySelector("#average").textContent = number.format(visitors ? total / visitors / 60000 : 0) + " นาที";
+      const rows = Object.entries(labels).map(([key, label]) => {
+        const row = document.createElement("tr");
+        const title = document.createElement("th");
+        title.scope = "row";
+        title.textContent = label;
+        row.append(title);
+        row.insertCell().textContent = number.format(sectionsMs[key] / 60000);
+        return row;
+      });
+      document.querySelector("tbody").replaceChildren(...rows);
+      summary.hidden = false;
+      status.textContent = "อัปเดต " + new Date().toLocaleTimeString("th-TH");
+    } catch {
+      status.textContent = "โหลดสถิติไม่ได้ในขณะนี้";
+    }
+  }
+  document.querySelector("#refresh").addEventListener("click", load);
+  load();
+</script>
+</body>
+</html>

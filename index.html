@@ -65,6 +65,7 @@
       display: none;
     }
     .scene[data-horizon] .countdown-horizon { display: block; }
+    .horizon-preview[hidden] { display: none; }
     .horizon-preview {
       left: max(.75rem, env(safe-area-inset-left));
       max-width: calc(100% - 10rem);
@@ -1902,7 +1903,7 @@
     <div class="heavenly-light" aria-hidden="true"></div>
     <audio id="theme-music" loop preload="none" src="assets/theme-music.mp4"></audio>
     <div class="nod-rim" aria-hidden="true"></div>
-    <select class="top-control horizon-preview" aria-label="ทดสอบออร่า">
+    <select class="top-control horizon-preview" aria-label="ทดสอบออร่า" hidden>
       <option value="live">ทดสอบออร่า · วันจริง</option>
       <option value="31">ก่อน 30 วัน</option>
       <option value="30">เหลือ 30–11 วัน</option>
@@ -2363,6 +2364,7 @@
     const sky = motion.getContext("2d");
     const scene = document.querySelector(".scene");
     const horizonPreview = scene.querySelector(".horizon-preview");
+    horizonPreview.hidden = !["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
     let horizonRays;
     const rayMotionPreference = matchMedia("(prefers-reduced-motion: reduce)");
     function prepareHorizonLights() {
@@ -3904,5 +3906,6 @@ function hideRegion(next) {
 </script>
 
 <script src="assets/relay.js"></script>
+<script src="assets/traffic.js" defer></script>
 </body>
 </html>
