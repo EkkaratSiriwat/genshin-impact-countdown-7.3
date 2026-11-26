@@ -1199,16 +1199,20 @@
         left:var(--mobile-x); top:var(--mobile-y);
         transform:translate(-50%,-50%);
       }
-      .gnosis-slot:nth-child(1) {--mobile-x:16%;--mobile-y:59%}
-      .gnosis-slot:nth-child(2) {--mobile-x:35%;--mobile-y:51%}
-      .gnosis-slot:nth-child(3) {--mobile-x:61%;--mobile-y:51%}
-      .gnosis-slot:nth-child(4) {--mobile-x:80%;--mobile-y:60%}
-      .gnosis-slot:nth-child(5) {--mobile-x:31%;--mobile-y:76%}
-      .gnosis-slot:nth-child(6) {--mobile-x:49%;--mobile-y:64%}
-      .gnosis-slot:nth-child(7) {--mobile-x:64%;--mobile-y:77%}
+      .gnosis-slot:nth-child(1) {--mobile-x:25%;--mobile-y:61%}
+      .gnosis-slot:nth-child(2) {--mobile-x:38%;--mobile-y:55%}
+      .gnosis-slot:nth-child(3) {--mobile-x:61%;--mobile-y:55%}
+      .gnosis-slot:nth-child(4) {--mobile-x:74%;--mobile-y:61%}
+      .gnosis-slot:nth-child(5) {--mobile-x:34%;--mobile-y:74%}
+      .gnosis-slot:nth-child(6) {--mobile-x:49%;--mobile-y:66%}
+      .gnosis-slot:nth-child(7) {--mobile-x:64%;--mobile-y:74%}
       .gnosis-piece {
-        height: clamp(2.8rem, 13svh, 6rem);
+        height: clamp(2.4rem, min(10svh, 22vw), 5.25rem);
         margin-inline: auto;
+        rotate: 0deg;
+        --float-distance: clamp(4px, .74svh, 7.2px);
+        animation-duration: calc(var(--float-period) / .6);
+        animation-delay: calc(var(--float-phase) / .6);
       }
     }
 
