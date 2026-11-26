@@ -1780,6 +1780,12 @@
 <link rel="stylesheet" href="assets/relay.css">
 <link rel="stylesheet" href="assets/reset-erosion.css"></head>
 <body>
+  <div class="site-language">
+    <select aria-label="ภาษา / Language">
+      <option value="th" lang="th">ไทย</option>
+      <option value="en" lang="en">English</option>
+    </select>
+  </div>
   <video class="opening-sequence" data-src="assets/pv-72-opening-v3.mp4" preload="none" muted playsinline aria-hidden="true" hidden></video>
   <main class="scene">
     <img class="plate" alt="" src="assets/countdown-plate.png">
@@ -1900,6 +1906,12 @@
     <li class="gnosis-slot" style="--piece-tilt:-51deg; --piece-x:89.3%; --piece-y:63%; --sprite-x:98.1915%; --piece-light:#cb7fff80; --float-period:5.90s; --float-phase:-5.58s"><button class="gnosis-trigger" type="button" data-element="4" aria-label="เลือกตัวละครธาตุสายฟ้า" aria-haspopup="dialog" aria-controls="relay-picker"><span class="gnosis-halo" aria-hidden="true"><span class="gnosis-piece"></span></span></button></li>
     </ul>
     <dialog id="relay-picker" aria-labelledby="relay-title"><button class="plan-close" type="button" aria-label="ปิดแผนต่อต้าน">×</button>
+    <div class="site-language">
+      <select aria-label="ภาษา / Language">
+        <option value="th" lang="th">ไทย</option>
+        <option value="en" lang="en">English</option>
+      </select>
+    </div>
     <article class="relay">
       <p class="relay-place">Teyvat · คืนก่อนเผชิญหน้า Celestia</p>
       <h2 id="relay-title">แผนต่อต้าน Celestia</h2>
@@ -1911,6 +1923,8 @@
     </article>
     </dialog>
   </section>
+  <script src="assets/english.js"></script>
+  <script src="assets/language.js"></script>
   <script src="assets/reset-erosion.js"></script>
   <script>
     const scheduledUpdate = document.querySelector("footer time");
@@ -2158,20 +2172,25 @@
           if (dayTransition) drawDayTransition(performance.now());
         }
         const [days, hours, minutes, seconds] = parts;
-        remaining.textContent = `เหลือ ${days} วัน ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`;
+        remaining.textContent = siteFormat('เหลือ {0} วัน {1} ชั่วโมง {2} นาที {3} วินาที',
+          '{0} days, {1} hours, {2} minutes, {3} seconds remaining', days, hours, minutes, seconds);
         previousDisplay = display;
       }
       if (now >= deadline) {
-        const message = "การรีเซ็ต Teyvat เริ่มต้นแล้ว";
+        const message = siteText("การรีเซ็ต Teyvat เริ่มต้นแล้ว");
         if (heading.textContent !== message) {
           heading.textContent = message;
-          heading.lang = "th";
+          heading.lang = document.documentElement.lang;
           announcement.textContent = message;
         }
         return;
       }
       pendingTick = setTimeout(tick, ((deadline - now - 1) % 1000) + 1);
     }
+    document.addEventListener('site-language-change', () => {
+      previousDisplay = undefined;
+      tick();
+    });
 
     const motion = document.querySelector(".motion");
     const sky = motion.getContext("2d");
@@ -3336,7 +3355,7 @@ function hideRegion(next) {
         regionVideo.hidden = false;
       } else {
         clearPreloadVideo();
-        regionArt.alt = page.alt;
+        regionArt.alt = siteText(page.alt);
         regionArt.toggleAttribute("data-cropped", Boolean(page.crop));
         regionArt.src = page.image;
         await regionArt.decode().catch(() => {});
@@ -3352,22 +3371,43 @@ function hideRegion(next) {
       });
     }
 
+    function renderRegionCopy(page) {
+      regionEpithet.textContent = siteText(page.epithet);
+      storyTitle.textContent = siteText(page.title ?? "");
+      storyTitle.hidden = !page.title;
+      regionDescription.textContent = siteText(page.description);
+      regionArt.alt = siteText(page.alt ?? "");
+      positionSelectedStar();
+      resetErosion.measureStory();
+    }
+
+    function regionChapterLabel(index) {
+      if (index === 0) return siteText("ภาพรวมเมือง");
+      const chapter = regionChapter(index);
+      return `${siteText(chapter.epithet)} ${siteText(chapter.title)}`;
+    }
+
     function showRegionChapter(index) {
       const page = regionChapter(index);
       setHeavenlyAwakening(page.heavenlyAwakening === true);
       regionSnow.classList.toggle("is-active",
         regionReveal.dataset.region === "snezhnaya" && !page.hideSnow);
-      regionEpithet.textContent = page.epithet;
-      storyTitle.textContent = page.title ?? "";
-      storyTitle.hidden = !page.title;
-      regionDescription.textContent = page.description;
+      renderRegionCopy(page);
       for (const button of storyTimeline.children) {
         button.setAttribute("aria-pressed", String(Number(button.dataset.chapter) === index));
       }
-      positionSelectedStar();
-      resetErosion.measureStory();
       fadeRegionMedia(page);
     }
+
+    document.addEventListener('site-language-change', () => {
+      if (!selectedStar) return;
+      const selected = storyTimeline.querySelector('[aria-pressed="true"]');
+      renderRegionCopy(regionChapter(Number(selected?.dataset.chapter ?? 0)));
+      for (const button of storyTimeline.children) {
+        button.title = regionChapterLabel(Number(button.dataset.chapter));
+        button.setAttribute('aria-label', button.title);
+      }
+    });
 
     function showRegion(star, index) {
       activeRegion = regions[index];
@@ -3400,7 +3440,8 @@ function hideRegion(next) {
       storyTimeline.hidden = !activeRegion.stories?.length;
       storyTimeline.toggleAttribute("data-long", (activeRegion.stories?.length ?? 0) >= 8);
       if (!storyTimeline.hidden) {
-        const labels = ["ภาพรวมเมือง", ...activeRegion.stories.map(story => `${story.epithet} ${story.title}`)];
+        const labels = Array.from({length: activeRegion.stories.length + 1},
+          (_, chapter) => regionChapterLabel(chapter));
         storyTimeline.style.setProperty("--timeline-edge", `${50 / labels.length}%`);
         for (const [chapter, label] of labels.entries()) {
           const button = document.createElement("button");

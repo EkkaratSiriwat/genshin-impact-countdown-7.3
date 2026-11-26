@@ -1,12 +1,14 @@
 function createResetErosion(scene, seededRandom) {
   const preview = scene.querySelector('.erosion-preview');
   const toggle = preview.querySelector('summary');
-  const openLabel = toggle.textContent;
   const slider = preview.querySelector('input');
   const dayLabel = preview.querySelector('output');
   const firstDay = Number(slider.max);
   const stages = firstDay + 1;
   const finalStrength = (stages - 5) / stages; // The former five-days-left appearance.
+  const dayOneBoost = .12;
+  const strengthFor = (stage, star) => stage === 0 ? 0 :
+    stage * finalStrength / stages + (star ? dayOneBoost * (stages - stage) / (stages - 1) : 0);
   const reveal = scene.querySelector('.region-reveal');
   const story = scene.querySelector('.region-memory');
   const vision = scene.querySelector('.region-vision');
@@ -18,9 +20,11 @@ function createResetErosion(scene, seededRandom) {
 
   // Wrap slices in both dimensions to relocate the old cuts without changing
   // their area. The last vertical shift staggers the joins between rows.
-  function makeSurface(host, maskOwner, seed, width) {
+  function makeSurface(host, maskOwner, seed, width, star = false) {
     const random = seededRandom(seed);
     const scatter = seededRandom(seed + 3109);
+    const firstDayStrength = strengthFor(1, star);
+    const step = (finalStrength - firstDayStrength) / (stages - 1);
     const rowShift = new Uint16Array(maskHeight);
     for (let y = 0; y < maskHeight;) {
       const end = y + 5 + Math.floor(scatter() * 8);
@@ -45,7 +49,7 @@ function createResetErosion(scene, seededRandom) {
       for (let sourceY = 0; sourceY < maskHeight; sourceY++) {
         const y = (sourceY + yShift) % maskHeight;
         const threshold = start + (sourceY + .5) / (maskHeight * travel);
-        const firstLostStage = Math.max(1, Math.ceil(threshold * stages / finalStrength));
+        const firstLostStage = Math.max(1, Math.ceil((threshold - firstDayStrength) / step) + 1);
         for (let dx = 0; dx < strip; dx++) {
           const column = (x + dx + rowShift[y]) % width;
           const row = (y + columnShift[column]) % maskHeight;
@@ -80,17 +84,17 @@ function createResetErosion(scene, seededRandom) {
     canvas.className = 'erosion-filaments';
     canvas.setAttribute('aria-hidden', 'true');
     host.append(canvas);
-    return {host, canvas, ctx: canvas.getContext('2d'), lanes, rowShift, columnShift,
+    return {host, canvas, ctx: canvas.getContext('2d'), lanes, rowShift, columnShift, star,
       maskWidth: width, width: 0, height: 0, lines: []};
   }
 
   const starSurfaces = [...scene.querySelectorAll('.region-star:not([data-region="nod-krai"])')].map((star, i) =>
-    makeSurface(star.querySelector('.star-glyph'), star, 720 + i, 156));
+    makeSurface(star.querySelector('.star-glyph'), star, 720 + i, 156, true));
   const storySurface = makeSurface(story, story, 1926, 352);
   const surfaces = [...starSurfaces, storySurface, makeSurface(vision, vision, 2026, 520)];
 
   let liveDay, target, level = 0, from = 0, changedAt = 0, lastFrame = -Infinity;
-  let visibleStrength = 0;
+  let visibleStage = 0;
   let dirty = true;
 
   function measure(surface) {
@@ -131,7 +135,7 @@ function createResetErosion(scene, seededRandom) {
   function applyLevel(value) {
     level = value;
     const stage = Math.round(value * stages / finalStrength);
-    visibleStrength = stage * finalStrength / stages;
+    visibleStage = stage;
     scene.toggleAttribute('data-eroding', value > 0);
     scene.style.setProperty('--erosion-position', (1 - stage / stages) * 100 + '%');
     scene.style.setProperty('--sky-remnant', 1 - .96 * value ** 1.45);
@@ -152,8 +156,9 @@ function createResetErosion(scene, seededRandom) {
     const {ctx, width, height, lift} = surface;
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, Math.ceil(height + lift));
+    const strength = strengthFor(visibleStage, surface.star);
     for (const lane of surface.lanes) {
-      const edge = (visibleStrength - lane.start) * travel;
+      const edge = (strength - lane.start) * travel;
       if (edge <= 0 || edge >= 1) continue;
       // Each plume lifts off at the same scattered edge as its missing pixels.
       const row = (edge * maskHeight + lane.yShift) % maskHeight;
@@ -208,7 +213,8 @@ function createResetErosion(scene, seededRandom) {
 
   function previewDay() {
     const days = firstDay - Number(slider.value);
-    const label = days === 0 ? 'วันสุดท้าย' : 'เหลือ ' + days + ' วัน';
+    const label = days === 0 ? siteText('วันสุดท้าย') :
+      siteFormat('เหลือ {0} วัน', '{0} days left', days);
     dayLabel.textContent = label;
     slider.setAttribute('aria-valuetext', label);
     selectDay(days);
@@ -216,13 +222,17 @@ function createResetErosion(scene, seededRandom) {
   preview.hidden = false;
   preview.addEventListener('toggle', () => {
     dirty = true;
-    toggle.textContent = preview.open ? 'กลับสู่วันจริง' : openLabel;
+    toggle.textContent = siteText(preview.open ? 'กลับสู่วันจริง' : 'ทดสอบการระเหย');
     if (preview.open) {
       slider.value = '0';
       previewDay();
     } else {
       selectDay(liveDay);
     }
+  });
+  document.addEventListener('site-language-change', () => {
+    toggle.textContent = siteText(preview.open ? 'กลับสู่วันจริง' : 'ทดสอบการระเหย');
+    if (preview.open) previewDay();
   });
   slider.addEventListener('input', previewDay);
   document.addEventListener('keydown', event => {
@@ -237,6 +247,8 @@ function createResetErosion(scene, seededRandom) {
     paint,
     measureStory: () => measure(storySurface),
     setDaysRemaining(days) {
+      // Begin on the morning of the first day, before the clock rolls to 19.
+      if (days === stages) days = firstDay;
       if (liveDay === days) return;
       liveDay = days;
       if (!preview.open) selectDay(days);

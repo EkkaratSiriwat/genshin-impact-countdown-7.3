@@ -7,8 +7,12 @@
     ['น้ำแข็ง',65.9574,'#b6eaff','ปราการเหมันต์',[1,4,2],'คมหอกเกล็ดน้ำแข็ง',[6,2,1]],
     ['น้ำ',81.9681,'#89bfff','เกราะคลื่นสะท้อนแสง',[2,4,1],'ธารน้ำคืนกำลัง',[1,2,6]],
     ['สายฟ้า',98.1915,'#d0a9ff','สายฟ้าผ่าบัลลังก์',[4,1,1],'ม่านอัสนีคุ้มทัพ',[2,5,3]]
-  ].map(([element,sprite,color,first,a,second,b])=>({
-    name:'ธาตุ'+element,sprite,color,items:[{label:first,stats:a},{label:second,stats:b}]
+  ].map(([element,sprite,color,first,a,second,b], index)=>({
+    get name() {
+      return siteFormat('ธาตุ{0}', '{1}', element,
+        ['Pyro', 'Geo', 'Dendro', 'Anemo', 'Cryo', 'Hydro', 'Electro'][index]);
+    },
+    sprite,color,items:[{label:first,stats:a},{label:second,stats:b}]
   }));
   const artists=[{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":1,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":2,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":7,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":5,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":8,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":4,"art":"aether-full.png"},{"items":["ดาบนักเดินทาง","ขนนกจากต่างฟ้า"],"name":"Aether","icon":"b975440a1ea06e378d525c68c67a3fae","element":3,"art":"aether-full.png"},{"items":["เครื่องกำเนิดน้ำ","กล่องเครื่องมือ"],"name":"Aino","icon":"a546e138386207a469665543a976064a","element":2,"art":"231c88ca0af3368429889d5244e6f1e5.webp"},{"items":["ดอกไม้แปรธาตุ","ลิฟต์หิน"],"name":"Albedo","icon":"9e80de34871edcc116f21670e9196153","element":8,"art":"92f25995c686fd889ef901e7da9a82e2.webp"},{"items":["กระจกสลักแสง","หนังสือภาษาศาสตร์"],"name":"Alhaitham","icon":"893f9fb93ba900600020b3ad0ad79015","element":3,"art":"7b4b33758940f57f0ea9b673332027e8.webp"},{"items":["กับดักเยือกแข็ง","ธนูนักล่า"],"name":"Aloy","icon":"cb5cddfb0c8dc0d959bac94c7a4f0337","element":5,"art":"465d679373e9db2b442bda7f575bf0a4.webp"},{"items":["คมอัสนี","เครื่องรางเดินทาง"],"name":"Alyosha","icon":"aebdd40d2ccdecf25bbfe9a7b8da9b06","element":4,"art":"cdc8923cdff647bb1acdfc6a08bdffcc.webp"},{"items":["ลูกศรเพลิง","ตุ๊กตา Baron Bunny"],"name":"Amber","icon":"11a50b0ac0b21cc36cc50646ab5d20c5","element":1,"art":"c52ffe0344bc5ccce4af0be75fd712ec.webp"},{"items":["เกราะน้ำแข็ง","คมเกล็ดหิมะ"],"name":"Anastasya","icon":"e5337e123927ed861e5863dcaf027702","element":5,"art":"7d45a97221f1bab0b57a641ff1a25710.webp"},{"items":["วัว Ushi","กระบองโอนิ"],"name":"Arataki Itto","icon":"d6429728dc64d53118c4a93b9d387e99","element":8,"art":"12b72cccc13dfc2001578fc9e42bf930.webp"},{"items":["เคียวจันทราแดง","ตราบ้านเตาผิง"],"name":"Arlecchino","icon":"f7faaaa3a6722483d84a39b0fde402a8","element":1,"art":"a84179c522c722f480c322dd155b1c90.webp"},{"items":["เขี้ยวฉางเซิง","ห่อยาสมุนไพร"],"name":"Baizhu","icon":"98105886ec95f94592010a7e7a890f13","element":3,"art":"468b47fa28b44da9d5801bca713fc001.webp"},{"items":["วงแหวนน้ำ","โน้ตเพลงประสานเสียง"],"name":"Barbara","icon":"d690017cf3871d16861837597d56402c","element":2,"art":"2209dc6c7eda6942dc62d646caf49b96.webp"},{"items":["ดาบผ่าคลื่น","ธงกองเรือ"],"name":"Beidou","icon":"ee41d4446a1e6ce2bbb6df163b30dfd9","element":4,"art":"7da4beb15d3e27edbbeb835ac6452a78.webp"},{"items":["ดาบวงแหวนไฟ","ผ้าพันแผลนักผจญภัย"],"name":"Bennett","icon":"8d3cfc558dd1eb14368774751519b3af","element":1,"art":"265613568f0fe15a30cce32ce2e39fbf.webp"},{"items":["โล่จันทร์เสี้ยว","เหยือกน้ำโอเอซิส"],"name":"Candace","icon":"b331f74419fb5164af17f77b8b523cc1","element":2,"art":"0df9f0503f0bf1fe74ee4d43a0b55dac.webp"},{"items":["ภาพข่าวแนวหน้า","กล้อง Monsieur Verite"],"name":"Charlotte","icon":"73a973925c974c8995e0aa857851bedd","element":5,"art":"e95d541d398433b8d08cac6772c04646.webp"},{"items":["กระสุนวิญญาณ","บังเหียนบิน"],"name":"Chasca","icon":"980764869d5ec95ad36fdc7340858712","element":7,"art":"af29e7153e983296e71b29b672e239b9.webp"},{"items":["กระสุนปืนคาบศิลา","นกหวีดหน่วยลาดตระเวน"],"name":"Chevreuse","icon":"54287f20d20b1614a963f9df2b695d83","element":1,"art":"3cb4850bdb17961b41b74160d342f425.webp"},{"items":["ตุ๊กตา Tamoto","ดาบคู่ช่างตัดเสื้อ"],"name":"Chiori","icon":"e4b7bf68459c46c1f98f1b8e6f024272","element":8,"art":"854c0db163c9948fb8eadd2c76500835.webp"},{"items":["ยันต์ขับไล่ภูต","ดาบน้ำแข็ง"],"name":"Chongyun","icon":"66680e97e0fd238372b9d9844c150cec","element":5,"art":"03c6509de6d5eaa352c98d2580b1d94b.webp"},{"items":["หมอน Itzpapa","ดาวราตรี"],"name":"Citlali","icon":"77170c0e23dca3c0f3d20961bf21c37e","element":5,"art":"666defe2ef37b01f0b7b7a9c69e66072.webp"},{"items":["ปืนดวล","ตรานักประลอง"],"name":"Clorinde","icon":"b5fd12aeb068c49e2f2b3d80222edc1f","element":4,"art":"3bdff6349b777a8fd6da44b6aa265c2d.webp"},{"items":["บูมเมอแรงใบไม้","ตุ๊กตา Cuilein-Anbar"],"name":"Collei","icon":"81c977ea85b332a69b215a43753de307","element":3,"art":"0cf1944815df1d6aa25ac166bfc3ce4d.webp"},{"items":["ม่านแสงจันทร์","กล่องเพลงจันทรา"],"name":"Columbina","icon":"5923697771179ff746614be63c61821b","element":2,"art":"7cd2c23ae798292779e96c96c309f3c1.webp"},{"items":["หอกพิพากษา","ไพ่เจ็ดอัจฉริยะ"],"name":"Cyno","icon":"c47c5e1a5f73834a2f72e7b27913d610","element":4,"art":"4a2ba15d77e116402602600982da2f42.webp"},{"items":["หยดน้ำแห่งพร","ระฆังวิหาร"],"name":"Dahlia","icon":"de1bf953d128be55051e2155ed8b7415","element":2,"art":"5ec412f71e1b160b1307cf071048b281.webp"},{"items":["ประกายอัสนี","โคมไฟนำทาง"],"name":"Danica","icon":"86c4cbe06ed7831ea555f4545fd62413","element":4,"art":"511fe3f27cd0857f3d7592d370fabddb.webp"},{"items":["ดาบทหารรับจ้าง","เครื่องรางสิงโต"],"name":"Dehya","icon":"9aade853d43808255b7305ffaf99f2fc","element":1,"art":"6c9fac98b3ed59d9aef06580798ea865.webp"},{"items":["เหยี่ยวเพลิง","ตะเกียงรุ่งอรุณ"],"name":"Diluc","icon":"799a9c50a2b4849ff346cff02b2f3653","element":1,"art":"050ec4150e9cafb3a10c0945ad66a787.webp"},{"items":["โล่อุ้งเท้าแมว","ขวดเครื่องดื่มเย็น"],"name":"Diona","icon":"5eecedb6e8e542b1602f283fb4824f1a","element":5,"art":"2a9f92529be74f8bf56cf78307632678.webp"},{"items":["ตะเกียงจินน์","ถุงโมรา"],"name":"Dori","icon":"97cc9ff2f8da61adf3bb6d2d4cf6938c","element":4,"art":"5048ba969d080d079bf4122028c566c5.webp"},{"items":["ปีกมังกรเพลิง","หนังสือนิทาน"],"name":"Durin","icon":"db8c9b5cd4b2bf432f950aa1e30620d2","element":1,"art":"b530466f809c87039c4a7dde48cdb40f.webp"},{"items":["ขวดน้ำหอม","ดอกไม้กลั่นกลิ่น"],"name":"Emilie","icon":"76668f2eb3ed2410df833a2fcbcdfc8b","element":3,"art":"467cc7a3cdb8fd11d5c937b3f6cfd772.webp"},{"items":["หม้อปรุงอาหาร","มีดเชฟ"],"name":"Escoffier","icon":"5f075987f83a290fc059ae18cd167f94","element":5,"art":"3c5b78af2b5cdc5831579ae0b702f6be.webp"},{"items":["รอยเท้าร่ายรำ","ดาบแห่งแสง"],"name":"Eula","icon":"f68c6ff36bb24e82547ead3c2aec4ea8","element":5,"art":"75073cb31552e482934ba75e2e2c0001.webp"},{"items":["กลไกพายุ","ตำราจักรกล"],"name":"Faruzan","icon":"de258beef931732f33536a86f9c6bc13","element":7,"art":"6b7751f4ad1ea14570e356f58f4b271d.webp"},{"items":["ปีกของ Oz","ดวงตาของ Oz"],"name":"Fischl","icon":"6c6b4b40a120e9b6e0dffe24313fc802","element":4,"art":"b0c217a6992a7011ddb032587da273b7.webp"},{"items":["หอกวิญญาณ","ตะเกียงผู้เฝ้าสุสาน"],"name":"Flins","icon":"9efa822fbf062ba1e013f94ccd953cd0","element":4,"art":"0e1ce45edac22c516e582c0313fb97b8.webp"},{"items":["หมวกนักดำน้ำ","เพนกวิน Pers"],"name":"Freminet","icon":"606cd6a1f4bf51fa41b7c472a2f66271","element":5,"art":"b5755aaa1adb7ea96dd87f244d36ce4f.webp"},{"items":["เวทีสายน้ำ","บทละครโอเปรา"],"name":"Furina","icon":"f112999e1c2a371f11cb162fa97dd67d","element":2,"art":"215bb9a5f77391a7834ff950afc006a8.webp"},{"items":["หัวสิงโตวูซู","กลองเชิดสิงโต"],"name":"Gaming","icon":"e76de9ab492c7de8f963a1ebf2a1360c","element":1,"art":"e0718f729f00dee8bf1957ec43e504da.webp"},{"items":["ดอกบัวน้ำแข็ง","ลูกศรเกล็ดหิมะ"],"name":"Ganyu","icon":"298b511471311ef3cfee8e65e14c017f","element":5,"art":"c16c04ff66ba586ce49af1db36369598.webp"},{"items":["ธงแม่ทัพ","ธนูทัพวาทัตสึมิ"],"name":"Gorou","icon":"2f8d5e6dfc0f8db4a36171dcc3c0c445","element":8,"art":"5e9f521770ec804d9fb771e8239cbb42.webp"},{"items":["หอกผีเสื้อ","โคมวิญญาณ"],"name":"Hu Tao","icon":"a38b6e8409527edd799672a26fe610f6","element":1,"art":"8eb0cce79ab76c26b3ad864479270dff.webp"},{"items":["หมัดสายฟ้า","อุปกรณ์ฝึกกำลัง"],"name":"Iansan","icon":"631b5707d1857bbd3de4990594c00f96","element":4,"art":"9bbef74f85aaa7b3776bf04489ca917a.webp"},{"items":["ปืนลม","กระเป๋าสัตวแพทย์"],"name":"Ifa","icon":"c66efae2e66989bd32f7210e2cecf8d9","element":7,"art":"7e65d0e105d97f8f53f4c0a926ec22f1.webp"},{"items":["ตรานำทาง","หอกผู้พิทักษ์"],"name":"Illuga","icon":"9d91b2895834ae2dab59bb8045009be4","element":8,"art":"eefbcbc87bfc7e8142564d167393eb54.webp"},{"items":["แขนกล","หุ่น Birgitta"],"name":"Ineffa","icon":"43b0d0c23d86c889aae11bdeb8e5bfd5","element":4,"art":"73a5ab8b1d77f429c0877402537306a1.webp"},{"items":["กลไกลม","ถุงมือทำงาน"],"name":"Jahoda","icon":"c94f69f2df7ae215f9c8a77ebfb03896","element":7,"art":"029461ecc23082659d04f769ca5bae95.webp"},{"items":["ดาบเขี้ยวสิงโต","เมล็ดแดนดิไลออน"],"name":"Jean","icon":"c0325d28aa7e0e0f19c0b4bd69ecda15","element":7,"art":"7936fdb27ff90ea2b0ae68b2c9ab3580.webp"},{"items":["สว่าน Turbo Twirly","เกล็ดผลึก"],"name":"Kachina","icon":"86647f6e046b5eac533358657797e799","element":8,"art":"89103462b133ea9cfcf0e4b788157f39.webp"},{"items":["คมดาบสายลม","ใบเมเปิล"],"name":"Kaedehara Kazuha","icon":"2268d7a8859be8ee186eae0e0ddeacba","element":7,"art":"9efc12c5fc64022dff0f6616f299e3b2.webp"},{"items":["สะพานน้ำแข็ง","คมดาบน้ำแข็ง"],"name":"Kaeya","icon":"a2dbd4a96ccbd206f302f85f637ee9db","element":5,"art":"f685581ed79ee5a71e8d192d21cdb70e.webp"},{"items":["พัดกระเรียน","ดาบหิมะ"],"name":"Kamisato Ayaka","icon":"01bd1655584d890ceffd290891f24380","element":5,"art":"213b2d2981c6ceb5a4c256f3b345b887.webp"},{"items":["ดาบเงาวารี","ถ้วยชาของเจ้าสำนัก"],"name":"Kamisato Ayato","icon":"b6159a135c6789b906cb99d1f405da97","element":2,"art":"c43280fd9e1c4b04f1aaad48ce11d2c9.webp"},{"items":["กระเป๋า Mehrak","พิมพ์เขียวที่พักพิง"],"name":"Kaveh","icon":"060f3485f377c49aebdb66838c9b5228","element":3,"art":"e622bdc2a96da9a1adf85f6b3772295b.webp"},{"items":["ปิ่นสายฟ้า","แผนผังเมือง"],"name":"Keqing","icon":"338eacfa72dd31a450fc76efd9d94ef6","element":4,"art":"7ae22cc270aa03322dc80f09171551d6.webp"},{"items":["ตะขอเกี่ยว","ภาพ Ajaw"],"name":"Kinich","icon":"d6950a854d5130492f84a551bdfce55b","element":3,"art":"6f1b53cd775e66af29046026ade3297b.webp"},{"items":["กรงเล็บเนโกะ","กล่องพัสดุ"],"name":"Kirara","icon":"ae55937f905d5888ade8b3c75e234b84","element":3,"art":"380e2467334d50a40574b52656eb4f61.webp"},{"items":["ระเบิด Dodoco","ใบโคลเวอร์นำโชค"],"name":"Klee","icon":"cd653c87fea3815f44edcb71db110647","element":1,"art":"dc5d65b2fbce18ce62efb0031aa6464d.webp"},{"items":["ขนนกเท็งงู","ธงแม่ทัพ"],"name":"Kujou Sara","icon":"5cde6d06b72e99e8b3c48ea47eb1d919","element":4,"art":"e5df85d9484d88a760a6ea5311ea28b4.webp"},{"items":["แส้สายฟ้า","วงแหวนหญ้านาคุ"],"name":"Kuki Shinobu","icon":"33f26c448a00e68210e073187b996a79","element":4,"art":"f2f8648d2b043009e9dceb4b81552d56.webp"},{"items":["วงแหวนหวาย","ตะกร้าสาน"],"name":"Lan Yan","icon":"d97909b68e6f8bfe4584a15262b8fbbe","element":7,"art":"78d4e1fbb4c1e8224fdc5a455890ff2d.webp"},{"items":["เขากวาง","โคมจันทรา"],"name":"Lauma","icon":"42c646d9ff4960b4522e3cb1b86e6c27","element":3,"art":"c949feb9af537c0f5f59b7da4667e18e.webp"},{"items":["ม่านดาวหลับใหล","ดาวตก"],"name":"Layla","icon":"155f840948bc37aba33d27dd41bf1690","element":5,"art":"f3159d1cefee502898502ef08bc85bdc.webp"},{"items":["เครื่องมือสำรวจ","ผลึกหิน"],"name":"Linnea","icon":"ba7bd044b7a67c92189abbf73587dd1a","element":8,"art":"85c1945e9cfbec68b08af3281f8f9934.webp"},{"items":["กุหลาบสายฟ้า","ตำราค่ายกล"],"name":"Lisa","icon":"56f7a290a7bdc85efcd70871f0710f0d","element":4,"art":"38ef9e4e8bc4cf9d89da87b890d2c43f.webp"},{"items":["ตรากองอัศวิน","หอกท้าประลอง"],"name":"Lohen","icon":"a2d466b12c8542f1b6d8871baebc1ab5","element":5,"art":"5430d0685ce6d84fb6a9a4bcbe8c29c6.webp"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":7,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":2,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":1,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":5,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":4,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":8,"art":"lumine-full.png"},{"items":["ดาบนักเดินทาง","ดอกอินเทย์วัต"],"name":"Lumine","icon":"1222e1d08252962c17c921d789879977","element":3,"art":"lumine-full.png"},{"items":["กล่องแมววิเศษ","ถ้วยชานักมายากล"],"name":"Lynette","icon":"0514a776ec048ef4297d62dc7bf95c9e","element":7,"art":"0d4469aef04facd9b479c0c730b78517.webp"},{"items":["ไพ่กล","หมวกนักมายากล"],"name":"Lyney","icon":"ff2d1d21568ba441b844b8f2dc550ebc","element":1,"art":"80cad918be4f658e214adfdbd2a8bd61.webp"},{"items":["วงล้อเพลิง","เปลวไฟศักดิ์สิทธิ์"],"name":"Mavuika","icon":"dc852c2f79f480f36fd9f05cfc5d5614","element":1,"art":"effb2bc40edcf17d27641dd0bb21e648.webp"},{"items":["แผนที่สำรวจ","หน้าไม้พลสำรวจ"],"name":"Mika","icon":"3cd2d8b36a536442b9173e72051121e1","element":5,"art":"bbb487eb35833848a8d6f4513a5b3793.webp"},{"items":["ประกายไฟฟ้า","สมุดจัดงาน"],"name":"Mitya","icon":"55316264625932aec26f2789e3065af5","element":4,"art":"4ec27ea406265269b013af811aea6097.webp"},{"items":["วงดาวสะท้อนน้ำ","แผนภูมิดวงดาว"],"name":"Mona","icon":"0fa4c59c1028ac78c14d567c3aafee0e","element":2,"art":"40159aa5804d78a7678d88ee7b2caa5b.webp"},{"items":["กระดานฉลาม","ลูกบอลชายหาด"],"name":"Mualani","icon":"0b2be6f46cda5fa7e2582857b3f7e619","element":2,"art":"63063d849c7591c98d6ebb005a278248.webp"},{"items":["เถาวัลย์แห่งฝัน","เมล็ดพันธุ์ปัญญา"],"name":"Nahida","icon":"e86b940e2a1b156607a76601c10e9f9b","element":3,"art":"6e4686efd57f3b2e9e1e95df2f25030a.webp"},{"items":["ร่มกันปืน","กระสุนผลึก"],"name":"Navia","icon":"a6387a0860c270ce9b1d2a41503cb3b4","element":8,"art":"513b324e2af2f170e69c5845bd0c95ac.webp"},{"items":["มีดเงา","ม้วนข่าวกรอง"],"name":"Nefer","icon":"e81f91fc7c32cfc1bda5081eb4f4ea2a","element":3,"art":"055b0874a9528bd5b82650c9c6f2a31e.webp"},{"items":["อักษรรูนแม่มด","ขนนกนำทาง"],"name":"Nicole","icon":"833692cb4e6ce9947f542124487dc04f","element":1,"art":"4b630764b8bca96ac2a0b6334b1d7b68.webp"},{"items":["ผ้าคลุมระบำ","ดอกบัวโรงละคร"],"name":"Nilou","icon":"962205780471379857eea4e82cbdeddd","element":2,"art":"d6357b36649831f96e8194b8d2801b0a.webp"},{"items":["ฉากหยก","อัญมณีดาว"],"name":"Ningguang","icon":"4170d1625b9740a71052030297527639","element":8,"art":"781861788b619b2b6624adadeee7ac9a.webp"},{"items":["เกราะกุหลาบ","ดาบใหญ่"],"name":"Noelle","icon":"6adf6bebd61db037c8990cf2a925be94","element":8,"art":"1d4a8e4d3c61438190a85c7b69d57582.webp"},{"items":["ม่านเกล็ดหิมะ","คมน้ำแข็ง"],"name":"Odette","icon":"4edcfaa343fb70b2b6ec162f583389d0","element":5,"art":"e8772b892364e4f12a8cc896a824fcaa.webp"},{"items":["ลูกศรยามค่ำ","เมล็ดผัก"],"name":"Ororon","icon":"fbc5826159a5fa593819c076b58de639","element":4,"art":"3b85efd21a8e4e3f0791d71ac1e35913.webp"},{"items":["ตรานักล่าแม่มด","หมวกแม่มด"],"name":"Prune","icon":"08f1bb1047faccb1fef6c98eb3ad1ef8","element":7,"art":"ff8119d75245d72bddec92659cc3dba1.webp"},{"items":["ยันต์คุ้มภัย","ดาบพิธีกรรม"],"name":"Qiqi","icon":"68b9e869712b02ff116a99d62c4873d4","element":5,"art":"04ae7f19ded0d41a35142c4714c5085c.webp"},{"items":["ดาบแห่งนิรันดร์","ตรามิตสึโดโมเอะ"],"name":"Raiden Shogun","icon":"ec1e5cb4edd2aee8c1ffb16fd0e494cd","element":4,"art":"da8a392c34fa440b9f2876cb2b73a3d5.webp"},{"items":["กรงเล็บสายฟ้า","รอยเท้าฝูงหมาป่า"],"name":"Razor","icon":"9df5679f6bc44e8560d7fceed5732818","element":4,"art":"7d72ff9db538f27b4951894a4904e915.webp"},{"items":["เงาไม้กางเขน","หอกน้ำแข็ง"],"name":"Rosaria","icon":"94b95d328ff72167358405eb5d38e239","element":5,"art":"31dfa71af4daf1d5ffccf9858838fcc9.webp"},{"items":["ชิ้นส่วนหุ่นกล","แขนจักรกล"],"name":"Sandrone","icon":"01d114df1f18f71a75763b1f27ea2a81","element":5,"art":"d27dbdd677e0b2a6f3060c6a2ee907d5.webp"},{"items":["แมงกะพรุนน้ำ","สมุดแผนกลศึก"],"name":"Sangonomiya Kokomi","icon":"f25319fda509e043a6fba7211ab92845","element":2,"art":"dfd67db309c80a3ad5ebfb6c42a903e9.webp"},{"items":["ดาวกระจายนินจา","ตุ๊กตามุจิมุจิ"],"name":"Sayu","icon":"7d2632f2e9c4d13fde72f5a90cd4551e","element":7,"art":"25ee0083be2dad495a5b472bc5fd8eda.webp"},{"items":["ลูกศรทราย","แผนที่ทะเลทราย"],"name":"Sethos","icon":"9c2493f2aedbe499185dd90c44b45724","element":4,"art":"4facd5c84dfd5db3c10395584e1ee104.webp"},{"items":["เชือกแดงผนึกวิญญาณ","หอกสะกดภูต"],"name":"Shenhe","icon":"5e53b80e0145b8bb0d5ce75163424851","element":5,"art":"2a72b1a1dd0231223f9c48de50058db0.webp"},{"items":["หมัดพายุ","สมุดสืบสวน"],"name":"Shikanoin Heizou","icon":"b1c2e4c7655d919ebdc3b8d81eddc654","element":7,"art":"62f3bd37bf83a6dead7ea02e9ef681c2.webp"},{"items":["ปืนฟองน้ำ","ชุดปฐมพยาบาล"],"name":"Sigewinne","icon":"0f51b6607e926c5d598e638bcd9da5e2","element":2,"art":"243c3557129c8bef1e47518d6864c1b7.webp"},{"items":["ผีเสื้อลมแปรธาตุ","ขวดทดลอง"],"name":"Sucrose","icon":"efe38ee19c398b2440c3b8a2471f91e7","element":7,"art":"b370715b6695ce35b7426efd2dcc05f8.webp"},{"items":["ดาบคู่วารี","ของเล่นให้ Teucer"],"name":"Tartaglia","icon":"4c79e19610d2659a303c61cc0d1eb69e","element":2,"art":"5ef6b9a77059dc0a27bd2dd37fa5da2f.webp"},{"items":["หอกเพลิง","เครื่องรางคุ้มครอง"],"name":"Thoma","icon":"20ff2eba5ce6f155848e7823a2d1746c","element":1,"art":"5f4da6709843b1429893c604e76bc0a2.webp"},{"items":["ลูกศรพฤกษา","คู่มือเจ้าหน้าที่พิทักษ์ป่า"],"name":"Tighnari","icon":"49015403586b9188e4c40e03cf975ae1","element":3,"art":"cb4509079568f5fcfdcc6238500152ff.webp"},{"items":["หอกอัสนี","เครื่องหมายหน่วย"],"name":"Valeriy","icon":"30b7be483206b877a88677c31e25a9bb","element":4,"art":"72aee06522e6ccd1e9ec0e1def021a1d.webp"},{"items":["หน้ากากนักมวยปล้ำ","ตะกร้าผลไม้"],"name":"Varesa","icon":"1531ed5375271187daf71a7e06986fd8","element":4,"art":"bdcdd3722590ff84bad1492f7d84d4fd.webp"},{"items":["ดาบคู่ลมเหนือ","ธงกองสำรวจ"],"name":"Varka","icon":"3b9cefb01ad79ac65edd444a0a413c2e","element":7,"art":"d001a79576e3fb75cd72c166defba778.webp"},{"items":["ลูกศรสายลม","พิณนักกวี"],"name":"Venti","icon":"d15fb2b55d19526020703ced81f85f7d","element":7,"art":"1e2e4a28b1ff81542690067520e6a759.webp"},{"items":["ดาบสายลม","ผีเสื้อพเนจร"],"name":"Vesna","icon":"673f828e16f466cb3fffa5dac8b9f8a5","element":7,"art":"ab884768a04a3960b428cf079e76e8c7.webp"},{"items":["ม่านธารน้ำ","หยดน้ำค้าง"],"name":"Vodyanitsa","icon":"940dbabba932ce86461b16150c846335","element":2,"art":"48ebd3a7044431ca257ba4ae299aef48.webp"},{"items":["วงแหวนลม","หมวกพเนจร"],"name":"Wanderer","icon":"8ca70815f72a5b273d27d30ac13dbd45","element":7,"art":"0cce6d14eaf979dae4ae5d2b9fa8d2ec.webp"},{"items":["ตราป้อมเมโรพิเด","นวมจักรกล"],"name":"Wriothesley","icon":"163a7355cca82dc5b3c9a36c70b7dedd","element":5,"art":"833b709c7e4de694016881b35ed86143.webp"},{"items":["พริกของ Guoba","หม้อซุปว่านหมิน"],"name":"Xiangling","icon":"ab2f94b2b8410db31c18b0501f01302b","element":1,"art":"0caef73a93e509e6a11803224e0e3941.webp"},{"items":["กลไกกระเรียน","ว่าวเหินฟ้า"],"name":"Xianyun","icon":"426d23d0277d63d652c0f8390d713eb4","element":7,"art":"88c6eb8925a7f1d049ee2268a1a9f740.webp"},{"items":["หอกหยก","หน้ากากยักษา"],"name":"Xiao","icon":"a78a380ad0ee9d2be1b6b684c21c2527","element":7,"art":"568309f88942d1596dd197a30c7c0403.webp"},{"items":["เครื่องผสมเสียง","ใบมีดโรลเลอร์"],"name":"Xilonen","icon":"4142693e6b710818f8da1757bb8abe26","element":8,"art":"eea13ef45099786f97f247eb17f14443.webp"},{"items":["ดาบพิรุณ","นิยายกำลังภายใน"],"name":"Xingqiu","icon":"132649d7a199f717fce6c7a6ab22caef","element":2,"art":"5ec26e0c117717ccd2cf8135e7fc21ee.webp"},{"items":["กีตาร์ไฟ","กลองร็อก"],"name":"Xinyan","icon":"a87b7d0ea3bca4e5e4fbf1b4e74a5a49","element":1,"art":"f782a2b5dcca6de0fecabdb4eeb66ede.webp"},{"items":["กิ่งซากุระสายฟ้า","นิยายสำนักพิมพ์ยาเอะ"],"name":"Yae Miko","icon":"9af3a07a5100bc9b1401fad7ac1d71cc","element":4,"art":"dfa6086559d8d046d16b187429df2337.webp"},{"items":["ตราพิพากษา","ตำรากฎหมาย"],"name":"Yanfei","icon":"f7160bf8a60d8b3c702a02314e74300c","element":1,"art":"6930dc9dd2dd189cef58cf8c679a8a97.webp"},{"items":["หัวไชเท้าลูกขาว","ตุ๊กตา Yuegui"],"name":"Yaoyao","icon":"aa70751d15f29ce548523e8659c89c10","element":3,"art":"ff98c616272ebea367d53c107f848353.webp"},{"items":["สายไหมวารี","ลูกเต๋าหยก"],"name":"Yelan","icon":"85548926dc60f5706038db74d916b6fd","element":2,"art":"12469685aef0cde4659300d1c5d976af.webp"},{"items":["จรวดดอกไม้ไฟ","ดอกไม้ไฟงานเทศกาล"],"name":"Yoimiya","icon":"87c16170d2f965e17475efb5ef02da2e","element":1,"art":"ff4b5ffe15b918c026ea4c17ed11b9b2.webp"},{"items":["พัดแห่งฝัน","ขนมบำบัดฝัน"],"name":"Yumemizuki Mizuki","icon":"b4331429163935d4d908b690aff9ba77","element":7,"art":"06e93291e1018a6eb442520fd134fbd2.webp"},{"items":["ธงงิ้ว","ทวนละครเวที"],"name":"Yun Jin","icon":"14d7b4e597225cbb1363358d89006c2a","element":8,"art":"66103c48f0da25cb08c3079ab4c866bd.webp"},{"items":["เสาหินหยก","หอกศิลา"],"name":"Zhongli","icon":"37de10beba5ba9b67d9fcc44d5de6574","element":8,"art":"28c2c4258b503cdb6a592e27d2f7bb71.webp"},{"items":["ม่านแสงหยก","ดาบแสงจันทร์"],"name":"Zibai","icon":"34a19ba96316e4711d8f5cc9b0588643","element":8,"art":"d6c0e1a137f7ab1003c73f72b8471cea.webp"}];
   const game=document.querySelector('.relay');
@@ -197,8 +201,9 @@
     {name:'คืนที่ระฆังไร้เสียง',need:[18,17,20]}
   ];
   let encounter;
+  let renderPicker;
   const marks=[];
-  const node=(tag,text)=>{const el=document.createElement(tag);el.textContent=text;return el;};
+  const node=(tag,text)=>{const el=document.createElement(tag);el.textContent=siteText(text);return el;};
   function button(label,handler,cls='relay-next'){
     const el=node('button',label);el.type='button';el.className=cls;el.onclick=handler;return el;
   }
@@ -602,7 +607,7 @@
       const mark = marks.find(m => m.person === g);
       if (mark) {
         point.classList.add('active');
-        point.title = [g.name, mark.artist.name, mark.pick.label].join(' · ');
+        point.title = [g.name, mark.artist.name, siteText(mark.pick.label)].join(' · ');
         point.setAttribute('role', 'img');
         point.setAttribute('aria-label', point.title);
         const elementIcon = new Image();
@@ -613,22 +618,22 @@
       }
       orbit.append(point);
     });
-    history.replaceChildren(...marks.map(({artist,pick})=>node('li',artist.name+' · '+pick.label)));
+    history.replaceChildren(...marks.map(({artist,pick})=>node('li',artist.name+' · '+siteText(pick.label))));
   }
   function panel(step,title){
-    status.textContent=step;heading.textContent=title;body.replaceChildren();
-    heading.focus({preventScroll:true});
+    status.textContent=step;heading.textContent=siteText(title);body.replaceChildren();
+    if (!document.activeElement.closest('.site-language')) heading.focus({preventScroll:true});
   }
   function totals(){
     return statNames.map((_,i)=>marks.reduce((sum,mark)=>sum+mark.pick.stats[i],0));
   }
   function progress(){
     const box=node('section','');box.className='relay-forecast';
-    box.append(node('strong','พลังสะสม · '+encounter.name));
+    box.append(node('strong',siteFormat('พลังสะสม · {0}', 'Accumulated power · {0}', siteText(encounter.name))));
     const scores = totals();
     const updateBars = scores.map((score,i)=>{
       const row=node('div','');row.className='relay-bar';
-      const bar=document.createElement('progress');bar.max=encounter.need[i];bar.value=score;bar.setAttribute('aria-label',statNames[i]);
+      const bar=document.createElement('progress');bar.max=encounter.need[i];bar.value=score;bar.setAttribute('aria-label',siteText(statNames[i]));
       const track = node('span', '');
       track.className = 'relay-meter';
       const ghost = node('span', '');
@@ -659,14 +664,14 @@
   const progressRow=hall.querySelector('.council-seats');
   const seatOrder=[7,8,4,3,2,1,5];
   function refreshHall(){
-    hall.querySelector('.council-count').textContent='เลือกแล้ว '+marks.length+' / 7 ธาตุ';
+    hall.querySelector('.council-count').textContent=siteFormat('เลือกแล้ว {0} / 7 ธาตุ', '{0} / 7 elements selected', marks.length);
     progressRow.replaceChildren();
     for(const id of seatOrder){
       const mark=marks.find(m=>m.artist.element===id);
       const trigger=triggers.find(t=>Number(t.dataset.element)===id);
       trigger.toggleAttribute('data-filled', Boolean(mark));
       const seat=button('',()=>trigger.click(),'council-seat');
-      seat.setAttribute('aria-label',mark?'แก้ไข '+mark.artist.name+' · '+mark.person.name:trigger.getAttribute('aria-label'));
+      seat.setAttribute('aria-label',mark?siteFormat('แก้ไข {0} · {1}', 'Edit {0} · {1}', mark.artist.name, mark.person.name):trigger.getAttribute('aria-label'));
       seat.dataset.filled=String(!!mark);
       const img=new Image();img.alt=mark?mark.artist.name:triggers.find(t=>Number(t.dataset.element)===id).getAttribute('aria-label');
       img.src='assets/characters/'+(mark?mark.artist.icon:'element-'+id)+'.webp';
@@ -675,12 +680,14 @@
 
   }
   function roster(g,id){
-    panel('ผสานพลังแล้ว '+marks.length+' / 7 ธาตุ','ใครจะเป็นผู้วาดไอเทม'+g.name+'?');
+    renderPicker = () => roster(g,id);
+    panel(siteFormat('ผสานพลังแล้ว {0} / 7 ธาตุ', '{0} / 7 elements united', marks.length),
+      siteFormat('ใครจะเป็นผู้วาดไอเทม{0}?', 'Who will draw the {0} item?', g.name));
     const current = marks.find(mark => mark.person === g);
     if (current) {
       const edit = node('div', '');
       edit.className = 'relay-edit';
-      edit.append(node('span', 'เลือกไว้ · ' + current.artist.name + ' · ' + current.pick.label));
+      edit.append(node('span', siteFormat('เลือกไว้ · {0} · {1}', 'Selected · {0} · {1}', current.artist.name, siteText(current.pick.label))));
       edit.append(button('ยกเลิกการเลือกธาตุนี้', () => {
         marks.splice(marks.indexOf(current), 1);
         redraw();
@@ -707,6 +714,7 @@
   const signatureStats={"Diluc":["531","234"],"Bennett":["414","144"],"Collei":["522","234"],"Nahida":["342","135"],"Albedo":["351","243"],"Klee":["513","135"],"Diona":["153","225"],"Xilonen":["135","522"],"Kaveh":["342","153"],"Furina":["342","225"],"Zhongli":["153","531"],"Alhaitham":["531","234"],"Raiden Shogun":["531","243"],"Barbara":["153","135"],"Fischl":["522","441"],"Xiangling":["432","135"],"Tighnari":["522","234"],"Rosaria":["243","531"],"Noelle":["252","441"],"Kirara":["423","144"],"Lisa":["531","441"],"Lynette":["342","135"],"Yaoyao":["243","135"],"Jean":["432","234"],"Ganyu":["144","531"],"Baizhu":["423","144"],"Venti":["432","135"],"Kaeya":["144","531"],"Amber":["522","243"]};
   const maxItemBonus = 5;
   function choose(g,artist){
+    renderPicker = () => choose(g,artist);
     panel(artist.name+' · '+g.name,'จะฝากสิ่งใดไว้ในแผนต่อต้าน?');
     const current = marks.find(mark => mark.person === g)?.pick;
     const beforeChoice = totals().map((score, i) => score - (current?.stats[i] ?? 0));
@@ -763,7 +771,7 @@
   async function revealResult() {
     const fusion = node('dialog', '');
     fusion.className = 'relay-fusion';
-    fusion.setAttribute('aria-label', 'กำลังรวมพลัง Gnosis ทั้งเจ็ด');
+    fusion.setAttribute('aria-label', siteText('กำลังรวมพลัง Gnosis ทั้งเจ็ด'));
     fusion.addEventListener('cancel', event => event.preventDefault());
     const pieces = seatOrder.map(id => {
       const trigger = triggers.find(trigger => Number(trigger.dataset.element) === id);
@@ -813,7 +821,7 @@
     const icon=node('span',['⚔','🛡','♥'][index]);
     icon.className='stat-icon stat-'+index;
     icon.setAttribute('aria-hidden','true');
-    label.append(icon,statNames[index]);
+    label.append(icon,siteText(statNames[index]));
     return label;
   }
   const itemStatOverrides = {
@@ -2074,14 +2082,14 @@
       "คืนนี้แสงจันทร์จะตกถึงพื้นโดยไม่มีอะไรมาขวาง ข้าอยากชวนเจ้าออกมาดู",
     ],
   };
-  function dialoguePanel(result) {
+  function dialoguePanel(result, activeSpeaker) {
     const section = node('section', '');
     section.className = 'relay-dialogue';
     const title = node('h4', 'บทพูดหลังการต่อสู้');
     const choices = node('div', '');
     choices.className = 'relay-speakers';
     choices.setAttribute('role', 'group');
-    choices.setAttribute('aria-label', 'เลือกตัวละครเพื่อดูบทพูด');
+    choices.setAttribute('aria-label', siteText('เลือกตัวละครเพื่อดูบทพูด'));
     const reply = node('div', '');
     reply.setAttribute('aria-live', 'polite');
     reply.setAttribute('aria-atomic', 'true');
@@ -2105,14 +2113,14 @@
       speakers.forEach(({control}, i) => control.setAttribute('aria-pressed', String(i === index)));
       artwork.src = 'assets/characters/' + marks[index].artist.art;
       name.textContent = speakers[index].name;
-      quote.textContent = '“' + speakers[index].text + '”';
+      quote.textContent = '“' + siteText(speakers[index].text) + '”';
     }
     choices.append(...speakers.map(({control}) => control));
     section.append(title, choices, reply);
-    showSpeaker(0);
+    showSpeaker(activeSpeaker);
     return section;
   }
-  function finish(){
+  function finish({activeSpeaker = 0, expanded = false, scroll = true} = {}){
     const scores=totals();
     const passed=scores.filter((score,i)=>score>=encounter.need[i]).length;
     const endings=[
@@ -2123,15 +2131,16 @@
     ];
     const [verdict,background,title,story]=endings[passed];
     hall.dataset.verdict=verdict;syncAtmosphere();art.src=background;
-    panel('ผลการต่อสู้ · '+encounter.name+' · ถึงเกณฑ์ '+passed+' / 3',title);
+    panel(siteFormat('ผลการต่อสู้ · {0} · ถึงเกณฑ์ {1} / 3',
+      'Battle outcome · {0} · {1} / 3 targets met', siteText(encounter.name), passed),title);
     const delay = title.match(/(\d+) วัน$/);
     if (delay) {
       const duration = node('span', '');
       duration.className = 'relay-result-duration';
       const digits = node('span', delay[1]);
       digits.className = 'relay-result-digits';
-      duration.append(digits, ' วัน');
-      heading.replaceChildren(title.slice(0, delay.index), duration);
+      duration.append(digits, siteFormat(' วัน', ' days'));
+      heading.replaceChildren(siteFormat('การรีเซ็ตโลกถูกเลื่อนออกไป ', 'The world reset is delayed by '), duration);
     }
     body.append(node('p',story));
     const table=document.createElement('table');table.className='relay-scores';
@@ -2142,9 +2151,11 @@
     scores.forEach((score,i)=>{
       const row=rows.insertRow();
       const label=row.insertCell();label.append(statLabel(i));
-      [score,encounter.need[i],score>=encounter.need[i]?'ถึงเกณฑ์':'ขาด '+(encounter.need[i]-score)].forEach(value=>row.append(node('td',value)));
+      [score,encounter.need[i],score>=encounter.need[i]?'ถึงเกณฑ์':
+        siteFormat('ขาด {0}', 'Short by {0}', encounter.need[i]-score)].forEach(value=>row.append(node('td',value)));
     });
     const details=document.createElement('details');details.className='relay-breakdown';
+    details.open = expanded;
     details.append(node('summary','ดูภาพวาดและพลังทั้ง 7 ธาตุ'), game.querySelector('.globe-stage').cloneNode(true));
     const members = node('table', '');
     members.className = 'relay-contributions';
@@ -2170,11 +2181,11 @@
       portrait.src = 'assets/characters/' + artist.icon + '.webp';
       portrait.alt = '';
       const info = node('div', '');
-      info.append(node('strong', artist.name), node('small', person.name + ' · ' + pick.label));
+      info.append(node('strong', artist.name), node('small', person.name + ' · ' + siteText(pick.label)));
       const tactic = itemTactics[artist.name][pick.label];
       const note = node('p', tactic);
       note.className = 'member-tactic';
-      note.title = tactic;
+      note.title = siteText(tactic);
       info.append(note);
       identity.append(portrait, info);
       member.append(identity);
@@ -2191,13 +2202,23 @@
         cell.append(track);
       }
     }
-    body.append(dialoguePanel(passed),table,members,details,button('วางแผนต่อต้านใหม่',()=>{start();triggers[0].focus({preventScroll:true});}));
-    game.scrollIntoView({block:'start',behavior:'instant'});
+    body.append(dialoguePanel(passed, activeSpeaker),table,members,details,button('วางแผนต่อต้านใหม่',()=>{start();triggers[0].focus({preventScroll:true});}));
+    if (scroll) game.scrollIntoView({block:'start',behavior:'instant'});
   }
   function start(){
     marks.length=0;delete hall.dataset.verdict;syncAtmosphere();art.src=intact;
     encounter=encounters[Math.floor(Math.random()*encounters.length)];
     body.replaceChildren();picker.append(game);redraw();refreshHall();
   }
+  document.addEventListener('site-language-change', () => {
+    redraw();
+    refreshHall();
+    if (picker.open) renderPicker?.();
+    else if (hall.dataset.verdict) {
+      const speakers = [...body.querySelectorAll('.relay-speaker')];
+      const activeSpeaker = Math.max(0, speakers.findIndex(speaker => speaker.getAttribute('aria-pressed') === 'true'));
+      finish({activeSpeaker, expanded: Boolean(body.querySelector('.relay-breakdown')?.open), scroll: false});
+    }
+  });
   start();
 })();
