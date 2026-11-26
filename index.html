@@ -2083,6 +2083,8 @@
     const digitImages = new Map();
     let dayTransition;
     const dayTransitionDuration = 460;
+    let digitFade;
+    const digitFadeDuration = 300;
 
     function remainingSeconds(now) {
       return Math.max(0, Math.ceil((deadline - now) / 1000));
@@ -2144,7 +2146,7 @@
       }
     }
 
-    function drawClock(display) {
+    function drawClock(display, now = performance.now()) {
       digitStrands = [];
       context.clearRect(0, 0, timer.width, timer.height);
       const colonAdvance = 46;
@@ -2152,6 +2154,7 @@
       context.save();
       const scale = Math.min(1, timer.width / naturalWidth);
       const inset = (timer.width - naturalWidth * scale) / 2;
+      const dayEnd = display.indexOf(":");
       context.translate(inset, 0);
       context.scale(scale, 1);
       let x = 0;
@@ -2172,7 +2175,15 @@
             change.x = inset + (x + 5) * scale;
             change.scale = scale;
           } else {
-            context.drawImage(digitImage(symbol), x + 5 - 12, 0);
+            const oldDigit = index > dayEnd ? digitFade?.before.at(index - display.length) : undefined;
+            if (oldDigit !== undefined && oldDigit !== symbol) {
+              const progress = Math.min(1, Math.max(0, (now - digitFade.start) / digitFadeDuration));
+              context.globalAlpha = .15 + .85 * Math.abs(2 * progress - 1);
+              context.drawImage(digitImage(progress < .5 ? oldDigit : symbol), x + 5 - 12, 0);
+              context.globalAlpha = 1;
+            } else {
+              context.drawImage(digitImage(symbol), x + 5 - 12, 0);
+            }
             addDigitStrands(digitStrands, symbol, x + 5, scale, inset);
           }
           x += digitAdvance;
@@ -2321,6 +2332,9 @@
           if (!document.hidden && oldDay !== undefined && oldDay !== nextDay) {
             startDayTransition(oldDay, nextDay);
           }
+          digitFade = !document.hidden && previousDisplay
+            ? {start: performance.now(), before: previousDisplay}
+            : undefined;
           drawClock(display);
           drawDigitTrails(elapsed);
         }
@@ -2611,9 +2625,11 @@
         if (progress === 1) heavenlyTransition = undefined;
       }
       if (clockEntrance) drawClockEntrance(now);
-      if (dayTransition && now - dayTransition.start >= dayTransitionDuration) {
-        dayTransition = undefined;
-        drawClock(previousDisplay);
+      const dayTransitionFinished = dayTransition && now - dayTransition.start >= dayTransitionDuration;
+      if (dayTransitionFinished) dayTransition = undefined;
+      if (digitFade || dayTransitionFinished) {
+        if (digitFade && now - digitFade.start >= digitFadeDuration) digitFade = undefined;
+        drawClock(previousDisplay, now);
       }
       const phase = (elapsed % loopDuration) / loopDuration;
       const swell = (1 - Math.cos(tau * phase)) / 2;
