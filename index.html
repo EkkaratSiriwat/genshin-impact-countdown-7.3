@@ -56,6 +56,102 @@
         radial-gradient(ellipse 65% 48% at 50% 49%, #ffd47766, transparent 100%),
         linear-gradient(150deg, #e1a2476b, #c584394f 54%, #a1642f73);
     }
+    .countdown-horizon {
+      position: absolute;
+      z-index: -1;
+      inset: auto 0 0;
+      height: 52%;
+      pointer-events: none;
+      display: none;
+    }
+    .scene[data-horizon] .countdown-horizon { display: block; }
+    .horizon-preview {
+      left: max(.75rem, env(safe-area-inset-left));
+      max-width: calc(100% - 10rem);
+      padding-inline: .5rem !important;
+      font-size: .82rem !important;
+    }
+    .nod-rim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      background:
+        radial-gradient(ellipse 70% 20% at 35% -4%, #93ffe899, transparent),
+        radial-gradient(ellipse 75% 20% at 65% 104%, #938dff99, transparent),
+        radial-gradient(ellipse 14% 78% at -2% 60%, #61d6d888, transparent),
+        radial-gradient(ellipse 14% 78% at 102% 40%, #afb6ff88, transparent);
+      box-shadow: inset 0 0 clamp(18px, 4vmin, 52px) #94c7ed73;
+    }
+    .scene:has(.region-star[data-region="nod-krai"][aria-expanded="true"]) .nod-rim { opacity: 1; }
+    .countdown-horizon::before, .countdown-horizon::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(0deg, #5e80c78c, #4a609b78 56%, #6874a840);
+      mask-image:
+        radial-gradient(ellipse 21% 96% at 0% 110%, black, transparent 100%),
+        radial-gradient(ellipse 21% 96% at 100% 110%, black, transparent 100%);
+      animation: horizon-breathe 2.8s ease-in-out infinite alternate;
+    }
+    .countdown-horizon::after {
+      mask-image:
+        radial-gradient(ellipse 78% 86% at 0% 109%, #000d, transparent),
+        radial-gradient(ellipse 78% 86% at 100% 109%, #000d, transparent),
+        radial-gradient(ellipse 60% 35% at 50% 104%, #0009, transparent);
+      animation-delay: -4s;
+      opacity: 0;
+      transition: opacity 1.2s ease-out;
+    }
+    .scene:is([data-horizon="wide"], [data-horizon="near"], [data-horizon="final"]) .countdown-horizon::after { opacity: 1; }
+    .final-rays {
+      display: none;
+      position: absolute;
+      inset: auto 0 0;
+      width: 100%;
+      height: 116%;
+      transform-origin: bottom;
+    }
+    .scene[data-horizon="wide"] { --ray-opacity: .20; }
+    .scene[data-horizon="corners"] .final-rays {
+      --ray-opacity: .10;
+      mask-image: linear-gradient(90deg, black, transparent 20% 80%, black);
+    }
+    .scene[data-horizon="near"] { --ray-opacity: .40; }
+    .scene[data-horizon="final"] { --ray-opacity: .55; }
+    .scene[data-horizon] .final-rays {
+      display: block;
+      opacity: var(--ray-opacity, 1);
+    }
+    @keyframes horizon-breathe {
+      from { transform: scaleY(.28); }
+      to { transform: scaleY(1.16); }
+    }
+    .countdown-horizon::before, .countdown-horizon::after { transform-origin: bottom; }
+    .horizon-star {
+      position: absolute;
+      top: 77%;
+      left: 24.5%;
+      width: clamp(20px, 4.8vmin, 60px);
+      aspect-ratio: 1.45;
+      transform: translate(-50%, -50%);
+      background: #c5d0fb26;
+      clip-path: polygon(50% 0,53% 27%,57% 38%,68% 44%,100% 50%,68% 56%,57% 62%,53% 73%,50% 100%,47% 73%,43% 62%,32% 56%,0 50%,32% 44%,43% 38%,47% 27%);
+    }
+    .horizon-star + .horizon-star { left: 75.5%; }
+    @media (prefers-reduced-motion: reduce) {
+      .countdown-horizon::before, .countdown-horizon::after {
+        animation-name: horizon-soft-pulse;
+        animation-duration: 4s;
+      }
+    }
+    @keyframes horizon-soft-pulse {
+      from { transform: scaleY(.38); }
+      to { transform: scaleY(1.08); }
+    }
     .heavenly-light::before {
       content: "";
       position: absolute;
@@ -925,6 +1021,11 @@
       }
     }
 
+    @property --gnosis-away {
+      syntax: "<number>";
+      inherits: true;
+      initial-value: 0;
+    }
     .gnosis-display {
       position: absolute;
       inset: 0;
@@ -936,10 +1037,18 @@
     }
     .gnosis-slot {
       position: absolute;
+      translate: calc(var(--entry-x) * var(--gnosis-away, 0)) calc(var(--entry-y) * var(--gnosis-away, 0));
       top: var(--piece-y);
       left: var(--piece-x);
       transform: translate(-50%, -50%);
     }
+    .gnosis-slot:nth-child(1) { --entry-x: -10vw; --entry-y: 24svh; }
+    .gnosis-slot:nth-child(2) { --entry-x: -6.5vw; --entry-y: 27svh; }
+    .gnosis-slot:nth-child(3) { --entry-x: -4vw; --entry-y: 28svh; }
+    .gnosis-slot:nth-child(4) { --entry-x: 0px; --entry-y: 22svh; }
+    .gnosis-slot:nth-child(5) { --entry-x: 6.6vw; --entry-y: 29svh; }
+    .gnosis-slot:nth-child(6) { --entry-x: 11.5vw; --entry-y: 23svh; }
+    .gnosis-slot:nth-child(7) { --entry-x: 11vw; --entry-y: 17svh; }
     .gnosis-piece {
       display: block;
       height: clamp(3.5rem, 13svh, 7.8rem);
@@ -1789,8 +1898,18 @@
   <video class="opening-sequence" data-src="assets/pv-72-opening-v3.mp4" preload="none" muted playsinline aria-hidden="true" hidden></video>
   <main class="scene">
     <img class="plate" alt="" src="assets/countdown-plate.png">
+    <div class="countdown-horizon" aria-hidden="true"><i class="horizon-star"></i><i class="horizon-star"></i></div>
     <div class="heavenly-light" aria-hidden="true"></div>
     <audio id="theme-music" loop preload="none" src="assets/theme-music.mp4"></audio>
+    <div class="nod-rim" aria-hidden="true"></div>
+    <select class="top-control horizon-preview" aria-label="ทดสอบออร่า">
+      <option value="live">ทดสอบออร่า · วันจริง</option>
+      <option value="31">ก่อน 30 วัน</option>
+      <option value="30">เหลือ 30–11 วัน</option>
+      <option value="10">เหลือ 10–4 วัน</option>
+      <option value="3">เหลือ 3–1 วัน</option>
+      <option value="0">24 ชั่วโมงสุดท้าย</option>
+    </select>
     <button class="top-control music-toggle" lang="en" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
       <span class="music-icon" aria-hidden="true">♫</span>
     </button>
@@ -2184,6 +2303,15 @@
       clearTimeout(pendingTick);
       const now = Date.now();
       const parts = splitTime(remainingSeconds(now));
+      const liveHorizon = horizonPreview.value === "live";
+      const days = liveHorizon ? parts[0] : Number(horizonPreview.value);
+      if (days > 30 || (liveHorizon && now >= deadline)) delete scene.dataset.horizon;
+      else {
+        const finalDay = liveHorizon ? deadline - now <= 86400000 : days === 0;
+        const horizon = finalDay ? "final" : days <= 3 ? "near" : days <= 10 ? "wide" : "corners";
+        prepareHorizonLights();
+        if (scene.dataset.horizon !== horizon) scene.dataset.horizon = horizon;
+      }
       resetErosion.setDaysRemaining(parts[0]);
       const display = formatCountdown(parts);
       if (display !== previousDisplay) {
@@ -2220,6 +2348,57 @@
     const motion = document.querySelector(".motion");
     const sky = motion.getContext("2d");
     const scene = document.querySelector(".scene");
+    const horizonPreview = scene.querySelector(".horizon-preview");
+    let horizonRays;
+    const rayMotionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+    function prepareHorizonLights() {
+      if (horizonRays) return;
+      const canvas = document.createElement("canvas");
+      canvas.className = "final-rays";
+      canvas.width = 1440;
+      canvas.height = 400;
+      scene.querySelector(".countdown-horizon").append(canvas);
+      // Cache tapered strokes once. Each stroke has its own position in its cycle.
+      const palette = document.createElement("canvas");
+      palette.width = 48;
+      palette.height = 96;
+      const brush = palette.getContext("2d");
+      for (let i = 0; i < 6; i++) {
+        const glow = brush.createLinearGradient(0, 96, 0, 0);
+        glow.addColorStop(0, "#e2e8ffdf");
+        glow.addColorStop(.32, `hsla(${185 + i * 16}, 72%, 74%, .58)`);
+        glow.addColorStop(1, "transparent");
+        brush.fillStyle = glow;
+        brush.beginPath();
+        brush.moveTo(i * 8, 96);
+        brush.lineTo(i * 8 + 4, 0);
+        brush.lineTo(i * 8 + 8, 96);
+        brush.fill();
+      }
+      const strokes = Array.from({length: 560}, (_, i) => ({
+        x: (i + Math.random()) * canvas.width / 560,
+        width: 1.5 + Math.random() * 6,
+        reach: 28 + Math.random() ** 2 * 120 + (i % 9 === 0 ? 215 : 0),
+        phase: Math.random() * Math.PI * 2,
+        speed: .0017 + Math.random() * .003,
+        color: Math.floor(Math.random() * 6) * 8
+      }));
+      horizonRays = {ctx: canvas.getContext("2d"), palette, strokes, lastFrame: -Infinity};
+    }
+
+    function drawHorizonRays(now) {
+      if (!horizonRays || !scene.dataset.horizon || now - horizonRays.lastFrame < 32) return;
+      const {ctx, palette, strokes} = horizonRays;
+      horizonRays.lastFrame = now;
+      const gentle = rayMotionPreference.matches;
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      for (const ray of strokes) {
+        const wave = (1 + Math.sin(ray.phase + now * ray.speed * (gentle ? .4 : 1))) / 2;
+        const height = ray.reach * (gentle ? .34 + .52 * wave : .12 + .88 * wave);
+        ctx.drawImage(palette, ray.color, 0, 8, 96, ray.x, ctx.canvas.height - height, ray.width, height);
+      }
+    }
+    horizonPreview.addEventListener("change", tick);
     const resetErosion = createResetErosion(scene, seededRandom);
     const music = document.querySelector("#theme-music");
     // Loudness and accents sampled from the embedded soundtrack at 30 Hz.
@@ -2444,6 +2623,7 @@
       scene.style.setProperty("--digit-glow", .14 + .42 * digitPulse);
       scene.style.setProperty("--music-level", musicPulse);
       drawMotion(elapsed);
+      drawHorizonRays(now);
       resetErosion.paint(now);
       drawDigitTrails(elapsed);
     }
@@ -3401,7 +3581,7 @@ function hideRegion(next) {
         regionVision.style.opacity = String(progress);
         regionVision.style.setProperty("--region-spread", `${progress * 100}%`);
         regionVision.style.setProperty("--region-blur", `${blur * (1 - progress)}px`);
-      }, undefined, page.preloadEarly ? 250 : 500);
+      }, undefined, regionReveal.dataset.region === "nod-krai" ? 1500 : page.preloadEarly ? 250 : 500);
     }
 
     function renderRegionCopy(page) {
@@ -3589,7 +3769,9 @@ function hideRegion(next) {
       if (pageSliding) return;
       countdownScene.style.setProperty('--star-scatter-distance', `${starSpread(window.scrollY)}px`);
       countdownScene.style.setProperty('--star-scroll-opacity', 1 - Math.min(1, Math.max(0, window.scrollY / (innerHeight * .52))));
-      const light = hallLightAt(successorHall.getBoundingClientRect().top);
+      const hallTop = successorHall.getBoundingClientRect().top;
+      const light = hallLightAt(hallTop);
+      gnosisDisplay.style.setProperty('--gnosis-away', gnosisAwayAt(hallTop));
       towerDusk.style.opacity = 1 - light;
       towerBloom.style.opacity = light;
     }
@@ -3601,6 +3783,10 @@ function hideRegion(next) {
     motionPreference.addEventListener('change', scheduleStarScroll);
 
     const successorHall = document.querySelector('#successors');
+    const gnosisDisplay = successorHall.querySelector('.gnosis-display');
+    function gnosisAwayAt(hallTop) {
+      return Math.max(0, Math.min(1, hallTop / (innerHeight * .48))) * (motionPreference.matches ? .55 : 1);
+    }
 
     let lastWheel = -Infinity;
     let pageSliding = false;
@@ -3630,6 +3816,9 @@ function hideRegion(next) {
       const slideAnimations = [
         countdownScene.animate(slide, transition),
         successorHall.animate(slide, transition),
+        gnosisDisplay.animate([0, .25, .5, .75, 1].map(offset => ({
+          offset, '--gnosis-away': String(gnosisAwayAt(hallTop - origin - offset * delta))
+        })), transition),
         towerDusk.animate([{ opacity: 1 - sourceLight }, { opacity: 1 - targetLight }], lightTransition),
         towerBloom.animate([{ opacity: sourceLight }, { opacity: targetLight }], lightTransition),
         ...stars.map(star => {
