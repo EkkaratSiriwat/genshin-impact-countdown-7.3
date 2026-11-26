@@ -152,7 +152,7 @@ function createResetErosion(scene, seededRandom) {
     if (initial || reducedMotion.matches) applyLevel(target);
   }
 
-  function paintSurface(surface, now) {
+  function paintSurface(surface, now, liftScale = 1) {
     const {ctx, width, height, lift} = surface;
     if (!width || !height) return;
     ctx.clearRect(0, 0, width, Math.ceil(height + lift));
@@ -176,7 +176,7 @@ function createResetErosion(scene, seededRandom) {
       }
       const phase = (now / lane.period + lane.phase) % 1;
       const root = lift + y;
-      const tip = root - phase * lift * lane.lift;
+      const tip = root - phase * lift * lane.lift * liftScale;
       const length = lane.length * lift;
       const brightness = weight * (1 - .7 * level ** 5);
       ctx.fillStyle = lane.tint;
@@ -200,13 +200,16 @@ function createResetErosion(scene, seededRandom) {
       const t = reducedMotion.matches ? 1 : Math.min(1, Math.max(0, (now - changedAt) / 650));
       applyLevel(t === 1 ? target : from + (target - from) * t * t * (3 - 2 * t));
     }
-    // Opening the test explicitly plays the effect. Return to the visitor's
-    // motion preference as soon as the preview closes.
-    const still = reducedMotion.matches && !preview.open;
-    if (!level || (still && !dirty)) return;
+    if (!level) return;
     lastFrame = now;
     const activeSurfaces = reveal.hidden || reveal.dataset.region === 'nod-krai' ? starSurfaces : surfaces;
-    for (const surface of activeSurfaces) paintSurface(surface, still ? 0 : now);
+    const gentler = reducedMotion.matches && !preview.open;
+    for (const surface of activeSurfaces) {
+      if (gentler && !surface.star && !dirty) continue;
+      // Keep the countdown stars active with shorter, slower trails in reduced motion.
+      const time = gentler ? (surface.star ? now * .45 : 0) : now;
+      paintSurface(surface, time, gentler ? .35 : 1);
+    }
     dirty = false;
   }
   reducedMotion.addEventListener('change', () => { dirty = true; });
