@@ -25,6 +25,7 @@ const englishCopy = {
   "หนึ่งธาตุ หนึ่งผู้ถือวิชั่น เลือกวาดไอเทมหนึ่งชิ้นให้ผู้ถือวิชั่นร่วมกอบกู้ Teyvat": "Choose one Vision holder and one item to draw for each element to help save Teyvat.",
   "ภาพวาดแผนที่โลก Teyvat บนกระดาษ": "A map of Teyvat drawn on parchment",
   "พลังที่เลือกแล้ว": "Selected items",
+  "Teyvat จะรีเซ็ตใน": "Teyvat resets in",
   "การรีเซ็ต Teyvat เริ่มต้นแล้ว": "Teyvat’s reset has begun",
   "เมืองแห่งอิสรภาพ": "City of Freedom",
   "Mondstadt ตั้งอยู่บนเกาะกลางทะเลสาบ Cider Lake กังหันลมและมหาวิหารสูงเด่นเหนือแนวหลังคาสีแดง จากลานหน้ามหาวิหารมองเห็นรูปปั้นของ Barbatos เทพแห่งสายลมที่ชาวเมืองนับถือ": "Mondstadt sits on an island in the middle of Cider Lake. Windmills and a cathedral dominate the red rooftops. From the plaza in front of the cathedral you can see the statue of Barbatos, the wind god revered by the townspeople.",
