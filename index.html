@@ -860,6 +860,10 @@
       pointer-events: none;
     }
     .opening-sequence.is-ending { opacity: 0; }
+    .opening-sequence[controls] { pointer-events: auto; }
+    @media (max-width: 680px) {
+      .opening-sequence { object-fit: contain; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .opening-sequence { transition: none; }
     }
@@ -2673,12 +2677,11 @@
     window.addEventListener("pageshow", tick);
     const opening = document.querySelector(".opening-sequence");
     const isLocalPreview = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
-    const playOpening = !isLocalPreview && !document.hidden && !matchMedia("(max-width: 680px)").matches;
+    const playOpening = !isLocalPreview;
     if (playOpening) {
       const scene = document.querySelector(".scene");
       scene.inert = true;
       opening.hidden = false;
-      opening.src = opening.dataset.src;
       opening.muted = true;
       let loadTimeout;
       const finishOpening = () => {
@@ -2691,7 +2694,7 @@
       };
       const startLoadTimeout = () => {
         clearTimeout(loadTimeout);
-        loadTimeout = setTimeout(finishOpening, 3000);
+        if (!document.hidden) loadTimeout = setTimeout(finishOpening, 10000);
       };
       opening.addEventListener("ended", () => {
         clearTimeout(loadTimeout);
@@ -2706,8 +2709,31 @@
       opening.addEventListener("error", finishOpening, {once: true});
       opening.addEventListener("waiting", startLoadTimeout);
       opening.addEventListener("playing", () => clearTimeout(loadTimeout));
-      startLoadTimeout();
-      opening.play().catch(finishOpening);
+      const startOpening = () => {
+        opening.src = opening.dataset.src;
+        startLoadTimeout();
+        opening.play().catch(error => {
+          if (opening.hidden) return;
+          if (error.name !== "NotAllowedError") {
+            finishOpening();
+            return;
+          }
+          clearTimeout(loadTimeout);
+          opening.controls = true;
+          opening.removeAttribute("aria-hidden");
+          opening.setAttribute("aria-label", "Intro");
+        });
+      };
+      if (document.hidden) {
+        const startWhenVisible = () => {
+          if (document.hidden) return;
+          document.removeEventListener("visibilitychange", startWhenVisible);
+          startOpening();
+        };
+        document.addEventListener("visibilitychange", startWhenVisible);
+      } else {
+        startOpening();
+      }
     }
     const startClockEntrance = () => {
       if (!document.hidden && Date.now() < deadline) clockEntrance = {};
