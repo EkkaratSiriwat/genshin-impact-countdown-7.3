@@ -1,9 +1,5 @@
 function createResetErosion(scene, seededRandom) {
-  const preview = scene.querySelector('.erosion-preview');
-  const toggle = preview.querySelector('summary');
-  const slider = preview.querySelector('input');
-  const dayLabel = preview.querySelector('output');
-  const firstDay = Number(slider.max);
+  const firstDay = 19;
   const stages = firstDay + 1;
   const finalStrength = (stages - 5) / stages; // The former five-days-left appearance.
   const dayOneBoost = .12;
@@ -57,15 +53,14 @@ function createResetErosion(scene, seededRandom) {
         }
       }
       lanes.push({
-        x: x + strip / 2, yShift, start, phase: random(), period: 1400 + random() * 1350,
+        x: x + strip / 2, yShift, start, phase: random(), period: (1400 + random() * 1350) / (star ? 1.5 : 1),
         length: .07 + random() ** 2 * .36, width: .8 + random() ** 2 * 1.4,
         lift: .22 + random() * .78, tint: tints[Math.floor(random() * tints.length)]
       });
       x += strip;
     }
 
-    // Bake all days once. Previewing a day selects a frame without encoding
-    // new textures while scrolling the slider. Keep a legible trace of the text.
+    // Bake one mask per day, retaining a legible trace of the text.
     const mask = document.createElement('canvas');
     mask.width = width;
     mask.height = maskHeight * (stages + 1);
@@ -93,7 +88,7 @@ function createResetErosion(scene, seededRandom) {
   const storySurface = makeSurface(story, story, 1926, 352);
   const surfaces = [...starSurfaces, storySurface, makeSurface(vision, vision, 2026, 520)];
 
-  let liveDay, target, level = 0, from = 0, changedAt = 0, lastFrame = -Infinity;
+  let target, level = 0, from = 0, changedAt = 0, lastFrame = -Infinity;
   let visibleStage = 0;
   let dirty = true;
 
@@ -203,48 +198,16 @@ function createResetErosion(scene, seededRandom) {
     if (!level) return;
     lastFrame = now;
     const activeSurfaces = reveal.hidden || reveal.dataset.region === 'nod-krai' ? starSurfaces : surfaces;
-    const gentler = reducedMotion.matches && !preview.open;
+    const gentler = reducedMotion.matches;
     for (const surface of activeSurfaces) {
-      if (gentler && !surface.star && !dirty) continue;
-      // Keep the countdown stars active with shorter, slower trails in reduced motion.
-      const time = gentler ? (surface.star ? now * .45 : 0) : now;
+      const staticText = gentler && surface === storySurface;
+      if (staticText && !dirty) continue;
+      const time = staticText ? 0 : gentler ? now * .45 : now;
       paintSurface(surface, time, gentler ? .35 : 1);
     }
     dirty = false;
   }
   reducedMotion.addEventListener('change', () => { dirty = true; });
-
-  function previewDay() {
-    const days = firstDay - Number(slider.value);
-    const label = days === 0 ? siteText('วันสุดท้าย') :
-      siteFormat('เหลือ {0} วัน', '{0} days left', days);
-    dayLabel.textContent = label;
-    slider.setAttribute('aria-valuetext', label);
-    selectDay(days);
-  }
-  preview.hidden = false;
-  preview.addEventListener('toggle', () => {
-    dirty = true;
-    toggle.textContent = siteText(preview.open ? 'กลับสู่วันจริง' : 'ทดสอบการระเหย');
-    if (preview.open) {
-      slider.value = '0';
-      previewDay();
-    } else {
-      selectDay(liveDay);
-    }
-  });
-  document.addEventListener('site-language-change', () => {
-    toggle.textContent = siteText(preview.open ? 'กลับสู่วันจริง' : 'ทดสอบการระเหย');
-    if (preview.open) previewDay();
-  });
-  slider.addEventListener('input', previewDay);
-  document.addEventListener('keydown', event => {
-    if (preview.open && event.key === 'Escape') {
-      event.preventDefault();
-      preview.open = false;
-      toggle.focus({preventScroll: true});
-    }
-  });
 
   return {
     paint,
@@ -252,9 +215,7 @@ function createResetErosion(scene, seededRandom) {
     setDaysRemaining(days) {
       // Begin on the morning of the first day, before the clock rolls to 19.
       if (days === stages) days = firstDay;
-      if (liveDay === days) return;
-      liveDay = days;
-      if (!preview.open) selectDay(days);
+      selectDay(days);
     }
   };
 }

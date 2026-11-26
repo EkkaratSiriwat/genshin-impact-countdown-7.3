@@ -431,9 +431,9 @@
     }
     .digit-trails {
       position: absolute;
-      inset: 0;
+      inset: auto 0 0;
       width: 100%;
-      height: 100%;
+      height: calc(100% * 352 / 142);
       pointer-events: none;
     }
     .units {
@@ -1782,7 +1782,7 @@
 <body>
   <div class="site-language">
     <select aria-label="ภาษา / Language">
-      <option value="th" lang="th">ไทย</option>
+      <option value="th" lang="th">ภาษาไทย</option>
       <option value="en" lang="en">English</option>
     </select>
   </div>
@@ -1791,14 +1791,6 @@
     <img class="plate" alt="" src="assets/countdown-plate.png">
     <div class="heavenly-light" aria-hidden="true"></div>
     <audio id="theme-music" loop preload="none" src="assets/theme-music.mp4"></audio>
-    <details class="erosion-preview" hidden>
-      <summary>ทดสอบการระเหย</summary>
-      <div class="erosion-controls">
-        <label for="erosion-day">วันจำลอง</label>
-        <output for="erosion-day" id="erosion-day-label"></output>
-        <input type="range" id="erosion-day" min="0" max="19" value="0" step="1">
-      </div>
-    </details>
     <button class="top-control music-toggle" lang="en" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
       <span class="music-icon" aria-hidden="true">♫</span>
     </button>
@@ -1863,7 +1855,6 @@
       <div class="clock-countdown" id="clock-countdown" role="timer" aria-live="off">
         <span class="sr-only" id="remaining"></span>
         <canvas class="digits" width="800" height="142" aria-hidden="true"></canvas>
-        <canvas class="digit-trails" width="800" height="142" aria-hidden="true"></canvas>
         <div class="units" lang="en" aria-hidden="true">
           <span>Days</span><span>Hours</span><span>Minutes</span><span>Seconds</span>
         </div>
@@ -1872,6 +1863,7 @@
         <span class="sr-only" id="clock-date-label"></span>
         <canvas class="date-digits" width="800" height="142" aria-hidden="true"></canvas>
       </time>
+      <canvas class="digit-trails" width="800" height="352" aria-hidden="true"></canvas>
       <button class="clock-toggle" lang="en" type="button" aria-label="Show update date" aria-pressed="false"
         aria-controls="clock-countdown clock-date" title="Show update date" hidden></button>
     </div>
@@ -1908,7 +1900,7 @@
     <dialog id="relay-picker" aria-labelledby="relay-title"><button class="plan-close" type="button" aria-label="ปิดแผนต่อต้าน">×</button>
     <div class="site-language">
       <select aria-label="ภาษา / Language">
-        <option value="th" lang="th">ไทย</option>
+        <option value="th" lang="th">ภาษาไทย</option>
         <option value="en" lang="en">English</option>
       </select>
     </div>
@@ -1933,6 +1925,7 @@
     const context = timer.getContext("2d");
     const trails = document.querySelector(".digit-trails");
     const trailContext = trails.getContext("2d");
+    trailContext.translate(0, trails.height - timer.height);
     const remaining = document.querySelector("#remaining");
     const announcement = document.querySelector("#announcement");
     const heading = document.querySelector("h1");
@@ -1967,6 +1960,8 @@
     const clockEntranceStartSeconds = 42 * 86400;
     const clockEntranceStopTimes = [.4, .62, .81, 1];
     let digitStrands = [];
+    const dateStrands = [];
+    const digitImages = new Map();
     let dayTransition;
     const dayTransitionDuration = 460;
 
@@ -2000,29 +1995,32 @@
       paint.restore();
     }
 
-    function addDigitStrands(digit, x, scale, inset) {
+    function digitTop(digit, column) {
       const shapes = activeSegments[Number(digit)];
-      // Attach each strand to the highest lit segment at its column.
-      for (let column = 4; column < 68; column += 1.9) {
-        let origin;
-        if (shapes.includes("a") && column >= 8 && column <= 57) {
-          origin = 31;
-        } else if (shapes.includes("f") && column < 17) {
-          origin = 45;
-        } else if (shapes.includes("b") && column > 53) {
-          origin = 45;
-        }
+      if (shapes.includes("a") && column >= 3 && column <= 61)
+        return 30 + Math.max(11 - column, column - 53, 0);
+      if (shapes.includes("f") && column >= 2 && column <= 16)
+        return 40 + Math.abs(column - 9);
+      if (shapes.includes("b") && column >= 55 && column <= 69)
+        return 40 + Math.abs(column - 63);
+    }
+
+    function addDigitStrands(strands, digit, x, scale, inset) {
+      for (let column = 2; column < 70; column += .95) {
+        const origin = digitTop(digit, column);
         if (origin === undefined) continue;
         const noise = (Math.sin(column * 97 + x * 31) + 1) / 2;
-        digitStrands.push({
+        const reach = (Math.cos(column * 7 + x * 17) + 1) / 2;
+        strands.push({
           x: inset + (x + column) * scale,
           origin,
           phase: (Math.cos(column * 19 + x * 7) + 1) / 2,
+          grainPhase: (Math.sin(column * 5.31 + x * .73) + 1) / 2,
           cycles: 9 + Math.floor(noise * 11),
-          length: 4 + noise * 14,
-          travel: Math.min(origin - 3, 11 + noise * 27),
-          width: (.65 + noise * .65) * scale,
-          brightness: .16 + noise * .49
+          length: 3 + noise ** 2 * 23,
+          travel: 22 + reach ** 3 * 190,
+          width: (.45 + noise * .9) * scale,
+          brightness: .22 + noise * .54
         });
       }
     }
@@ -2055,8 +2053,8 @@
             change.x = inset + (x + 5) * scale;
             change.scale = scale;
           } else {
-            paintDigit(context, symbol, x + 5);
-            addDigitStrands(symbol, x + 5, scale, inset);
+            context.drawImage(digitImage(symbol), x + 5 - 12, 0);
+            addDigitStrands(digitStrands, symbol, x + 5, scale, inset);
           }
           x += digitAdvance;
         }
@@ -2065,10 +2063,28 @@
     }
 
     function digitImage(digit) {
+      if (digitImages.has(digit)) return digitImages.get(digit);
       const image = document.createElement("canvas");
-      image.width = 72;
+      image.width = 96;
       image.height = timer.height;
-      paintDigit(image.getContext("2d"), digit, 0);
+      const paint = image.getContext("2d");
+      paintDigit(paint, digit, 12);
+      // Break up the luminous face itself, including its halo. Keep the lower
+      // segments solid so a changing second remains legible through the plume.
+      const pixels = paint.getImageData(0, 0, image.width, image.height);
+      const noise = seededRandom(901 + Number(digit));
+      for (let column = 0; column < 72; column++) {
+        const top = digitTop(digit, Math.min(69, Math.max(2, column)));
+        if (top === undefined) continue;
+        const depth = 12 + noise() * 11;
+        for (let y = 0; y < top + depth; y++) {
+          const fade = Math.max(0, (y - top) / depth);
+          const alpha = (y * image.width + 12 + column) * 4 + 3;
+          pixels.data[alpha] *= noise() < .22 ? .55 + fade * .45 : .05 + fade ** 2 * .95;
+        }
+      }
+      paint.putImageData(pixels, 0, 0);
+      digitImages.set(digit, image);
       return image;
     }
 
@@ -2097,7 +2113,7 @@
           const x = 36 + (left - 36) * compression + offset * 4 * distortion;
           const y = (142 - height) / 2 + offset * 12 * distortion;
           const image = progress >= .5 + offset * .12 ? digit.after : digit.before;
-          trailContext.drawImage(image, left, 0, 6, 142, x, y, 6 * compression, height);
+          trailContext.drawImage(image, 12 + left, 0, 6, 142, x, y, 6 * compression, height);
           trailContext.globalAlpha = distortion * (.22 + .47 * Math.abs(offset));
           trailContext.fillStyle = "#f0e9ff";
           trailContext.fillRect(x, 29 + offset * 15, 1 + Math.abs(offset), 83 + offset * 29);
@@ -2108,23 +2124,33 @@
     }
 
     function drawDigitTrails(elapsed) {
-      trailContext.clearRect(0, 0, trails.width, trails.height);
-      trailContext.fillStyle = "#f2edff";
-      for (const strand of digitStrands) {
-        const phase = (elapsed / loopDuration * strand.cycles + strand.phase) % 1;
+      const headroom = trails.height - timer.height;
+      trailContext.clearRect(0, -headroom, trails.width, trails.height);
+      trailContext.fillStyle = "#f2eff8";
+      for (const strand of (clockDate.hidden ? digitStrands : dateStrands)) {
+        const phase = (elapsed / digitLoopDuration * strand.cycles + strand.phase) % 1;
         const rise = strand.travel * phase;
         const top = strand.origin - rise;
         const length = Math.min(strand.length, rise);
         const light = strand.brightness * Math.sin(Math.PI * phase);
-        const base = 2 + strand.length * (.25 + phase * .45);
-        trailContext.globalAlpha = strand.brightness * (.16 + .24 * (1 - phase));
-        trailContext.fillRect(strand.x, strand.origin - base, strand.width, base + 1);
-        trailContext.globalAlpha = light * .38;
-        trailContext.fillRect(strand.x, top, strand.width, length);
-        trailContext.globalAlpha = light * .75;
-        trailContext.fillRect(strand.x, top + length * .58, strand.width, length * .42);
+        // Two short flights keep a dense, shimmering fringe attached to the
+        // broken face while the longer detached grains fade farther above it.
+        for (let layer = 0; layer < 2; layer++) {
+          const flight = (phase + strand.grainPhase + layer * .5) % 1;
+          const lift = flight * flight * (19 + 14 * strand.grainPhase);
+          const root = strand.origin + 12 - lift;
+          trailContext.globalAlpha = (.38 + .55 * strand.brightness) * Math.sin(Math.PI * flight);
+          trailContext.fillRect(strand.x, root - 3, strand.width * 1.35, 3 + strand.grainPhase * 4);
+          trailContext.globalAlpha *= .45;
+          trailContext.fillRect(strand.x, root - 8, strand.width * .75, 4);
+        }
+        trailContext.globalAlpha = light * .18;
+        trailContext.fillRect(strand.x, top - length * .65, strand.width, length * 1.65);
+        trailContext.globalAlpha = light * .64;
+        trailContext.fillRect(strand.x, top + length * .52, strand.width, length * .48);
       }
       trailContext.globalAlpha = 1;
+      if (clockDate.hidden && dayTransition) drawDayTransition(performance.now());
     }
 
     function formatCountdown(parts) {
@@ -2169,7 +2195,6 @@
           }
           drawClock(display);
           drawDigitTrails(elapsed);
-          if (dayTransition) drawDayTransition(performance.now());
         }
         const [days, hours, minutes, seconds] = parts;
         remaining.textContent = siteFormat('เหลือ {0} วัน {1} ชั่วโมง {2} นาที {3} วินาที',
@@ -2204,6 +2229,7 @@
     let heavenlyGlow = 0;
     let heavenlyTransition;
     const loopDuration = 10000;
+    const digitLoopDuration = loopDuration * 2;
     const tau = 2 * Math.PI;
     const {width: skyWidth, height: skyHeight} = motion;
 
@@ -2410,9 +2436,9 @@
         dayTransition = undefined;
         drawClock(previousDisplay);
       }
-      const phase = elapsed / loopDuration;
+      const phase = (elapsed % loopDuration) / loopDuration;
       const swell = (1 - Math.cos(tau * phase)) / 2;
-      const digitPulse = (1 - Math.cos(tau * phase * 5)) / 2;
+      const digitPulse = (1 - Math.cos(tau * elapsed / digitLoopDuration * 5)) / 2;
       scene.style.setProperty("--plate-scale", 1 + .018 * swell);
       scene.style.setProperty("--plate-opacity", 1 - .12 * swell);
       scene.style.setProperty("--digit-glow", .14 + .42 * digitPulse);
@@ -2420,7 +2446,6 @@
       drawMotion(elapsed);
       resetErosion.paint(now);
       drawDigitTrails(elapsed);
-      if (dayTransition) drawDayTransition(now);
     }
 
     let countdownMotionVisible = true;
@@ -2430,7 +2455,7 @@
 
     function animate(now) {
       if (previousFrame !== undefined) {
-        elapsed = (elapsed + now - previousFrame) % loopDuration;
+        elapsed = (elapsed + now - previousFrame) % digitLoopDuration;
       }
       previousFrame = now;
       if (countdownMotionVisible && !document.documentElement.hasAttribute('data-page-sliding')) renderMotion(now);
@@ -2511,7 +2536,8 @@
         datePaint.fill();
         dateX += dotSpacing;
       } else {
-        paintDigit(datePaint, symbol, dateX + 5);
+        datePaint.drawImage(digitImage(symbol), dateX + 5 - 12, 0);
+        addDigitStrands(dateStrands, symbol, dateX + 5, 1, 0);
         dateX += digitAdvance;
       }
     }
@@ -2520,6 +2546,7 @@
       const showDate = clockDate.hidden;
       clockDate.hidden = !showDate;
       clock.toggleAttribute("data-show-date", showDate);
+      drawDigitTrails(elapsed);
       clockToggle.setAttribute("aria-pressed", String(showDate));
       clockToggle.title = showDate ? "Show countdown" : "Show update date";
     });
@@ -3511,7 +3538,7 @@ function hideRegion(next) {
       });
     });
     scene.addEventListener("click", event => {
-      if (!event.target.closest("button, a, .region-info, .erosion-preview")) hideRegion();
+      if (!event.target.closest("button, a, .region-info")) hideRegion();
     });
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && !event.defaultPrevented) hideRegion();
