@@ -2036,7 +2036,6 @@
   function dialoguePanel(result, activeSpeaker) {
     const section = node('section', '');
     section.className = 'relay-dialogue';
-    const title = node('h4', 'บทพูดหลังการต่อสู้');
     const choices = node('div', '');
     choices.className = 'relay-speakers';
     choices.setAttribute('role', 'group');
@@ -2067,10 +2066,169 @@
       quote.textContent = '“' + siteText(speakers[index].text) + '”';
     }
     choices.append(...speakers.map(({control}) => control));
-    section.append(title, choices, reply);
+    section.append(choices, reply);
     showSpeaker(activeSpeaker);
     return section;
   }
+
+  async function saveResultImage(background, dialogue, table) {
+    const title = heading.textContent;
+    const subtitle = status.textContent;
+    const story = body.firstElementChild.textContent;
+    const speaker = dialogue.querySelector('strong').textContent;
+    const quote = dialogue.querySelector('blockquote').textContent;
+    const selected = dialogue.querySelector('[aria-pressed="true"]');
+    const portraits = [...dialogue.querySelectorAll('.relay-speaker')];
+    const cells = Array.from(table.rows, row => Array.from(row.cells, cell => cell.textContent.trim()));
+    const urls = [background, dialogue.querySelector('.relay-speaker-art').src,
+      ...portraits.map(portrait => portrait.querySelector('img').src)];
+    const images = await Promise.all(urls.map(async url => {
+      const image = new Image();
+      image.src = url;
+      try { await image.decode(); return image; } catch { return null; }
+    }));
+    const [scene, artwork, ...faces] = images;
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    const ctx = canvas.getContext('2d');
+    const width = 896;
+    const left = 92;
+    const font = (size, weight = 400) => `${weight} ${size}px system-ui, sans-serif`;
+    const segmenter = new Intl.Segmenter(document.documentElement.lang, {granularity:'word'});
+    function wrap(text, style) {
+      ctx.font = style;
+      const lines = [];
+      let line = '';
+      for (const {segment} of segmenter.segment(text)) {
+        if (line && ctx.measureText(line + segment).width > width) {
+          lines.push(line.trimEnd());
+          line = segment.trimStart();
+        } else {
+          line += segment;
+        }
+      }
+      if (line) lines.push(line.trimEnd());
+      return lines;
+    }
+    const titleLines = wrap(title, font(62, 700));
+    const storyLines = wrap(story, font(26));
+    const quoteLines = wrap(quote, font(26));
+    canvas.height = 1140 + titleLines.length * 74 + (storyLines.length + quoteLines.length) * 38;
+    ctx.fillStyle = '#12172a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (scene) {
+      const scale = Math.max(canvas.width / scene.width, canvas.height / scene.height);
+      ctx.drawImage(scene, (canvas.width - scene.width * scale) / 2, 0, scene.width * scale, scene.height * scale);
+    }
+    ctx.fillStyle = '#101423d9';
+    ctx.fillRect(42, 42, 996, canvas.height - 84);
+    ctx.textBaseline = 'top';
+    function print(text, x, y, style, color = '#fff5e5', maxWidth = width) {
+      ctx.font = style;
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y, maxWidth);
+    }
+    let y = 82;
+    print(subtitle, left, y, font(24), '#f1d7a6');
+    y += 47;
+    for (const line of titleLines) {
+      print(line, left, y, font(62, 700), '#ffe1a5');
+      y += 74;
+    }
+    y += 12;
+    for (const line of storyLines) {
+      print(line, left, y, font(26));
+      y += 38;
+    }
+    y += 28;
+    faces.forEach((face, i) => {
+      const x = left + 34 + i * 85;
+      ctx.beginPath();
+      ctx.arc(x, y + 32, 32, 0, Math.PI * 2);
+      ctx.fillStyle = '#1d2438';
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+      if (face) ctx.drawImage(face, x - 32, y, 64, 64);
+      ctx.restore();
+      ctx.lineWidth = portraits[i] === selected ? 3 : 1;
+      ctx.strokeStyle = '#e7cc98';
+      ctx.stroke();
+    });
+    y += 86;
+    if (artwork) {
+      const scale = Math.min(width / artwork.width, 450 / artwork.height);
+      const artWidth = artwork.width * scale;
+      const artHeight = artwork.height * scale;
+      ctx.drawImage(artwork, (1080 - artWidth) / 2, y + (450 - artHeight) / 2, artWidth, artHeight);
+    }
+    y += 476;
+    print(speaker, left, y, font(34, 700));
+    y += 50;
+    for (const line of quoteLines) {
+      print(line, left, y, font(26));
+      y += 38;
+    }
+    y += 28;
+    print(table.caption.textContent, left, y, font(28, 700), '#f1d7a6');
+    y += 48;
+    for (const [index, row] of cells.entries()) {
+      const offsets = [0, 335, 525, 715];
+      row.forEach((value, column) => print(value, left + offsets[column], y, font(25, index ? 400 : 700),
+        '#fff5e5', (offsets[column + 1] ?? width) - offsets[column] - 12));
+      ctx.fillStyle = '#e7cc9855';
+      ctx.fillRect(left, y + 34, width, 1);
+      y += 45;
+    }
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('Unable to encode result image');
+    const download = document.createElement('a');
+    download.href = URL.createObjectURL(blob);
+    download.download = 'teyvat-battle-result.png';
+    document.body.append(download);
+    download.click();
+    download.remove();
+    setTimeout(() => URL.revokeObjectURL(download.href), 60000);
+  }
+
+  function resultActions(background, dialogue, table) {
+    const group = node('div', '');
+    group.className = 'relay-result-actions';
+    const status = node('p', '');
+    status.className = 'relay-share-status';
+    status.setAttribute('role', 'status');
+    const save = button(siteFormat('บันทึกภาพผลลัพธ์', 'Save result image'), async () => {
+      save.disabled = true;
+      status.textContent = siteFormat('กำลังสร้างภาพ…', 'Preparing image…');
+      try {
+        await saveResultImage(background, dialogue, table);
+        status.textContent = siteFormat('ส่งภาพ PNG ไปยังรายการดาวน์โหลดแล้ว', 'PNG sent to downloads.');
+      } catch {
+        status.textContent = siteFormat('บันทึกรูปไม่สำเร็จ ลองอีกครั้ง', 'Could not save the image. Try again.');
+      } finally {
+        save.disabled = false;
+      }
+    });
+    const copy = button(siteFormat('คัดลอกลิงก์เว็บ', 'Copy website link'), async () => {
+      try {
+        await navigator.clipboard.writeText(new URL('/', location.href).href);
+        status.textContent = siteFormat('คัดลอกลิงก์แล้ว', 'Link copied.');
+      } catch {
+        status.textContent = siteFormat('คัดลอกไม่ได้ ลองคัดลอกจากแถบที่อยู่', 'Copy unavailable. Use the address bar.');
+      }
+    });
+    const follow = node('a', siteFormat('ติดตามผู้สร้าง MeenChan', 'Follow the creator MeenChan'));
+    follow.href = 'https://www.facebook.com/profile.php?id=61557128480263';
+    follow.target = '_blank';
+    follow.rel = 'noopener noreferrer';
+    const restart = button('วางแผนต่อต้านใหม่', () => {
+      start();
+      triggers[0].focus({preventScroll:true});
+    });
+    group.append(restart, save, copy, follow, status);
+    return group;
+  }
+
   function finish({activeSpeaker = 0, expanded = false, contributionsOpen = false, scroll = true} = {}){
     const scores=totals();
     const passed=scores.filter((score,i)=>score>=encounter.need[i]).length;
@@ -2156,7 +2314,8 @@
         cell.append(track);
       }
     }
-    body.append(dialoguePanel(passed, activeSpeaker),table,contributions,details,button('วางแผนต่อต้านใหม่',()=>{start();triggers[0].focus({preventScroll:true});}));
+    const dialogue = dialoguePanel(passed, activeSpeaker);
+    body.append(dialogue, table, contributions, details, resultActions(background, dialogue, table));
     if (scroll) game.scrollIntoView({block:'start',behavior:'instant'});
   }
   function start(){
