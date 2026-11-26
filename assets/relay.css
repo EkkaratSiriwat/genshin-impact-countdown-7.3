@@ -311,3 +311,22 @@ body:has(#relay-picker[open], .relay-fusion[open]){overflow:hidden}
 .successor-hall[data-motion-paused] *::after {
   animation-play-state:paused !important;
 }
+.relay-scroll-rail {display:none}
+@media(max-width:680px) {
+  #relay-picker {scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#d9bc7b #ffffff16}
+  #relay-picker .relay-roster {max-height:none;overflow:visible}
+  #relay-picker .relay-scroll-rail:not([hidden]) {
+    display:block;position:fixed;width:5px;border-radius:5px;
+    background:rgba(255,255,255,.16);pointer-events:none;z-index:10;
+  }
+  .relay-scroll-rail > span {display:block;width:100%;border-radius:inherit;background:#d9bc7b}
+}
+.mobile-effects .digits,
+.mobile-effects .date-digits {filter:none}
+.mobile-effects {--plate-scale:1;--plate-opacity:1;--music-level:0;--digit-glow:.22}
+@media(max-width:680px), (hover:none) and (pointer:coarse) {
+  .gnosis-halo,
+  .gnosis-trigger:hover .gnosis-halo {filter:none}
+  #relay-picker::backdrop {backdrop-filter:none}
+  .relay-celestial-reply > div::before {filter:none}
+}

@@ -650,6 +650,28 @@
     return statNames.map((_,i)=>marks.reduce((sum,mark)=>sum+mark.pick.stats[i],0));
   }
   const picker=document.querySelector('#relay-picker');
+  // Native overlay scrollbars disappear on phones, so retain a visible position indicator.
+  const scrollRail = document.createElement('span');
+  scrollRail.className = 'relay-scroll-rail';
+  scrollRail.setAttribute('aria-hidden', 'true');
+  const scrollThumb = document.createElement('span');
+  scrollRail.append(scrollThumb);
+  picker.append(scrollRail);
+  function updatePickerScroll() {
+    const overflow = picker.scrollHeight - picker.clientHeight;
+    scrollRail.hidden = !picker.open || overflow <= 1;
+    if (scrollRail.hidden) return;
+    const rect = picker.getBoundingClientRect();
+    const trackHeight = Math.max(0, picker.clientHeight - 40);
+    const thumbHeight = Math.min(trackHeight, Math.max(32, trackHeight * picker.clientHeight / picker.scrollHeight));
+    scrollRail.style.cssText = `left:${rect.right - 12}px;top:${rect.top + 20}px;height:${trackHeight}px`;
+    scrollThumb.style.height = thumbHeight + 'px';
+    scrollThumb.style.transform = `translateY(${Math.min(1, Math.max(0, picker.scrollTop / overflow)) * (trackHeight - thumbHeight)}px)`;
+  }
+  picker.addEventListener('scroll', updatePickerScroll, {passive:true});
+  picker.addEventListener('close', updatePickerScroll);
+  new ResizeObserver(updatePickerScroll).observe(picker);
+  new ResizeObserver(updatePickerScroll).observe(game);
   const triggers=[...hall.querySelectorAll('.gnosis-trigger')];
   const progressRow=hall.querySelector('.council-seats');
   const seatOrder=[7,8,4,3,2,1,5];
