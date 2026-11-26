@@ -42,6 +42,13 @@
   top: max(.75rem, env(safe-area-inset-top));
   right: calc(max(.75rem, env(safe-area-inset-right)) + 44px + .5rem);
 }
+body > .site-language {
+  right: max(.75rem, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+body > .site-language .music-toggle { position: relative; inset: auto; }
 .site-language select {
   height: 44px;
   padding: 0 .45rem;

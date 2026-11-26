@@ -24,6 +24,7 @@
       isolation: isolate;
       min-height: 100svh;
       overflow: hidden;
+      background: linear-gradient(#30313e, #1e1f29 53%, #10111a);
     }
     .plate {
       position: absolute;
@@ -33,7 +34,71 @@
       opacity: calc(var(--plate-opacity, 1) * var(--sky-remnant, 1));
       width: var(--plate-width);
       height: 100%;
-      object-fit: fill;
+      pointer-events: none;
+    }
+    .plate-sky {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .plate::before, .plate::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: calc(50% - 30vw);
+      width: clamp(52px, 19vw, 330px);
+      height: 84%;
+      translate: -50% -50%;
+      background:
+        radial-gradient(ellipse 8% 46% at 36% 58%, #dbe1ff14, transparent),
+        radial-gradient(ellipse 12% 43% at 66% 42%, #e0e4ff12, transparent),
+        radial-gradient(ellipse 2% 51% at 24% 39%, #dce2ff1c, transparent),
+        radial-gradient(ellipse 2% 47% at 78% 59%, #dce2ff17, transparent),
+        radial-gradient(ellipse 50% 50% at center, #adb9e514, transparent);
+    }
+    .plate::after {
+      left: calc(50% + 30vw);
+      scale: -1 1;
+    }
+    @media (max-width: 680px) {
+      .plate::before, .plate::after {
+        left: calc(50% - 40vw);
+        width: 16vw;
+      }
+      .plate::after { left: calc(50% + 40vw); }
+    }
+    .countdown-emblem-stage {
+      /* The old plate's center motif is 512px wide on a 1672px canvas. */
+      --emblem-size: min(calc(var(--plate-width) * .30622), 54.41svh);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--emblem-size);
+      aspect-ratio: 1;
+      translate: -50% -50%;
+      perspective: calc(var(--emblem-size) * 3);
+    }
+    .countdown-emblem {
+      --emblem-turn-duration: calc(60s / 1.4);
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      animation: countdown-emblem-turn var(--emblem-turn-duration) linear infinite;
+    }
+    .emblem-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      mask-image: radial-gradient(ellipse closest-side, black 83%, transparent);
+    }
+    .emblem-face.back {
+      transform: rotateY(180deg);
+    }
+    @keyframes countdown-emblem-turn {
+      from { transform: rotateY(0turn); }
+      to { transform: rotateY(-1turn); }
     }
     .motion {
       position: absolute;
@@ -87,6 +152,16 @@
       box-shadow: inset 0 0 clamp(18px, 4vmin, 52px) #94c7ed73;
     }
     .scene:has(.region-star[data-region="nod-krai"][aria-expanded="true"]) .nod-rim { opacity: 1; }
+    .nod-rim, .city-atmosphere[data-effect="nod-krai"]::before {
+      mask-image:
+        linear-gradient(to right, #0003 43%, #000 58%),
+        linear-gradient(to bottom, transparent 43%, #000 57%);
+    }
+    @media (max-width: 680px) {
+      .nod-rim, .city-atmosphere[data-effect="nod-krai"]::before {
+        mask-image: radial-gradient(ellipse 49% 21% at 50% 30%, #0003 66%, #000);
+      }
+    }
     .countdown-horizon::before, .countdown-horizon::after {
       content: "";
       position: absolute;
@@ -560,6 +635,9 @@
       color: #ded9e6;
     }
     footer time { display: inline-block; }
+    .scene:has(.region-star[data-region="fontaine"][aria-expanded="true"]) footer :is(time, .countdown-trailer) {
+      visibility: hidden;
+    }
     footer a {
       display: inline-block;
       padding: .55rem .45rem;
@@ -574,6 +652,42 @@
       outline: 1px solid white;
       outline-offset: .15rem;
     }
+    footer .celestia-scroll {
+      position: relative;
+      inset-block-start: clamp(8px, 1.8svh, 24px);
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .1rem;
+      padding: .3rem .65rem .6rem;
+      color: #e8deca;
+      font-size: 1em;
+      text-decoration: none;
+    }
+    .celestia-scroll::after {
+      content: "";
+      width: .5rem;
+      height: .5rem;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg);
+      animation: celestia-arrow-bob 1.2s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .celestia-scroll::after { animation-duration: 1.7s; --arrow-travel: 4px; }
+    }
+    @media (hover: hover) {
+      .celestia-scroll:hover::after {
+        animation: none;
+        transform: translateY(var(--arrow-travel, 10px)) rotate(45deg);
+      }
+    }
+    @keyframes celestia-arrow-bob {
+      0%, 100% { transform: translateY(0) rotate(45deg); }
+      50% { transform: translateY(var(--arrow-travel, 10px)) rotate(45deg); }
+    }
+    footer .celestia-scroll:hover { color: #fff0ca; }
     .sr-only {
       position: absolute;
       width: 1px;
@@ -633,6 +747,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .plate { transform: translateX(-50%); }
+      .countdown-emblem { animation-duration: calc(var(--emblem-turn-duration) * 2); }
       .region-star, .star-glyph { transition: none; }
     }
   /* City atmosphere: decorative layers never intercept clicks. */
@@ -1895,14 +2010,32 @@
 <link rel="stylesheet" href="assets/reset-erosion.css"></head>
 <body>
   <div class="site-language">
+    <button class="relay-scenery-toggle" type="button" aria-pressed="false" aria-label="ซ่อนแผงผลลัพธ์" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/>
+        <circle cx="12" cy="12" r="2.5"/>
+        <path class="relay-eye-slash" d="M4 20 20 4"/>
+      </svg>
+    </button>
     <select aria-label="ภาษา / Language">
       <option value="th" lang="th">ภาษาไทย</option>
       <option value="en" lang="en">English</option>
     </select>
+    <button class="top-control music-toggle" lang="en" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
+      <span class="music-icon" aria-hidden="true">♫</span>
+    </button>
   </div>
   <video class="opening-sequence" data-src="assets/pv-72-opening-v3.mp4" preload="none" muted playsinline aria-hidden="true" hidden></video>
   <main class="scene">
-    <img class="plate" alt="" src="assets/countdown-plate.png">
+    <div class="plate" aria-hidden="true">
+      <img class="plate-sky" alt="" src="assets/countdown-plate.png">
+      <div class="countdown-emblem-stage">
+        <div class="countdown-emblem">
+          <img class="emblem-face" alt="" src="assets/countdown-emblem.png">
+          <img class="emblem-face back" alt="" src="assets/countdown-emblem.png">
+        </div>
+      </div>
+    </div>
     <div class="countdown-horizon" aria-hidden="true"><i class="horizon-star"></i><i class="horizon-star"></i></div>
     <div class="heavenly-light" aria-hidden="true"></div>
     <audio id="theme-music" loop preload="none" src="assets/theme-music.mp4"></audio>
@@ -1915,9 +2048,6 @@
       <option value="3">เหลือ 3–1 วัน</option>
       <option value="0">24 ชั่วโมงสุดท้าย</option>
     </select>
-    <button class="top-control music-toggle" lang="en" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
-      <span class="music-icon" aria-hidden="true">♫</span>
-    </button>
     <canvas class="motion" width="1600" height="900" aria-hidden="true"></canvas>
     <div class="region-snow" aria-hidden="true"></div>
     <section class="region-reveal" id="region-reveal" aria-labelledby="region-title" hidden>
@@ -1994,12 +2124,14 @@
     <div class="sr-only" role="status" id="announcement"></div>
     <noscript>เปิด JavaScript เพื่อดูเวลานับถอยหลัง</noscript>
     <footer>
-      <time lang="en" datetime="2026-12-16T09:00:00+07:00">16 December 2026 · ~09:00 AM UTC+7</time>
+      <time datetime="2026-12-16T09:00:00+07:00">16 ธันวาคม 2026 · ~09:00 AM UTC+7</time>
       <br>
-      <a lang="en" href="https://www.youtube.com/watch?v=6gFCnMLSw-Y&amp;t=62s" target="_blank" rel="noopener">Trailer Genshin Impact Patch 7.2</a>
+      <a class="countdown-trailer" href="https://www.youtube.com/watch?v=6gFCnMLSw-Y&amp;t=62s" target="_blank" rel="noopener">ตัวอย่าง Genshin Impact เวอร์ชัน 7.2</a>
+      <br>
+      <a class="celestia-scroll" href="#successors">Celestia ต้องการท้าทายโชคชะตา</a>
     </footer>
   </main>
-  <section class="successor-hall" id="successors" aria-labelledby="successor-heading">
+  <section class="successor-hall" id="successors" aria-labelledby="successor-heading" tabindex="-1">
     <div class="successor-hall-backdrop" aria-hidden="true">
       <img class="successor-hall-art" src="assets/successor-hall.png" alt="" decoding="async" loading="lazy">
       <canvas class="successor-hall-atmosphere" width="1672" height="940"></canvas>
@@ -2653,21 +2785,30 @@
     let countdownMotionVisible = true;
     new IntersectionObserver(([entry]) => {
       countdownMotionVisible = entry.isIntersecting;
+      scene.toggleAttribute('data-motion-paused', !countdownMotionVisible || document.hidden);
+      syncMotion();
     }).observe(scene);
 
     function animate(now) {
+      if (previousFrame !== undefined && now - previousFrame < 1000 / 60 - .5) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
       if (previousFrame !== undefined) {
         elapsed = (elapsed + now - previousFrame) % digitLoopDuration;
       }
       previousFrame = now;
-      if (countdownMotionVisible && !document.documentElement.hasAttribute('data-page-sliding')) renderMotion(now);
+      if (countdownMotionVisible && !document.documentElement.matches('[data-page-sliding], [data-celestia-scrolling]')) {
+        renderMotion(now);
+      }
       frame = requestAnimationFrame(animate);
     }
 
     function syncMotion() {
       cancelAnimationFrame(frame);
       previousFrame = undefined;
-      if (!document.hidden) frame = requestAnimationFrame(animate);
+      scene.toggleAttribute('data-motion-paused', !countdownMotionVisible || document.hidden);
+      if (!document.hidden && countdownMotionVisible) frame = requestAnimationFrame(animate);
     }
 
     document.addEventListener("visibilitychange", () => {
@@ -3315,8 +3456,22 @@ function addWindParticles(layer) {
 
   let particles = [];
   let nextSpawn = 0;
+  let lastDraw = 0;
+  let width = 0, height = 0;
+  const sizeObserver = new ResizeObserver(() => {
+    width = layer.clientWidth;
+    height = layer.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
+  });
+  sizeObserver.observe(layer);
   function draw(now) {
-    if (!layer.isConnected) return;
+    if (!layer.isConnected) { sizeObserver.disconnect(); return; }
+    if (document.hidden || layer.closest('[data-motion-paused]') || now - lastDraw < 1000 / 30 - .5) {
+      requestAnimationFrame(draw);
+      return;
+    }
+    lastDraw = now;
     if (sheet.naturalWidth) {
       particles = particles.filter(particle => now - particle.start < particle.duration);
       if (!layer.classList.contains("is-leaving") && now >= nextSpawn) {
@@ -3328,9 +3483,6 @@ function addWindParticles(layer) {
         });
         nextSpawn = now + 280 + Math.random() * 570;
       }
-      const {clientWidth: width, clientHeight: height} = layer;
-      if (canvas.width !== width) canvas.width = width;
-      if (canvas.height !== height) canvas.height = height;
       const scale = Math.max(width / frameWidth, height / frameHeight) / 16;
       const ribbonWidth = frameHeight * scale;
       const ribbonHeight = frameWidth * scale;
@@ -3413,10 +3565,10 @@ function startCityAtmosphere(index) {
   if (id === "liyue") {
     const quakeFrames = [
       { translate: "0 0", offset: 0 },
-      { translate: "-.72px .45px", offset: .025 },
-      { translate: ".72px -.45px", offset: .05 },
-      { translate: "-.54px .27px", offset: .075 },
-      { translate: ".36px -.18px", offset: .1 },
+      { translate: "-.9px .5625px", offset: .025 },
+      { translate: ".9px -.5625px", offset: .05 },
+      { translate: "-.675px .3375px", offset: .075 },
+      { translate: ".45px -.225px", offset: .1 },
       { translate: "0 0", offset: .14 },
       { translate: "0 0", offset: 1 }
     ];
@@ -3431,12 +3583,12 @@ function startCityAtmosphere(index) {
   layer.dataset.effect = id;
   layer.setAttribute("aria-hidden", "true");
   const settings = {
-    sumeru: { size: 6, opacity: .65, turn: 120 },
-    fontaine: { size: 4, opacity: .5, turn: 120 },
-    natlan: { size: 3, opacity: .75, turn: 120 }
+    sumeru: { count: 30, size: 6, opacity: .65, turn: 120 },
+    fontaine: { count: 42, size: 4, opacity: .5, turn: 120 },
+    natlan: { count: 42, size: 3, opacity: .75, turn: 120 }
   }[id];
   if (settings) {
-    const count = 30;
+    const {count} = settings;
     const duration = 9;
     for (let i = 0; i < count; i++) {
       const particle = document.createElement("span");
@@ -3811,10 +3963,11 @@ function hideRegion(next) {
     function updateStarScroll() {
       scrollFrame = 0;
       if (pageSliding) return;
-      countdownScene.style.setProperty('--star-scatter-distance', `${starSpread(window.scrollY)}px`);
-      countdownScene.style.setProperty('--star-scroll-opacity', 1 - Math.min(1, Math.max(0, window.scrollY / (innerHeight * .52))));
+      const offset = window.scrollY;
       const hallTop = successorHall.getBoundingClientRect().top;
       const light = hallLightAt(hallTop);
+      countdownScene.style.setProperty('--star-scatter-distance', `${starSpread(offset)}px`);
+      countdownScene.style.setProperty('--star-scroll-opacity', 1 - Math.min(1, Math.max(0, offset / (innerHeight * .52))));
       gnosisDisplay.style.setProperty('--gnosis-away', gnosisAwayAt(hallTop));
       towerDusk.style.opacity = 1 - light;
       towerBloom.style.opacity = light;
@@ -3897,6 +4050,37 @@ function hideRegion(next) {
       }
     }
 
+    let celestiaScrollFrame = 0;
+    function cancelCelestiaScroll() {
+      if (!celestiaScrollFrame) return;
+      cancelAnimationFrame(celestiaScrollFrame);
+      celestiaScrollFrame = 0;
+      document.documentElement.removeAttribute('data-celestia-scrolling');
+    }
+    window.addEventListener('wheel', cancelCelestiaScroll, {passive: true});
+    window.addEventListener('touchstart', cancelCelestiaScroll, {passive: true});
+    countdownScene.querySelector('.celestia-scroll').addEventListener('click', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+      event.preventDefault();
+      if (pageSliding || celestiaScrollFrame) return;
+      const origin = window.scrollY;
+      const distance = successorHall.getBoundingClientRect().top;
+      document.documentElement.setAttribute('data-celestia-scrolling', '');
+      const start = performance.now();
+      function step(now) {
+        const progress = Math.min(1, (now - start) / 720);
+        const eased = progress ** 2 * (3 - 2 * progress);
+        window.scrollTo({top: origin + distance * eased, behavior: 'instant'});
+        if (progress < 1) {
+          celestiaScrollFrame = requestAnimationFrame(step);
+        } else {
+          cancelCelestiaScroll();
+          successorHall.focus({preventScroll: true});
+        }
+      }
+      celestiaScrollFrame = requestAnimationFrame(step);
+    });
+
     function isInsideScrollablePane(target) {
       for (let node = target; node && node !== document.body; node = node.parentElement) {
         if (node.scrollHeight > node.clientHeight + 1 && /^(auto|scroll)$/.test(getComputedStyle(node).overflowY)) {
@@ -3931,6 +4115,7 @@ function hideRegion(next) {
   }
 </script>
 
+<script src="assets/relay-relationships.js"></script>
 <script src="assets/relay.js"></script>
 <script src="assets/traffic.js" defer></script>
 </body>
