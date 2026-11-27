@@ -652,8 +652,10 @@
       color: #ded9e6;
     }
     footer time { display: inline-block; }
-    .scene:has(.region-star[data-region="fontaine"][aria-expanded="true"]) footer :is(time, .countdown-trailer) {
-      visibility: hidden;
+    @media (width > 680px) {
+      .scene:has(.region-star[data-region="fontaine"][aria-expanded="true"]) footer :is(time, .countdown-trailer) {
+        visibility: hidden;
+      }
     }
     footer a {
       display: inline-block;
@@ -953,26 +955,46 @@
   .region-stars .star-name { display: none; }
   .region-reveal:not([hidden]) { grid-area: auto; }
   .region-reveal[data-corner] .region-vision {
+    --video-bottom: calc(50% + var(--half-digits) + .4rem);
+    --video-clearance: calc(var(--mobile-top) + 1.5rem + 92px + 2.5 * var(--mobile-gap));
     position: absolute;
-    inset: auto auto calc(50% + var(--half-digits) + .85rem) 50%;
-    width: min(calc(100% - 2rem), 34rem);
-    height: min(calc(50% - var(--half-digits) - var(--mobile-top) - 92px - 1.5rem - 3 * var(--mobile-gap) - .85rem), calc((100vw - 2rem) * .5625));
+    inset: auto auto var(--video-bottom) 50%;
+    width: min(calc(100% - 4rem), 34rem);
+    height: clamp(0px, calc(100% - var(--video-bottom) - var(--video-clearance)), 10rem);
     transform: translateX(-50%);
-    --vision-edge: radial-gradient(ellipse closest-side, #000 52%, #000b 76%, transparent 100%);
+    --vision-edge: radial-gradient(ellipse closest-side, #000 62%, #000c 83%, transparent 100%);
   }
   .region-vision .region-video { transform: none; }
   /* The 720px Mondstadt opening contains 88px letterbox bars on both edges. */
   .region-vision .region-video[src$="/mondstadt-overview.mp4"] { transform: scale(1.33); }
   .region-reveal[data-corner][data-region] .region-info {
     position: absolute;
-    inset: calc(50% + var(--half-digits) + 2.25rem) auto auto 50%;
+    inset: calc(50% + var(--half-digits) + 2.25rem) auto calc(var(--mobile-bottom) + 7.5rem) 50%;
     width: min(calc(100% - 2rem), 34rem);
-    max-height: calc(50% - var(--half-digits) - 2.25rem - var(--mobile-bottom) - 4.75rem);
-    overflow: auto;
+    max-height: none;
+    overflow: hidden;
     transform: translateX(-50%);
     padding: .75rem .85rem;
     background: none;
     overflow-wrap: anywhere;
+  }
+  .region-info .region-memory { height: 100%; }
+  .region-info .region-material, .region-info .region-story-copy {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .region-info .region-material { height: 100%; }
+  .region-info :is(.region-heading, .region-story-heading) { flex: none; }
+  .region-story-copy { flex: 1; }
+  .region-story-copy #region-description {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: #cfc0e8 #24213177;
+    padding-inline-end: .35rem;
   }
   .region-reveal[data-region="nod-krai"] .region-heading h2 { margin-inline-start: 0; }
   .region-info .region-heading { flex-wrap: wrap; row-gap: .25rem; }
@@ -2169,12 +2191,12 @@
                 <button class="timeline-arrow" type="button" aria-label="เลื่อนไทม์ไลน์ไปทางขวา" aria-controls="story-timeline">›</button>
               </div>
             </div>
-            <div aria-live="polite">
+            <div class="region-story-copy" aria-live="polite">
               <div class="region-story-heading">
                 <span id="region-epithet" class="region-epithet"></span>
                 <h3 id="region-story-title" class="region-story-title" hidden></h3>
               </div>
-              <p id="region-description"></p>
+              <p id="region-description" tabindex="0"></p>
             </div>
           </div>
         </div>
@@ -3985,6 +4007,7 @@ function hideRegion(next) {
       storyTitle.textContent = siteText(page.title ?? "");
       storyTitle.hidden = !page.title;
       regionDescription.textContent = siteText(page.description);
+      regionDescription.scrollTop = 0;
       regionArt.alt = siteText(page.alt ?? "");
       positionSelectedStar();
       resetErosion.measureStory();
