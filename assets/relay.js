@@ -2518,7 +2518,7 @@
         save.disabled = false;
       }
     }, 'relay-next relay-action-secondary');
-    const copy = button(siteFormat('คัดลอกลิงก์เว็บ', 'Copy website link'), async () => {
+    const copy = button(siteFormat('คัดลอกลิงค์เว็บ', 'Copy website link'), async () => {
       try {
         await navigator.clipboard.writeText('https://genshin-impact-countdown-73.vercel.app/?share=meenchan-2');
         status.textContent = siteFormat('คัดลอกลิงก์แล้ว', 'Link copied.');
