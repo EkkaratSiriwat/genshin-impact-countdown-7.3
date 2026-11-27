@@ -606,6 +606,18 @@
       display: block;
       filter: drop-shadow(0 0 5px rgb(228 217 255 / var(--digit-glow, 0)));
     }
+    .clock-separators {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      animation: clock-separator-fade 2.5s ease-in-out infinite;
+    }
+    @keyframes clock-separator-fade {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .08; }
+    }
     .digit-trails {
       position: absolute;
       inset: auto 0 0;
@@ -2199,6 +2211,7 @@
       <div class="clock-countdown" id="clock-countdown" role="timer" aria-live="off">
         <span class="sr-only" id="remaining"></span>
         <canvas class="digits" width="800" height="142" aria-hidden="true"></canvas>
+        <canvas class="clock-separators" width="800" height="142" aria-hidden="true"></canvas>
         <div class="units" lang="en" aria-hidden="true">
           <span>Days</span><span>Hours</span><span>Minutes</span><span>Seconds</span>
         </div>
@@ -2273,6 +2286,9 @@
     const deadline = Date.parse(scheduledUpdate.dateTime);
     const timer = document.querySelector(".digits");
     const context = timer.getContext("2d");
+    const separators = document.querySelector(".clock-separators");
+    const separatorContext = separators.getContext("2d");
+    let separatorDayWidth;
     const trails = document.querySelector(".digit-trails");
     const trailContext = trails.getContext("2d");
     trailContext.translate(0, trails.height - timer.height);
@@ -2412,19 +2428,30 @@
       const scale = Math.min(1, timer.width / naturalWidth);
       const inset = (timer.width - naturalWidth * scale) / 2;
       const dayEnd = display.indexOf(":");
+      if (separatorDayWidth !== dayEnd) {
+        separatorDayWidth = dayEnd;
+        separatorContext.clearRect(0, 0, separators.width, separators.height);
+        separatorContext.save();
+        separatorContext.translate(inset, 0);
+        separatorContext.scale(scale, 1);
+        separatorContext.fillStyle = "#e9e5f3b5";
+        for (let group = 0; group < 3; group++) {
+          const x = dayEnd * digitAdvance + group * (colonAdvance + 2 * digitAdvance);
+          for (const y of [65, 106]) {
+            for (let row = 0; row < 4; row++) {
+              for (let col = 0; col < 4; col++) {
+                separatorContext.fillRect(x + 13 + col * 3.2, y + row * 3.2, 1.9, 2.1);
+              }
+            }
+          }
+        }
+        separatorContext.restore();
+      }
       context.translate(inset, 0);
       context.scale(scale, 1);
       let x = 0;
       for (const [index, symbol] of Array.from(display).entries()) {
         if (symbol === ":") {
-          context.fillStyle = "#e9e5f3b5";
-          for (const y of [65, 106]) {
-            for (let row = 0; row < 4; row++) {
-              for (let col = 0; col < 4; col++) {
-                context.fillRect(x + 13 + col * 3.2, y + row * 3.2, 1.9, 2.1);
-              }
-            }
-          }
           x += colonAdvance;
         } else {
           const change = dayTransition?.digits.get(index);
