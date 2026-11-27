@@ -1,5 +1,7 @@
 // Site translation; verified character and chapter names use HoYoWiki entry IDs.
 registerSiteLocale("zh-Hant", {
+  "Aether": "空",
+  "Lumine": "熒",
   "Full Moon Humming": "滿月嗡嗡聲",
   "Beneath the full moon, Columbina hums a soft melody. As she holds the last note, Celestia’s beam hangs motionless in the sky.": "滿月下，哥倫比娜哼著輕柔的旋律。當她按下最後一個音符時，塞拉斯蒂婭的光束一動也不動地懸掛在天空中。",
   "Sandrone kept time for me until the sky closed. I still remember that sound. But when I close my eyes, I can’t remember how the song ends.": "桑德龍為我保留了時間，直到天色閉合。我仍然記得那個聲音。但當我閉上眼睛時，我不記得這首歌是如何結束的。",
