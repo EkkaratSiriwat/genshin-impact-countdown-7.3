@@ -1205,6 +1205,7 @@
       }
       .gnosis-slot {
         position: absolute;
+        translate: none;
         left:var(--mobile-x); top:var(--mobile-y);
         transform:translate(-50%,-50%);
       }
@@ -3992,7 +3993,9 @@ function hideRegion(next) {
       const light = hallLightAt(hallTop);
       countdownScene.style.setProperty('--star-scatter-distance', `${starSpread(offset)}px`);
       countdownScene.style.setProperty('--star-scroll-opacity', 1 - Math.min(1, Math.max(0, offset / (innerHeight * .52))));
-      gnosisDisplay.style.setProperty('--gnosis-away', gnosisAwayAt(hallTop));
+      if (!mobileGnosisLayout.matches) {
+        gnosisDisplay.style.setProperty('--gnosis-away', gnosisAwayAt(hallTop));
+      }
       towerDusk.style.opacity = 1 - light;
       towerBloom.style.opacity = light;
     }
@@ -4005,6 +4008,7 @@ function hideRegion(next) {
 
     const successorHall = document.querySelector('#successors');
     const gnosisDisplay = successorHall.querySelector('.gnosis-display');
+    const mobileGnosisLayout = matchMedia('(max-width: 680px)');
     function gnosisAwayAt(hallTop) {
       return Math.max(0, Math.min(1, hallTop / (innerHeight * .48))) * (motionPreference.matches ? .55 : 1);
     }
@@ -4037,9 +4041,6 @@ function hideRegion(next) {
       const slideAnimations = [
         countdownScene.animate(slide, transition),
         successorHall.animate(slide, transition),
-        gnosisDisplay.animate([0, .25, .5, .75, 1].map(offset => ({
-          offset, '--gnosis-away': String(gnosisAwayAt(hallTop - origin - offset * delta))
-        })), transition),
         towerDusk.animate([{ opacity: 1 - sourceLight }, { opacity: 1 - targetLight }], lightTransition),
         towerBloom.animate([{ opacity: sourceLight }, { opacity: targetLight }], lightTransition),
         ...stars.map(star => {
@@ -4052,6 +4053,11 @@ function hideRegion(next) {
           }), transition);
         }),
       ];
+      if (!mobileGnosisLayout.matches) {
+        slideAnimations.push(gnosisDisplay.animate([0, .25, .5, .75, 1].map(offset => ({
+          offset, '--gnosis-away': String(gnosisAwayAt(hallTop - origin - offset * delta))
+        })), transition));
+      }
       if (CSS.supports('animation-timeline: view()') && !motionPreference.matches) {
         const backdropTransform = scrollY => {
           const appearance = hallLightAt(hallTop - scrollY);
