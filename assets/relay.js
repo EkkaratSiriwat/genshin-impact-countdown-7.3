@@ -636,7 +636,14 @@
         elementIcon.className = 'globe-element';
         elementIcon.src = 'assets/characters/element-' + mark.artist.element + '.webp';
         elementIcon.alt = '';
-        point.append(itemDrawing(mark.pick.label), elementIcon);
+        const portrait = new Image();
+        portrait.className = 'globe-portrait';
+        portrait.src = 'assets/characters/' + mark.artist.icon + '.webp';
+        portrait.alt = '';
+        const badges = node('span', '');
+        badges.className = 'globe-badges';
+        badges.append(portrait, elementIcon);
+        point.append(itemDrawing(mark.pick.label), badges);
       }
       orbit.append(point);
     });
@@ -2479,15 +2486,6 @@
     return typeof navigator.share === 'function' && navigator.canShare?.(data);
   }
 
-  function resultImageSaveRoute() {
-    const agent = navigator.userAgent;
-    const ios = /iPhone|iPad|iPod/i.test(agent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const inApp = /FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|BytedanceWebview|; wv\)/i.test(agent);
-    if (ios) return 'share';
-    return inApp ? 'preview' : 'download';
-  }
-
   function resultActions(background, dialogue, table) {
     const group = node('div', '');
     group.className = 'relay-result-actions';
@@ -2495,8 +2493,13 @@
     status.className = 'relay-share-status';
     status.setAttribute('role', 'status');
     let cachedImage;
+    const preview = button(siteFormat('เปิดภาพเพื่อบันทึกเอง', 'Open image to save manually'), () => {
+      if (cachedImage) showResultImage(cachedImage.file);
+    }, 'relay-next relay-action-secondary');
+    preview.hidden = true;
     const save = button(siteFormat('บันทึกภาพผลลัพธ์', 'Save result image'), async () => {
       save.disabled = true;
+      preview.hidden = true;
       status.textContent = siteFormat('กำลังสร้างภาพ…', 'Preparing image…');
       try {
         const speaker = dialogue.querySelector('.relay-speaker[aria-pressed="true"]');
@@ -2506,23 +2509,9 @@
         }
         if (!save.isConnected) return;
         const {file} = cachedImage;
-        const route = resultImageSaveRoute();
-        if (route === 'download') {
-          downloadResultImage(file);
-          status.textContent = siteFormat('ส่งภาพ PNG ไปยังรายการดาวน์โหลดแล้ว', 'PNG sent to downloads.');
-          return;
-        }
-        status.textContent = '';
-        const data = {files: [file]};
-        if (route === 'share' && canShareResultImage(data) && navigator.userActivation?.isActive !== false) {
-          try {
-            await navigator.share(data);
-            return;
-          } catch (error) {
-            if (error.name === 'AbortError') return;
-          }
-        }
-        if (save.isConnected) showResultImage(file);
+        downloadResultImage(file);
+        status.textContent = siteFormat('ตรวจไฟล์ PNG ในรายการดาวน์โหลดของเครื่อง', 'Check your device downloads for the PNG.');
+        preview.hidden = !matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)').matches;
       } catch {
         status.textContent = siteFormat('บันทึกรูปไม่สำเร็จ ลองอีกครั้ง', 'Could not save the image. Try again.');
       } finally {
@@ -2545,7 +2534,7 @@
       start();
       triggers[0].focus({preventScroll:true});
     });
-    group.append(restart, save, copy, follow, status);
+    group.append(restart, save, copy, follow, status, preview);
     return group;
   }
 

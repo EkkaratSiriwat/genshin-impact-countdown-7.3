@@ -39,7 +39,7 @@ const englishCopy = {
   "16 ธันวาคม 2026 · ~09:00 AM UTC+7": "16 December 2026 · ~09:00 AM UTC+7",
   "ตัวอย่าง Genshin Impact เวอร์ชัน 7.2": "Genshin Impact Trailer Patch 7.2",
   "หมายเหตุเกี่ยวกับเว็บไซต์": "About this website",
-  "เว็บนับเวลานี้คือผลงานแฟนเมดที่ไม่แสวงหากำไร ไม่ใช่เว็บไซต์ทางการและไม่มีส่วนเกี่ยวข้องกับผู้พัฒนาเกม HoYoverse": "This countdown is a nonprofit fan project. It is unofficial and is not affiliated with the game's developer, HoYoverse.",
+  "เว็บนับเวลานี้คือผลงานแฟนเมดที่ไม่แสวงหากำไร ไม่ใช่เว็บไซต์ทางการและไม่มีส่วนเกี่ยวข้องกับผู้พัฒนาเกมค่าย HoYoverse": "This countdown is a nonprofit fan project. It is unofficial and is not affiliated with the game's developer, HoYoverse.",
   "ปิด": "Close",
   "ทดสอบออร่า": "Preview aura",
   "ทดสอบออร่า · วันจริง": "Preview aura · Live",

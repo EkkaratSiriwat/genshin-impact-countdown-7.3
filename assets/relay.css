@@ -125,19 +125,30 @@ body:has(#relay-picker[open], .relay-fusion[open]){overflow:hidden}
     0 0 8px 2px color-mix(in srgb, var(--tone) 60%, transparent);
 }
 .globe-point .item-sketch { width: 96%; stroke: #503d29; }
-.globe-element {
+.globe-badges {
+  --element-badge-size: max(13px, 32%);
   position: absolute;
   right: -2px;
   bottom: -2px;
+  width: var(--element-badge-size);
+}
+.globe-element, .globe-portrait {
+  display: block;
   box-sizing: border-box;
-  width: 32%;
-  min-width: 13px;
   aspect-ratio: 1;
   object-fit: contain;
-  padding: 1px;
   border: 1px solid var(--tone);
   border-radius: 50%;
   background: #25303b;
+}
+.globe-element { width: 100%; padding: 1px; }
+.globe-portrait {
+  position: absolute;
+  left: 34%;
+  bottom: calc(100% + 2px);
+  width: max(100%, 16px);
+  object-fit: cover;
+  object-position: center top;
 }
 .relay-breakdown .globe-stage { margin: 1rem auto; max-width: 450px; }
 
