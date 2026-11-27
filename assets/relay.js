@@ -2283,7 +2283,7 @@
     return section;
   }
 
-  async function saveResultImage(background, dialogue, table) {
+  async function createResultImage(background, dialogue, table) {
     const title = heading.textContent;
     const subtitle = status.textContent;
     const story = body.firstElementChild.textContent;
@@ -2308,12 +2308,15 @@
     const width = 896;
     const left = 92;
     const font = (size, weight = 400) => `${weight} ${size}px system-ui, sans-serif`;
-    const segmenter = new Intl.Segmenter(document.documentElement.lang, {granularity:'word'});
+    const segmenter = typeof Intl.Segmenter === 'function'
+      ? new Intl.Segmenter(document.documentElement.lang, {granularity:'word'})
+      : null;
     function wrap(text, style, maxWidth = width) {
       ctx.font = style;
       const lines = [];
       let line = '';
-      for (const {segment} of segmenter.segment(text)) {
+      const segments = segmenter ? Array.from(segmenter.segment(text), part => part.segment) : Array.from(text);
+      for (const segment of segments) {
         if (line && ctx.measureText(line + segment).width > maxWidth) {
           lines.push(line.trimEnd());
           line = segment.trimStart();
@@ -2406,13 +2409,64 @@
     }
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     if (!blob) throw new Error('Unable to encode result image');
+    return new File([blob], 'teyvat-battle-result.png', {type: blob.type});
+  }
+
+  function downloadResultImage(file) {
     const download = document.createElement('a');
-    download.href = URL.createObjectURL(blob);
-    download.download = 'teyvat-battle-result.png';
+    download.href = URL.createObjectURL(file);
+    download.download = file.name;
     document.body.append(download);
     download.click();
     download.remove();
     setTimeout(() => URL.revokeObjectURL(download.href), 60000);
+  }
+
+  function showResultImage(file) {
+    const dialog = node('dialog', '');
+    dialog.className = 'relay-image-preview';
+    const title = node('h2', '');
+    title.id = 'relay-image-preview-title';
+    title.textContent = siteFormat('บันทึกภาพผลลัพธ์', 'Save result image');
+    dialog.setAttribute('aria-labelledby', title.id);
+    const hint = node('p', '');
+    hint.setAttribute('role', 'status');
+    const manualHint = siteFormat('แตะภาพค้างไว้ แล้วเลือกบันทึกภาพ หรือดาวน์โหลดไฟล์ PNG', 'Touch and hold the image to save it, or download the PNG.');
+    const data = {files: [file]};
+    const canShareImage = typeof navigator.share === 'function' && navigator.canShare?.(data);
+    hint.textContent = canShareImage
+      ? siteFormat('เปิดเมนูของเครื่อง แล้วเลือกบันทึกภาพลงรูปภาพหากมีตัวเลือกนี้', 'Open device options and choose Save Image if available.')
+      : manualHint;
+    const actions = node('div', '');
+    actions.className = 'relay-result-actions';
+    if (canShareImage) {
+      const share = button(siteFormat('เปิดเมนูบันทึกภาพ', 'Open save options'), async () => {
+        share.disabled = true;
+        try {
+          await navigator.share(data);
+        } catch (error) {
+          if (error.name !== 'AbortError') hint.textContent = manualHint;
+        } finally {
+          share.disabled = false;
+        }
+      });
+      actions.append(share);
+    }
+    actions.append(
+      button(siteFormat('ดาวน์โหลด PNG', 'Download PNG'), () => downloadResultImage(file)),
+      button(siteFormat('ปิด', 'Close'), () => dialog.close())
+    );
+    const preview = new Image();
+    preview.alt = siteFormat('ภาพผลการต่อสู้', 'Battle result image');
+    const previewUrl = URL.createObjectURL(file);
+    preview.src = previewUrl;
+    dialog.append(title, hint, actions, preview);
+    dialog.addEventListener('close', () => {
+      dialog.remove();
+      URL.revokeObjectURL(previewUrl);
+    }, {once:true});
+    document.body.append(dialog);
+    dialog.showModal();
   }
 
   function resultActions(background, dialogue, table) {
@@ -2425,8 +2479,15 @@
       save.disabled = true;
       status.textContent = siteFormat('กำลังสร้างภาพ…', 'Preparing image…');
       try {
-        await saveResultImage(background, dialogue, table);
-        status.textContent = siteFormat('ส่งภาพ PNG ไปยังรายการดาวน์โหลดแล้ว', 'PNG sent to downloads.');
+        const file = await createResultImage(background, dialogue, table);
+        if (!save.isConnected) return;
+        if (matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)').matches) {
+          showResultImage(file);
+          status.textContent = '';
+        } else {
+          downloadResultImage(file);
+          status.textContent = siteFormat('ส่งภาพ PNG ไปยังรายการดาวน์โหลดแล้ว', 'PNG sent to downloads.');
+        }
       } catch {
         status.textContent = siteFormat('บันทึกรูปไม่สำเร็จ ลองอีกครั้ง', 'Could not save the image. Try again.');
       } finally {
