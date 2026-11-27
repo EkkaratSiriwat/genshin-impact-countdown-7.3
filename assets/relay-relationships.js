@@ -2379,5 +2379,5 @@ function pickRelayDialoguePartners(team, random = Math.random) {
 
 function relayRelationshipQuote(speaker, partner, result) {
   const line = relayRelationshipDialogue[speaker]?.[result];
-  return line ? siteFormat(...line, partner) : null;
+  return line ? siteFormat(...line, siteText(partner)) : null;
 }

@@ -2205,8 +2205,15 @@
     <select aria-label="ภาษา / Language">
       <option value="th" lang="th">ภาษาไทย</option>
       <option value="en" lang="en">English</option>
+      <option value="zh-Hans" lang="zh-Hans">简体中文</option>
+      <option value="zh-Hant" lang="zh-Hant">繁體中文</option>
+      <option value="de" lang="de">Deutsch</option>
+      <option value="fr" lang="fr">Français</option>
+      <option value="id" lang="id">Indonesia</option>
+      <option value="ja" lang="ja">日本語</option>
+      <option value="vi" lang="vi">Tiếng Việt</option>
     </select>
-    <button class="top-control music-toggle" lang="en" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
+    <button class="top-control music-toggle" type="button" aria-label="Music" aria-pressed="false" title="Turn music on" hidden>
       <span class="music-icon" aria-hidden="true">♫</span>
     </button>
   </div>
@@ -2314,7 +2321,7 @@
         <canvas class="date-digits" width="800" height="142" aria-hidden="true"></canvas>
       </time>
       <canvas class="digit-trails" width="800" height="352" aria-hidden="true"></canvas>
-      <button class="clock-toggle" lang="en" type="button" aria-label="Show update date" aria-pressed="false"
+      <button class="clock-toggle" type="button" aria-label="Show update date" aria-pressed="false"
         aria-controls="clock-countdown clock-date" title="Show update date" hidden></button>
     </div>
     <div class="sr-only" role="status" id="announcement"></div>
@@ -2358,6 +2365,13 @@
       <select aria-label="ภาษา / Language">
         <option value="th" lang="th">ภาษาไทย</option>
         <option value="en" lang="en">English</option>
+        <option value="zh-Hans" lang="zh-Hans">简体中文</option>
+        <option value="zh-Hant" lang="zh-Hant">繁體中文</option>
+        <option value="de" lang="de">Deutsch</option>
+        <option value="fr" lang="fr">Français</option>
+        <option value="id" lang="id">Indonesia</option>
+        <option value="ja" lang="ja">日本語</option>
+        <option value="vi" lang="vi">Tiếng Việt</option>
       </select>
     </div>
     <article class="relay">
@@ -3117,8 +3131,12 @@
         clearTimeout(loadTimeout);
         openingActions.hidden = true;
       });
-      playButton.textContent = siteFormat('เล่น Intro พร้อมเสียง', 'Play intro with sound');
-      skipButton.textContent = siteFormat('ข้าม Intro', 'Skip intro');
+      const updateOpeningActions = () => {
+        playButton.textContent = siteFormat('เล่น Intro พร้อมเสียง', 'Play intro with sound');
+        skipButton.textContent = siteFormat('ข้าม Intro', 'Skip intro');
+      };
+      updateOpeningActions();
+      document.addEventListener('site-language-change', updateOpeningActions);
       playButton.addEventListener('click', () => {
         startLoadTimeout();
         opening.play().catch(finishOpening);
@@ -3189,14 +3207,23 @@
         dateX += digitAdvance;
       }
     }
+    function updateClockToggleLabel() {
+      const label = clockDate.hidden
+        ? siteFormat('แสดงวันที่อัปเดต', 'Show update date')
+        : siteFormat('แสดงการนับถอยหลัง', 'Show countdown');
+      clockToggle.title = label;
+      clockToggle.setAttribute('aria-label', label);
+    }
     clockToggle.hidden = false;
+    updateClockToggleLabel();
+    document.addEventListener('site-language-change', updateClockToggleLabel);
     clockToggle.addEventListener("click", () => {
       const showDate = clockDate.hidden;
       clockDate.hidden = !showDate;
       clock.toggleAttribute("data-show-date", showDate);
       drawDigitTrails(elapsed);
       clockToggle.setAttribute("aria-pressed", String(showDate));
-      clockToggle.title = showDate ? "Show countdown" : "Show update date";
+      updateClockToggleLabel();
     });
 
   </script>
@@ -3208,7 +3235,12 @@
       const enabled = !music.paused && !music.error;
       musicToggle.setAttribute("aria-pressed", String(enabled));
       musicToggle.disabled = !musicReady || Boolean(music.error);
-      musicToggle.title = music.error ? "Music unavailable" : enabled ? "Turn music off" : "Turn music on";
+      musicToggle.setAttribute('aria-label', siteFormat('เพลง', 'Music'));
+      musicToggle.title = music.error
+        ? siteFormat('เพลงไม่พร้อมเล่น', 'Music unavailable')
+        : enabled
+          ? siteFormat('ปิดเพลง', 'Turn music off')
+          : siteFormat('เปิดเพลง', 'Turn music on');
     }
 
     function playMusic() {
@@ -3218,6 +3250,7 @@
     music.addEventListener("playing", syncMusic);
     music.addEventListener("pause", syncMusic);
     music.addEventListener("error", syncMusic);
+    document.addEventListener('site-language-change', syncMusic);
     const musicGesture = new AbortController();
     const startMusicOnGesture = event => {
       if (!musicReady || !event.isTrusted || musicToggle.contains(event.target)) return;

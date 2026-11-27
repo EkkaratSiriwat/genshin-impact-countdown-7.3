@@ -10,7 +10,7 @@
   ].map(([element,sprite,color,first,a,second,b], index)=>({
     get name() {
       return siteFormat('ธาตุ{0}', '{1}', element,
-        ['Pyro', 'Geo', 'Dendro', 'Anemo', 'Cryo', 'Hydro', 'Electro'][index]);
+        siteText(['Pyro', 'Geo', 'Dendro', 'Anemo', 'Cryo', 'Hydro', 'Electro'][index]));
     },
     sprite,color,items:[{label:first,stats:a},{label:second,stats:b}]
   }));
@@ -629,7 +629,7 @@
       const mark = marks.find(m => m.person === g);
       if (mark) {
         point.classList.add('active');
-        point.title = [g.name, mark.artist.name, siteText(mark.pick.label)].join(' · ');
+        point.title = [g.name, siteText(mark.artist.name), siteText(mark.pick.label)].join(' · ');
         point.setAttribute('role', 'img');
         point.setAttribute('aria-label', point.title);
         const elementIcon = new Image();
@@ -647,7 +647,7 @@
       }
       orbit.append(point);
     });
-    history.replaceChildren(...marks.map(({artist,pick})=>node('li',artist.name+' · '+siteText(pick.label))));
+    history.replaceChildren(...marks.map(({artist,pick})=>node('li',siteText(artist.name)+' · '+siteText(pick.label))));
   }
   function panel(step,title){
     status.textContent=step;heading.textContent=siteText(title);body.replaceChildren();
@@ -690,9 +690,9 @@
       const trigger=triggers.find(t=>Number(t.dataset.element)===id);
       trigger.toggleAttribute('data-filled', Boolean(mark));
       const seat=button('',()=>trigger.click(),'council-seat');
-      seat.setAttribute('aria-label',mark?siteFormat('แก้ไข {0} · {1}', 'Edit {0} · {1}', mark.artist.name, mark.person.name):trigger.getAttribute('aria-label'));
+      seat.setAttribute('aria-label',mark?siteFormat('แก้ไข {0} · {1}', 'Edit {0} · {1}', siteText(mark.artist.name), mark.person.name):trigger.getAttribute('aria-label'));
       seat.dataset.filled=String(!!mark);
-      const img=new Image();img.alt=mark?mark.artist.name:triggers.find(t=>Number(t.dataset.element)===id).getAttribute('aria-label');
+      const img=new Image();img.alt=mark?siteText(mark.artist.name):triggers.find(t=>Number(t.dataset.element)===id).getAttribute('aria-label');
       img.src='assets/characters/'+(mark?mark.artist.icon:'element-'+id)+'.webp';
       seat.append(img);progressRow.append(seat);
     }
@@ -714,7 +714,7 @@
     if (current) {
       const edit = node('div', '');
       edit.className = 'relay-edit';
-      edit.append(node('span', siteFormat('เลือกไว้ · {0} · {1}', 'Selected · {0} · {1}', current.artist.name, siteText(current.pick.label))));
+      edit.append(node('span', siteFormat('เลือกไว้ · {0} · {1}', 'Selected · {0} · {1}', siteText(current.artist.name), siteText(current.pick.label))));
       edit.append(button('ยกเลิกการเลือกธาตุนี้', () => {
         marks.splice(marks.indexOf(current), 1);
         redraw();
@@ -746,7 +746,7 @@
   };
   function choose(g,artist){
     renderPicker = () => choose(g,artist);
-    panel(artist.name+' · '+g.name,'จะฝากสิ่งใดไว้ในแผนต่อต้าน?');
+    panel(siteText(artist.name)+' · '+g.name,'จะฝากสิ่งใดไว้ในแผนต่อต้าน?');
     const current = marks.find(mark => mark.person === g)?.pick;
     const beforeChoice = totals().map((score, i) => score - (current?.stats[i] ?? 0));
     artist.items.forEach((label,index)=>{
@@ -2241,8 +2241,9 @@
     dialoguePartners ??= pickRelayDialoguePartners(marks.map(({artist}) => artist.name));
     const speakers = marks.map(({artist}, index) => {
       const control = button('', () => showSpeaker(index), 'relay-speaker');
-      control.setAttribute('aria-label', artist.name);
-      control.title = artist.name;
+      const displayName = siteText(artist.name);
+      control.setAttribute('aria-label', displayName);
+      control.title = displayName;
       const portrait = new Image();
       portrait.src = 'assets/characters/' + artist.icon + '.webp';
       portrait.alt = '';
@@ -2281,7 +2282,7 @@
       const line = !partner || partner === specialPartner
         ? siteText(lines[result])
         : (relayRelationshipQuote(speaker, partner, result) ?? siteText(lines[result]));
-      name.textContent = speaker;
+      name.textContent = siteText(speaker);
       quote.textContent = '“' + line + '”';
     }
     choices.append(...speakers.map(({control}) => control));
@@ -2602,13 +2603,13 @@
     panel(siteFormat('ผลการต่อสู้ · {0} · ถึงเกณฑ์ {1} / 3',
       'Battle outcome · {0} · {1} / 3 targets met', siteText(encounter.name), passed),title);
     const delay = title.match(/(\d+) วัน$/);
-    if (delay) {
-      const duration = node('span', '');
-      duration.className = 'relay-result-duration';
+    const localizedTitle = heading.textContent;
+    const dayPosition = delay ? localizedTitle.indexOf(delay[1]) : -1;
+    if (dayPosition >= 0) {
       const digits = node('span', delay[1]);
       digits.className = 'relay-result-digits';
-      duration.append(digits, siteFormat(' วัน', ' days'));
-      heading.replaceChildren(siteFormat('การรีเซ็ตโลกถูกเลื่อนออกไป ', 'The world reset is delayed by '), duration);
+      heading.replaceChildren(localizedTitle.slice(0, dayPosition), digits,
+        localizedTitle.slice(dayPosition + delay[1].length));
     }
     body.append(node('p',story));
     const table=document.createElement('table');table.className='relay-scores';
