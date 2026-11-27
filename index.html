@@ -899,7 +899,7 @@
 
 
 /* Keep the mobile controls in place while revealing city content. */
-@media (max-width: 680px) {
+@media (max-width: 680px), (max-width: 1024px) and (orientation: portrait), (max-width: 1366px) and (pointer: coarse) {
   :root { --constellation-scale: .5; }
   .scene {
     --mobile-top: max(4.25rem, calc(env(safe-area-inset-top) + 3.75rem));
@@ -929,6 +929,9 @@
     z-index: 1;
   }
   .scene > footer { grid-row: 4; padding-bottom: .75rem; }
+  .scene:has(.region-star[data-region="fontaine"][aria-expanded="true"]) footer :is(time, .countdown-trailer) {
+    visibility: visible;
+  }
   .region-stars:not([hidden]) {
     grid-area: 2 / 1;
     display: grid;
@@ -964,7 +967,22 @@
     transform: translateX(-50%);
     --vision-edge: radial-gradient(ellipse closest-side, #000 62%, #000c 83%, transparent 100%);
   }
-  .region-vision .region-video { transform: none; }
+  .region-vision .region-video { transform: none; opacity: 1; }
+  .region-reveal[data-corner] .region-vision:has(.region-video:not([hidden])) {
+    --video-edge: 10.4px;
+    transform: translate(-50%, -12px);
+    border-radius: 10px;
+    mask-image:
+      linear-gradient(to right, transparent, #000 var(--video-edge), #000 calc(100% - var(--video-edge)), transparent),
+      linear-gradient(to bottom, transparent, #000 var(--video-edge), #000 calc(100% - var(--video-edge)), transparent);
+    mask-composite: intersect;
+  }
+  .region-picture:has(.region-video:not([hidden])) {
+    --erosion-mask: none;
+  }
+  .region-picture:has(.region-video:not([hidden]))::after {
+    background: linear-gradient(180deg, #aeb8e212, transparent 25%, transparent 75%, #13111d32);
+  }
   /* The 720px Mondstadt opening contains 88px letterbox bars on both edges. */
   .region-vision .region-video[src$="/mondstadt-overview.mp4"] { transform: scale(1.33); }
   .region-reveal[data-corner][data-region] .region-info {
@@ -987,14 +1005,34 @@
   .region-info .region-material { height: 100%; }
   .region-info :is(.region-heading, .region-story-heading) { flex: none; }
   .region-story-copy { flex: 1; }
+  .region-description-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
   .region-story-copy #region-description {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior-y: contain;
     touch-action: pan-y;
-    scrollbar-width: thin;
-    scrollbar-color: #cfc0e8 #24213177;
-    padding-inline-end: .35rem;
+    scrollbar-width: none;
+    padding-inline-end: .6rem;
+  }
+  .region-description-scroll:not([hidden]) {
+    position: absolute;
+    inset: .45rem 0 0 auto;
+    display: block;
+    width: 4px;
+    border-radius: 6px;
+    background: #cfc0e840;
+    pointer-events: none;
+  }
+  .region-description-scroll > span {
+    display: block;
+    width: 100%;
+    border-radius: inherit;
+    background: #cfc0e8;
   }
   .region-reveal[data-region="nod-krai"] .region-heading h2 { margin-inline-start: 0; }
   .region-info .region-heading { flex-wrap: wrap; row-gap: .25rem; }
@@ -1039,6 +1077,16 @@
   cursor: pointer;
 }
 .timeline-arrow:disabled { opacity: .3; cursor: default; }
+@media (max-width: 680px), (max-width: 1024px) and (orientation: portrait), (max-width: 1366px) and (pointer: coarse) {
+  .region-reveal[data-region="nod-krai"] .region-heading { flex-wrap: nowrap; }
+  .region-reveal[data-region="nod-krai"] .region-heading h2 { white-space: nowrap; }
+  .region-reveal[data-region="nod-krai"] .timeline-rail {
+    flex: 1 1 0;
+    grid-template-columns: 1.5rem minmax(0, 1fr) 1.5rem;
+    gap: .15rem;
+  }
+  .region-reveal[data-region="nod-krai"] .story-point { flex-basis: 32px; }
+}
 .timeline-arrow:focus-visible { outline: 1px solid #e3d8f8; }
 
     .opening-sequence[hidden] { display: none; }
@@ -1094,7 +1142,7 @@
       );
       transform: translate(-50%, -50%) var(--star-scroll-transform);
     }
-    @media (max-width: 680px) {
+    @media (max-width: 680px), (max-width: 1024px) and (orientation: portrait), (max-width: 1366px) and (pointer: coarse) {
       .scene .region-stars .region-star {
         transform: var(--star-scroll-transform);
       }
@@ -2196,7 +2244,10 @@
                 <span id="region-epithet" class="region-epithet"></span>
                 <h3 id="region-story-title" class="region-story-title" hidden></h3>
               </div>
-              <p id="region-description" tabindex="0"></p>
+              <div class="region-description-box">
+                <p id="region-description" tabindex="0"></p>
+                <span class="region-description-scroll" aria-hidden="true" hidden><span></span></span>
+              </div>
             </div>
           </div>
         </div>
@@ -2680,7 +2731,9 @@
     const motion = document.querySelector(".motion");
     const sky = motion.getContext("2d");
     const scene = document.querySelector(".scene");
-    const mobileEffects = matchMedia('(max-width: 680px), (hover: none) and (pointer: coarse)').matches;
+    const compactCountdownQuery = '(max-width: 680px), (max-width: 1024px) and (orientation: portrait), (max-width: 1366px) and (pointer: coarse)';
+    const compactCountdown = matchMedia(compactCountdownQuery);
+    const mobileEffects = compactCountdown.matches || matchMedia('(hover: none) and (pointer: coarse)').matches;
     scene.classList.toggle('mobile-effects', mobileEffects);
     const horizonPreview = scene.querySelector(".horizon-preview");
     horizonPreview.hidden = !["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
@@ -3011,7 +3064,7 @@
     });
     const opening = document.querySelector(".opening-sequence");
     const isLocalPreview = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
-    const isMobileView = matchMedia('(max-width: 680px), (hover: none) and (pointer: coarse)').matches;
+    const isMobileView = mobileEffects;
     const playOpening = !isMobileView && (!isLocalPreview || location.hash === '#intro');
     if (playOpening) {
       const openingActions = document.querySelector('.opening-actions');
@@ -3566,7 +3619,8 @@
       timelineArrows[1].disabled = storyTimeline.scrollLeft + storyTimeline.clientWidth >= storyTimeline.scrollWidth - 1;
     }
     timelineArrows.forEach((arrow, i) => arrow.addEventListener("click", () => {
-      const distance = Math.max(44, Math.floor(storyTimeline.clientWidth / 44) * 44);
+      const pointWidth = storyTimeline.firstElementChild?.getBoundingClientRect().width || 44;
+      const distance = Math.max(pointWidth, Math.floor(storyTimeline.clientWidth / pointWidth) * pointWidth);
       storyTimeline.scrollBy({left: i === 0 ? -distance : distance,
         behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"});
     }));
@@ -3576,10 +3630,25 @@
     const storyTitle = document.querySelector("#region-story-title");
     const regionEpithet = document.querySelector("#region-epithet");
     const regionDescription = document.querySelector("#region-description");
+    const descriptionRail = document.querySelector('.region-description-scroll');
+    const descriptionThumb = descriptionRail.firstElementChild;
+    function updateDescriptionScroll() {
+      const {clientHeight, scrollHeight, scrollTop} = regionDescription;
+      const overflow = scrollHeight - clientHeight;
+      descriptionRail.hidden = !mobileStarGrid.matches || clientHeight === 0 || overflow <= 1;
+      if (descriptionRail.hidden) return;
+      const size = Math.min(clientHeight, Math.max(14, clientHeight ** 2 / scrollHeight));
+      const progress = Math.min(1, Math.max(0, scrollTop / overflow));
+      descriptionThumb.style.height = size + 'px';
+      descriptionThumb.style.transform = `translateY(${progress * (clientHeight - size)}px)`;
+    }
     let selectedStar;
     let activeRegion;
     let obscuredStars = [];
-    const mobileStarGrid = matchMedia("(max-width: 680px)");
+    const mobileStarGrid = compactCountdown;
+    regionDescription.addEventListener('scroll', updateDescriptionScroll, {passive:true});
+    new ResizeObserver(updateDescriptionScroll).observe(regionDescription);
+    mobileStarGrid.addEventListener('change', updateDescriptionScroll);
     mobileStarGrid.addEventListener("change", () => setObscuredStar(selectedStar?.dataset.hideStar));
     let nextRegion;
     let imageRevealVersion = 0;
@@ -4008,6 +4077,7 @@ function hideRegion(next) {
       storyTitle.hidden = !page.title;
       regionDescription.textContent = siteText(page.description);
       regionDescription.scrollTop = 0;
+      updateDescriptionScroll();
       regionArt.alt = siteText(page.alt ?? "");
       positionSelectedStar();
       resetErosion.measureStory();
