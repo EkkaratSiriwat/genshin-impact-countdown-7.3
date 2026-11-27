@@ -2471,6 +2471,34 @@
     sceneryToggle.setAttribute('aria-label', label);
     sceneryToggle.title = label;
   }
+  const resultScrollRail = node('span', '');
+  resultScrollRail.className = 'relay-scroll-rail relay-result-scroll';
+  resultScrollRail.setAttribute('aria-hidden', 'true');
+  resultScrollRail.hidden = true;
+  const resultScrollThumb = node('span', '');
+  resultScrollRail.append(resultScrollThumb);
+  hall.append(resultScrollRail);
+  const mobileResult = matchMedia('(max-width:700px)');
+  function updateResultScroll() {
+    if (!mobileResult.matches || !hall.dataset.verdict) {
+      resultScrollRail.hidden = true;
+      return;
+    }
+    const {clientHeight, scrollHeight, scrollTop} = game;
+    const overflow = scrollHeight - clientHeight;
+    resultScrollRail.hidden = overflow <= 1;
+    if (resultScrollRail.hidden) return;
+    const thumbHeight = Math.min(clientHeight, Math.max(28, clientHeight ** 2 / scrollHeight));
+    const progress = Math.max(0, Math.min(1, scrollTop / overflow));
+    resultScrollRail.style.height = clientHeight + 'px';
+    resultScrollThumb.style.height = thumbHeight + 'px';
+    resultScrollThumb.style.transform = `translateY(${progress * (clientHeight - thumbHeight)}px)`;
+  }
+  game.addEventListener('scroll', updateResultScroll, {passive:true});
+  const resultScrollObserver = new ResizeObserver(updateResultScroll);
+  resultScrollObserver.observe(game);
+  resultScrollObserver.observe(body);
+  mobileResult.addEventListener('change', updateResultScroll);
   sceneryToggle.addEventListener('click', () => {
     syncSceneryToggle(!hall.hasAttribute('data-scenery-only'));
   });
@@ -2564,7 +2592,11 @@
     body.append(dialogue, table, contributions, details, resultActions(background, dialogue, table));
     updateSceneryControl();
     syncSceneryToggle(hall.hasAttribute('data-scenery-only'));
-    if (scroll) game.scrollIntoView({block:'start',behavior:'instant'});
+    if (scroll) {
+      game.scrollTop = 0;
+      hall.scrollIntoView({block:'start',behavior:'instant'});
+    }
+    updateResultScroll();
   }
   function start(){
     clearTimeout(celestialReplyTimer);
@@ -2575,6 +2607,7 @@
     syncSceneryToggle(false);
     dialoguePartners = undefined;
     marks.length=0;delete hall.dataset.verdict;syncAtmosphere();art.src=intact;
+    updateResultScroll();
     encounter=encounters[Math.floor(Math.random()*encounters.length)];
     body.replaceChildren();picker.append(game);redraw();refreshHall();
   }

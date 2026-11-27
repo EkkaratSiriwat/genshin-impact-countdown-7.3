@@ -1188,24 +1188,33 @@
       50% { translate: 0 var(--float-distance); }
     }
     @media (max-width: 680px) {
-      .successor-hall h2 { align-self: start; margin-top: 29svh; }
+      .successor-hall:not([data-verdict]) {
+        align-content: start;
+      }
+      #successor-heading {
+        margin-top: max(8rem, 24svh);
+      }
       .gnosis-display {
-        inset: 0;
+        position: relative;
+        inset: auto;
         translate: none;
         display: block;
+        width: 100%;
+        height: clamp(13rem, 34svh, 20rem);
+        margin-top: calc(14px + clamp(24px, 4svh, 32px));
       }
       .gnosis-slot {
         position: absolute;
         left:var(--mobile-x); top:var(--mobile-y);
         transform:translate(-50%,-50%);
       }
-      .gnosis-slot:nth-child(1) {--mobile-x:25%;--mobile-y:61%}
-      .gnosis-slot:nth-child(2) {--mobile-x:38%;--mobile-y:55%}
-      .gnosis-slot:nth-child(3) {--mobile-x:61%;--mobile-y:55%}
-      .gnosis-slot:nth-child(4) {--mobile-x:74%;--mobile-y:61%}
-      .gnosis-slot:nth-child(5) {--mobile-x:34%;--mobile-y:74%}
-      .gnosis-slot:nth-child(6) {--mobile-x:49%;--mobile-y:66%}
-      .gnosis-slot:nth-child(7) {--mobile-x:64%;--mobile-y:74%}
+      .gnosis-slot:nth-child(1) {--mobile-x:22%;--mobile-y:39%}
+      .gnosis-slot:nth-child(2) {--mobile-x:37%;--mobile-y:22%}
+      .gnosis-slot:nth-child(3) {--mobile-x:63%;--mobile-y:22%}
+      .gnosis-slot:nth-child(4) {--mobile-x:78%;--mobile-y:39%}
+      .gnosis-slot:nth-child(5) {--mobile-x:32%;--mobile-y:79%}
+      .gnosis-slot:nth-child(6) {--mobile-x:50%;--mobile-y:55%}
+      .gnosis-slot:nth-child(7) {--mobile-x:68%;--mobile-y:79%}
       .gnosis-piece {
         height: clamp(2.4rem, min(10svh, 22vw), 5.25rem);
         margin-inline: auto;
@@ -2002,7 +2011,7 @@
     .council-final-quote { font-size: 1rem; }
     .council-finale footer { position: static; margin: .6rem 0; color: #e3ca99; font-size: .8rem; }
     @media (max-width: 680px) {
-      .council-progress { top: 1.15rem; }
+      .council-progress { top: calc(max(.75rem, env(safe-area-inset-top)) + 56px); }
       .council-seats { gap: .5rem; }
       .celestia-reply { padding-bottom: 3rem; }
       .celestia-reply-art { max-height: 40svh; }

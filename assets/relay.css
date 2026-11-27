@@ -312,6 +312,33 @@ body:has(#relay-picker[open], .relay-fusion[open]){overflow:hidden}
   animation-play-state:paused !important;
 }
 .relay-scroll-rail {display:none}
+@media(max-width:700px) {
+  #successors[data-verdict] {
+    --result-top: calc(max(.75rem, env(safe-area-inset-top)) + 56px);
+    --result-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-block: var(--result-top) var(--result-bottom);
+  }
+  #successors[data-verdict] .relay {
+    margin-block: 0 auto;
+    max-height: calc(100svh - var(--result-top) - var(--result-bottom));
+    scrollbar-width: none;
+  }
+  #successors[data-verdict]:not([data-scenery-only]) > .relay-result-scroll:not([hidden]) {
+    display: block;
+    position: absolute;
+    top: var(--result-top);
+    right: max(7px, env(safe-area-inset-right));
+    width: 5px;
+    border-radius: 5px;
+    background: #ffffff29;
+    pointer-events: none;
+  }
+}
+.relay-result-scroll > span {
+  display: block;
+  border-radius: inherit;
+  background: #d9bc7b;
+}
 @media(max-width:680px) {
   #relay-picker {scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#d9bc7b #ffffff16}
   #relay-picker .relay-roster {max-height:none;overflow:visible}
