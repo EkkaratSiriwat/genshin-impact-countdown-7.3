@@ -2407,8 +2407,14 @@
       ctx.fillRect(left, y + 34, width, 1);
       y += 45;
     }
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) throw new Error('Unable to encode result image');
+    let blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob?.size) {
+      const dataUrl = canvas.toDataURL('image/png');
+      const encoded = dataUrl.split(',')[1];
+      if (!encoded) throw new Error('Unable to encode result image');
+      const bytes = Uint8Array.from(atob(encoded), character => character.charCodeAt(0));
+      blob = new Blob([bytes], {type: 'image/png'});
+    }
     return new File([blob], 'teyvat-battle-result.png', {type: blob.type});
   }
 
@@ -2433,7 +2439,7 @@
     hint.setAttribute('role', 'status');
     const manualHint = siteFormat('แตะภาพค้างไว้ แล้วเลือกบันทึกภาพ หรือดาวน์โหลดไฟล์ PNG', 'Touch and hold the image to save it, or download the PNG.');
     const data = {files: [file]};
-    const canShareImage = typeof navigator.share === 'function' && navigator.canShare?.(data);
+    const canShareImage = canShareResultImage(data);
     hint.textContent = canShareImage
       ? siteFormat('เปิดเมนูของเครื่อง แล้วเลือกบันทึกภาพลงรูปภาพหากมีตัวเลือกนี้', 'Open device options and choose Save Image if available.')
       : manualHint;
@@ -2469,25 +2475,54 @@
     dialog.showModal();
   }
 
+  function canShareResultImage(data) {
+    return typeof navigator.share === 'function' && navigator.canShare?.(data);
+  }
+
+  function resultImageSaveRoute() {
+    const agent = navigator.userAgent;
+    const ios = /iPhone|iPad|iPod/i.test(agent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const inApp = /FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|BytedanceWebview|; wv\)/i.test(agent);
+    if (ios) return 'share';
+    return inApp ? 'preview' : 'download';
+  }
+
   function resultActions(background, dialogue, table) {
     const group = node('div', '');
     group.className = 'relay-result-actions';
     const status = node('p', '');
     status.className = 'relay-share-status';
     status.setAttribute('role', 'status');
+    let cachedImage;
     const save = button(siteFormat('บันทึกภาพผลลัพธ์', 'Save result image'), async () => {
       save.disabled = true;
       status.textContent = siteFormat('กำลังสร้างภาพ…', 'Preparing image…');
       try {
-        const file = await createResultImage(background, dialogue, table);
+        const speaker = dialogue.querySelector('.relay-speaker[aria-pressed="true"]');
+        if (cachedImage?.speaker !== speaker) {
+          const file = await createResultImage(background, dialogue, table);
+          cachedImage = {speaker, file};
+        }
         if (!save.isConnected) return;
-        if (matchMedia('(max-width: 700px), (hover: none) and (pointer: coarse)').matches) {
-          showResultImage(file);
-          status.textContent = '';
-        } else {
+        const {file} = cachedImage;
+        const route = resultImageSaveRoute();
+        if (route === 'download') {
           downloadResultImage(file);
           status.textContent = siteFormat('ส่งภาพ PNG ไปยังรายการดาวน์โหลดแล้ว', 'PNG sent to downloads.');
+          return;
         }
+        status.textContent = '';
+        const data = {files: [file]};
+        if (route === 'share' && canShareResultImage(data) && navigator.userActivation?.isActive !== false) {
+          try {
+            await navigator.share(data);
+            return;
+          } catch (error) {
+            if (error.name === 'AbortError') return;
+          }
+        }
+        if (save.isConnected) showResultImage(file);
       } catch {
         status.textContent = siteFormat('บันทึกรูปไม่สำเร็จ ลองอีกครั้ง', 'Could not save the image. Try again.');
       } finally {
